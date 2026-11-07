@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "Analisi spese",
+    "subtitle": "Analisi basata su AI dei tuoi modelli di spesa e anomalie"
+  },
+  "list": {
+    "refreshButton": "Aggiorna analisi",
+    "refreshAge": "({time})",
+    "summary": {
+      "active": "Analisi attive",
+      "alerts": "Avvisi",
+      "warnings": "Avvertimenti"
+    },
+    "allTypes": "Tutti i tipi",
+    "typeFilterLabel": "Tipo",
+    "severityFilterLabel": "Gravità",
+    "severityFilter": {
+      "all": "Tutte ({count})",
+      "alert": "Avvisi ({count})",
+      "warning": "Avvertimenti ({count})",
+      "info": "Info ({count})"
+    },
+    "showDismissed": "Mostra ignorati",
+    "emptyNoInsights": "Nessuna analisi generata. Clicca su \"Aggiorna analisi\" per analizzare i tuoi modelli di spesa.",
+    "emptyFiltered": "Nessuna analisi corrisponde ai filtri attuali.",
+    "generateButton": "Genera analisi",
+    "errorLoadFailed": "Caricamento analisi non riuscito. Riprova.",
+    "errorGenerateFailed": "Generazione analisi non riuscita. Assicurati di avere un provider AI configurato.",
+    "errorDismissFailed": "Impossibile ignorare l'analisi. Riprova.",
+    "errorTimeout": "La generazione dell'analisi sta impiegando più del previsto. Attendi o aggiorna la pagina."
+  },
+  "card": {
+    "dismiss": "Ignora",
+    "dismissing": "Ignorando..."
+  },
+  "notConfigured": {
+    "heading": "AI non configurata",
+    "message": "Nessun provider AI è configurato. Per usare le Analisi spese, {link} nelle impostazioni."
+  },
+  "insightTypes": {
+    "anomaly": "Anomalia",
+    "trend": "Tendenza",
+    "subscription": "Abbonamento",
+    "budget_pace": "Ritmo budget",
+    "seasonal": "Stagionale",
+    "new_recurring": "Nuova ricorrente"
+  },
+  "insightSeverities": {
+    "info": "Info",
+    "warning": "Avvertimento",
+    "alert": "Avviso"
+  }
+}

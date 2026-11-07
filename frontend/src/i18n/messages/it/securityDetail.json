@@ -1,0 +1,495 @@
+{
+  "loading": "Caricamento del titolo...",
+  "loadFailed": "Impossibile caricare questo titolo",
+  "notFound": "Titolo non trovato",
+  "backToSecurities": "Titoli",
+  "error": {
+    "retry": "Riprova"
+  },
+  "header": {
+    "priceAt": "Prezzo del {date}",
+    "priceAtTime": "Prezzo del {datetime} {zone}",
+    "marketOpen": "Mercato aperto",
+    "marketClosed": "Mercato chiuso",
+    "marketHours": "Negoziato dalle {open} alle {close}, {zone}. I giorni festivi non sono considerati.",
+    "noPrice": "Nessun prezzo ancora registrato",
+    "changeToday": "{change} ({percent}) oggi",
+    "changeLast": "{change} ({percent}) ultima variazione",
+    "inactiveBadge": "Non attivo",
+    "edit": "Modifica",
+    "favourites": "Preferiti",
+    "switchSecurity": "Passa a un altro titolo",
+    "switchPlaceholder": "Filtra per simbolo o nome...",
+    "switchNoMatches": "Nessun titolo corrisponde"
+  },
+  "toasts": {
+    "favouriteAdded": "Aggiunto ai preferiti",
+    "favouriteRemoved": "Rimosso dai preferiti",
+    "favouriteFailed": "Impossibile aggiornare i preferiti"
+  },
+  "cards": {
+    "marketValue": "Valore di mercato",
+    "costBasis": "Costo di acquisto",
+    "unrealizedPl": "U/P non realizzato",
+    "units": "Quote",
+    "avgCostPerUnit": "Costo medio / quota",
+    "heldInAccounts": "Detenuto nei conti",
+    "unitsShare": "{units} ({share})",
+    "valueUnknown": "Non valorizzato",
+    "approx": "~ {amount}"
+  },
+  "chart": {
+    "title": "Prezzo di {symbol}",
+    "seriesAriaLabel": "Serie del grafico",
+    "modes": {
+      "price": "Prezzo",
+      "value": "Valore dell'investimento",
+      "return": "Rendimento"
+    },
+    "titles": {
+      "price": "Prezzo",
+      "value": "Valore dell'investimento",
+      "return": "Rendimento"
+    },
+    "summary": {
+      "first": "Primo",
+      "latest": "Ultimo",
+      "ending": "Finale",
+      "lowest": "Minimo"
+    },
+    "panEarlier": "Mostra il tratto precedente dello storico",
+    "panLater": "Mostra il tratto successivo dello storico"
+  },
+  "keyInfo": {
+    "title": "Informazioni principali",
+    "symbol": "Simbolo",
+    "securityType": "Tipo di titolo",
+    "distributions": "Distribuzioni",
+    "distributing": "Pagate (osservato)",
+    "accumulating": "Nessuna (ad accumulazione)",
+    "distributionsTitle": "Letto dallo storico dei prezzi: la chiusura aggiustata si discosta da quella quotata ogni volta che viene pagata una distribuzione. Dedotto dai dati, non dichiarato dall'emittente.",
+    "exchange": "Borsa",
+    "currency": "Valuta",
+    "sector": "Settore",
+    "industry": "Industria",
+    "provider": "Fornitore",
+    "lastPrice": "Ultimo prezzo",
+    "bondDescription": "Descrizione dell'obbligazione"
+  },
+  "tabs": {
+    "ariaLabel": "Sezioni del titolo",
+    "overview": "Panoramica",
+    "transactions": "Transazioni",
+    "prices": "Storico prezzi",
+    "terms": "Storico delle condizioni",
+    "documents": "Documenti",
+    "news": "Notizie"
+  },
+  "bondPrices": {
+    "title": "Storico dei prezzi"
+  },
+  "about": {
+    "title": "Informazioni",
+    "noDescription": "Per questo titolo non è stata salvata alcuna descrizione.",
+    "sector": "Settore",
+    "industry": "Industria",
+    "country": "Paese",
+    "website": "Sito web",
+    "irWebsite": "Sito investor relations",
+    "tags": "Tag"
+  },
+  "performance": {
+    "title": "Andamento del titolo",
+    "subject": "Come si è mosso lo strumento in sé, che tu lo abbia detenuto o no. Quanto ha reso la tua posizione è sotto Rendimento totale.",
+    "empty": "Storico prezzi ancora insufficiente per misurare un rendimento.",
+    "unavailable": "n/d",
+    "periods": {
+      "1m": "1M",
+      "3m": "3M",
+      "ytd": "Da inizio anno",
+      "1y": "1A",
+      "3y": "3A",
+      "5y": "5A"
+    },
+    "includesDividends": "Dividendi inclusi",
+    "excludesDividends": "Senza dividendi",
+    "excludesDividendsTitle": "Questo fornitore non offre una serie di chiusure aggiustate, quindi questi rendimenti sono misurati solo sul prezzo. Per un fondo a distribuzione sottostimano il rendimento di tutto il suo tasso di distribuzione."
+  },
+  "positionInfo": {
+    "title": "Dati della posizione",
+    "firstTransaction": "Prima transazione",
+    "lastTransaction": "Ultima transazione",
+    "totalInvested": "Totale investito",
+    "totalSold": "Totale venduto",
+    "dividends": "Dividendi",
+    "fees": "Commissioni",
+    "realizedPl": "U/P realizzato",
+    "realizedMixed": "Realizzato in {currencies}, quindi non sommato",
+    "realizedUnknownReason": "Questo utile non può essere calcolato: la posizione contiene azioni aggiunte senza costo, quindi il costo delle azioni vendute è sconosciuto. Apri la transazione che le ha aggiunte e inserisci il loro prezzo.",
+    "realizedKnownPart": "Parte nota: {amount}",
+    "totalReturn": "Rendimento totale",
+    "totalReturnValue": "{amount} ({percent})",
+    "totalReturnTitle": "L'utile non realizzato, più quanto hai realizzato sulle vendite e ricevuto come proventi, meno le commissioni, rapportato al capitale impiegato. Un rendimento semplice su quel capitale: non è annualizzato e non pondera le tranche per il tempo in cui le hai tenute.",
+    "status": "Stato",
+    "statusOpen": "Aperta",
+    "statusClosed": "Chiusa",
+    "statusNone": "Mai detenuto"
+  },
+  "accounts": {
+    "title": "Conti",
+    "closedSuffix": "{name} (chiuso)",
+    "total": "Totale",
+    "columns": {
+      "account": "Conto",
+      "currency": "Valuta",
+      "units": "Quote",
+      "avgCost": "Costo medio / quota",
+      "marketValue": "Valore di mercato",
+      "costBasis": "Costo di acquisto",
+      "unrealizedPl": "U/P non realizzato"
+    }
+  },
+  "closed": {
+    "title": "Posizione chiusa",
+    "description": "Non detieni più questo titolo. Il suo storico resta disponibile qui sotto.",
+    "realizedPl": "U/P realizzato",
+    "realizedUnknownReason": "Questo utile non può essere calcolato: la posizione conteneva azioni aggiunte senza costo, quindi il costo delle azioni vendute è sconosciuto. Apri la transazione che le ha aggiunte e inserisci il loro prezzo.",
+    "realizedKnownPart": "Parte nota: {amount}",
+    "heldFrom": "Detenuto da",
+    "heldRange": "dal {start} al {end}"
+  },
+  "empty": {
+    "noPosition": "Nessun dato di posizione",
+    "noPositionHint": "Non hai ancora registrato alcuna transazione per questo titolo.",
+    "noPrices": "Nessuno storico prezzi disponibile",
+    "noAccounts": "Questo titolo non è detenuto in alcun conto."
+  },
+  "weightings": {
+    "title": "Composizione",
+    "ariaLabel": "Dimensione della composizione",
+    "sectorTab": "Settore",
+    "countryTab": "Paese",
+    "assetClassTab": "Classe di attivo",
+    "sectorEmpty": "Non è memorizzata alcuna composizione settoriale. Monize la compila dal fornitore per fondi ed ETF.",
+    "countryEmpty": "Non è memorizzata alcuna composizione per paese. Puoi inserirla modificando il titolo.",
+    "assetClassEmpty": "Non è ancora memorizzata alcuna composizione per classe di attivo.",
+    "remainder": "{percent} non classificato",
+    "bond": {
+      "seriesTab": "Serie",
+      "maturityTab": "Scadenza",
+      "empty": "Non possiedi ancora nessuna serie di questo tipo di obbligazione.",
+      "someUnknown": "Alcuni valori sono sconosciuti, quindi le quote non vengono mostrate.",
+      "issuerCountry": "Paese dell'emittente",
+      "rate": "Tasso di interesse",
+      "interest": "Interessi",
+      "term": "Durata fino alla scadenza",
+      "interestValue": "{capitalization}, periodo: {period}",
+      "rateType": {
+        "FIXED": "Fisso",
+        "BENCHMARK_PLUS_SPREAD": "Variabile (parametro + spread)",
+        "INFLATION_PLUS_MARGIN_AS_RATE": "Indicizzato all'inflazione (parametro + margine)",
+        "ZERO_COUPON_DISCOUNT": "Zero coupon (sconto)"
+      }
+    }
+  },
+  "documents": {
+    "title": "Documenti",
+    "add": "Aggiungi documento",
+    "loadFailed": "Impossibile caricare i documenti di questo titolo",
+    "noDate": "Senza data",
+    "columns": {
+      "type": "Tipo",
+      "name": "Nome",
+      "date": "Data",
+      "address": "Indirizzo",
+      "actions": "Azioni"
+    },
+    "types": {
+      "FACTSHEET": "Scheda informativa",
+      "KIID": "KIID",
+      "PROSPECTUS": "Prospetto",
+      "ANNUAL_REPORT": "Relazione annuale",
+      "SEMI_ANNUAL_REPORT": "Relazione semestrale",
+      "TAX": "Documento fiscale",
+      "RESEARCH": "Analisi",
+      "OTHER": "Altro"
+    },
+    "actions": {
+      "open": "Apri",
+      "openNamed": "Apri {name} in una nuova scheda",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    },
+    "empty": {
+      "title": "Ancora nessun documento",
+      "description": "Tieni la documentazione di questo titolo in un unico posto: la scheda informativa, il KIID, un prospetto, una relazione annuale, un documento fiscale. Ognuno è un link che apri direttamente da qui.",
+      "action": "Aggiungi il primo documento"
+    },
+    "form": {
+      "addTitle": "Aggiungi documento",
+      "editTitle": "Modifica documento",
+      "date": "Data del documento",
+      "dateHint": "La data riportata sul documento stesso, non quella di oggi. Lascia vuoto se non ne ha una.",
+      "url": "Indirizzo",
+      "notes": "Note",
+      "create": "Aggiungi documento",
+      "save": "Salva documento"
+    },
+    "validation": {
+      "nameRequired": "Dai un nome al documento",
+      "urlRequired": "L'indirizzo è obbligatorio",
+      "urlScheme": "L'indirizzo deve iniziare con http:// o https://"
+    },
+    "delete": {
+      "title": "Eliminare il documento?",
+      "message": "Questo rimuove il link a «{name}». Il documento in sé non viene toccato."
+    },
+    "toasts": {
+      "created": "Documento aggiunto",
+      "updated": "Documento aggiornato",
+      "deleted": "Documento eliminato",
+      "saveFailed": "Impossibile salvare il documento",
+      "deleteFailed": "Impossibile eliminare il documento"
+    },
+    "issueLetters": {
+      "title": "Lettere di emissione",
+      "loadFailed": "Impossibile caricare le lettere di emissione.",
+      "empty": "Non è ancora memorizzata alcuna lettera di emissione per questo tipo di obbligazione.",
+      "held": "Detenuta",
+      "onSale": "In vendita",
+      "noLetter": "Nessuna lettera registrata per questa serie",
+      "open": "PDF ufficiale",
+      "openNamed": "Apri la lettera di emissione della serie {series}"
+    }
+  },
+  "news": {
+    "title": "Notizie che citano {symbol}",
+    "subject": "Il fornitore associa una notizia a ogni simbolo che nomina, quindi alcune riguardano un'altra società che cita questa.",
+    "loadFailed": "Impossibile caricare le notizie di questo titolo",
+    "video": "Video",
+    "alsoMentions": "Cita anche {tickers}",
+    "unsupportedProvider": "Il fornitore di quotazioni di questo titolo non offre notizie. Passandolo a Yahoo mentre modifichi il titolo, qui compariranno i titoli di giornale.",
+    "empty": {
+      "title": "Nessuna notizia al momento",
+      "description": "Di recente non è stato pubblicato nulla su questo simbolo. La lista si aggiorna quando ci torni."
+    }
+  },
+  "bond": {
+    "loading": "Caricamento della valutazione dell'obbligazione...",
+    "loadFailed": "Impossibile caricare la valutazione dell'obbligazione.",
+    "unknown": "Sconosciuto",
+    "asOf": "Valutata al",
+    "termsSource": "Condizioni: {document}",
+    "termsManual": "Condizioni inserite manualmente da un amministratore",
+    "noLots": "Nessun lotto aperto in questa data.",
+    "totals": {
+      "quantity": "Obbligazioni detenute",
+      "grossValue": "Valore lordo",
+      "earlyRedemptionValue": "Valore di rimborso anticipato",
+      "accruedInterest": "Interessi maturati",
+      "unknownLot": "Almeno un lotto non ha un valore, quindi non viene indicato alcun totale.",
+      "unknownRefusal": "Non è possibile determinare i lotti, quindi non viene indicato alcun totale."
+    },
+    "lots": {
+      "purchaseDate": "Acquistato",
+      "assumed": "Presunta",
+      "assumedTitle": "La data di acquisto effettiva è sconosciuta: questo lotto è arrivato tramite un trasferimento senza lato mittente collegato.",
+      "quantity": "Quantità",
+      "maturity": "Scadenza",
+      "period": "Periodo corrente",
+      "periodValue": "{index}: dal {start} al {end}",
+      "rate": "Tasso",
+      "principal": "Capitale per obbligazione",
+      "accruedInterest": "Interessi maturati",
+      "grossValue": "Valore lordo",
+      "earlyRedemption": "Rimborso anticipato",
+      "nextCashFlow": "Prossimo flusso di cassa",
+      "cashFlowValue": "{type} {amount} il {date}",
+      "noCashFlow": "Nessuno",
+      "projected": "Previsto",
+      "maturityValue": "Valore a scadenza",
+      "maturityKnown": "Noto",
+      "maturityProjected": "Previsto",
+      "matured": "Scaduta",
+      "refused": "Non valutata",
+      "amountUnknown": "Importo sconosciuto"
+    },
+    "rateSource": {
+      "TERMS": "Condizioni",
+      "ANNOUNCED": "Annunciato",
+      "DERIVED": "Derivato",
+      "PROJECTED": "Previsto"
+    },
+    "cashFlowType": {
+      "INTEREST": "Interessi",
+      "PRINCIPAL": "Capitale"
+    },
+    "earlyRefusal": {
+      "NOT_REDEEMABLE": "Non rimborsabile anticipatamente",
+      "TOO_EARLY": "Troppo presto per il rimborso",
+      "TOO_LATE": "Troppo tardi per il rimborso",
+      "RECORD_DAY": "Non rimborsabile nel giorno di registrazione",
+      "MATURED": "Scaduta",
+      "RATE_UNKNOWN": "Tasso non ancora noto",
+      "TERMS_INCOMPLETE": "Condizioni incomplete"
+    },
+    "lotsRefusal": {
+      "SPLIT": "Impossibile derivare i lotti: un'obbligazione non è frazionabile.",
+      "FRACTIONAL_QUANTITY": "Impossibile derivare i lotti: una quantità non è un numero intero di obbligazioni.",
+      "OVER_REMOVAL": "Impossibile derivare i lotti: sono state rimosse più obbligazioni di quelle detenute.",
+      "INVALID_QUANTITY": "Impossibile derivare i lotti: una quantità manca, è negativa o troppo grande.",
+      "REMOVAL_EXCEEDS_SERIES": "Impossibile ricavare i lotti: sono state rimosse più obbligazioni di una serie di quante ne fossero detenute.",
+      "SERIES_NOT_DETERMINED": "Impossibile ricavare i lotti: la serie di un acquisto è sconosciuta."
+    },
+    "lotsRefusalDetail": {
+      "SPLIT": "Su questo titolo è registrato uno split ({action} il {date}); un'obbligazione non si divide.",
+      "FRACTIONAL_QUANTITY": "{action} il {date} sposta {quantity} obbligazioni, che non è un numero intero.",
+      "OVER_REMOVAL": "{action} il {date} rimuove {quantity} obbligazioni, più di quelle detenute.",
+      "INVALID_QUANTITY": "La quantità di {action} il {date} manca, è negativa o troppo grande.",
+      "REMOVAL_EXCEEDS_SERIES": "{action} del {date} rimuove {quantity} obbligazioni della sua serie, più di quante ce ne fossero.",
+      "SERIES_NOT_DETERMINED": "{action} del {date} non indica una serie e quel giorno non era in vendita alcuna serie salvata del tipo di obbligazione. Recupera la serie e sceglila nella transazione."
+    },
+    "assumptions": {
+      "title": "Ipotesi della previsione",
+      "latestObservation": "{benchmark} ipotizzato al {value} per tutti i periodi successivi, ultimo valore pubblicato ({observation})",
+      "supplied": "{benchmark} ipotizzato al {value} per tutti i periodi successivi"
+    },
+    "missing": {
+      "title": "Dati ancora necessari",
+      "item": "{benchmark} {observation} — pubblicato da {publisher}",
+      "itemNoPublisher": "{benchmark} {observation} — editore non noto"
+    },
+    "recompute": {
+      "button": "Ricalcola i prezzi",
+      "done": "Prezzi ricalcolati: {written} scritti, {deleted} rimossi.",
+      "failed": "Impossibile ricalcolare i prezzi."
+    },
+    "rate": {
+      "title": "Tasso di interesse",
+      "rule": {
+        "fixed": "{rate} fisso per tutta la durata",
+        "firstThen": "Periodo 1: {firstRate}. Poi {benchmark} + {addend}",
+        "every": "Ogni periodo: {benchmark} + {addend}",
+        "floorZero": "Un valore negativo di {benchmark} conta come 0",
+        "discount": "Sconto sul valore nominale"
+      },
+      "lotHeading": "Lotto acquistato il {date}",
+      "range": "dal {start} al {end}",
+      "current": "Corrente",
+      "columns": {
+        "period": "Periodo",
+        "dates": "Date",
+        "rate": "Tasso",
+        "source": "Fonte",
+        "how": "Come è stabilito"
+      },
+      "how": {
+        "stated": "Tasso indicato",
+        "observed": "{benchmark} {observation}: {value} + {addend}",
+        "floored": "(portato a {floor})",
+        "missing": "{benchmark} {observation}: non ancora pubblicato"
+      },
+      "nextRateReset": "Prossima revisione del tasso: {date}",
+      "nextCapitalization": "Prossima capitalizzazione: {date}"
+    },
+    "indexation": {
+      "inflation": "Indicizzata all'inflazione: dal {date} (periodo 2) il tasso è {benchmark} + {addend}, ricalcolato a ogni periodo",
+      "floating": "Tasso variabile: dal {date} (periodo 2) il tasso è {benchmark} + {addend}, ricalcolato a ogni periodo"
+    },
+    "interestParts": {
+      "fixed": "Interessi fissi (1º periodo)",
+      "margin": "Interessi dal margine",
+      "inflation": "Interessi dall'inflazione",
+      "benchmark": "Interessi dal tasso di riferimento",
+      "announced": "Interessi annunciati",
+      "fixedTerm": "Interessi a tasso fisso"
+    },
+    "chart": {
+      "title": "Interessi cumulati alla fine di ogni periodo",
+      "assumption": "Proiezione ipotizzando {benchmark} = {value}",
+      "projectedNote": "Le barre più chiare sono periodi proiettati",
+      "stoppedAt": "Gli interessi non sono noti dal periodo {period}, quindi il grafico si ferma prima."
+    },
+    "scenarios": {
+      "title": "Scenari di inflazione",
+      "titleBenchmark": "Scenari dei tassi di interesse",
+      "projection": "Proiezione",
+      "caption": "Valore a scadenza proiettato e interessi per valore ipotizzato",
+      "intro": "Sono proiezioni, non certezze: per ogni periodo non ancora iniziato si ipotizza il valore di {benchmark} della prima colonna. I periodi noti e annunciati non cambiano. Seleziona una riga per vedere la sua tabella dei tassi e il grafico.",
+      "custom": "Valore personalizzato di {benchmark} (%)",
+      "add": "Aggiungi scenario",
+      "useDefault": "Usa l'ipotesi predefinita",
+      "selected": "Selezionato",
+      "loading": "Caricamento degli scenari...",
+      "loadFailed": "Impossibile caricare gli scenari.",
+      "columns": {
+        "assumed": "Ipotizzato: {benchmark}",
+        "maturityValue": "Valore a scadenza (proiezione)",
+        "totalInterest": "Interessi totali (proiezione)"
+      },
+      "asOfNote": "Valutato al {date}, la data scelta sopra: le cifre riguardano le obbligazioni detenute in quel giorno."
+    },
+    "benchmarks": {
+      "PL_CPI_GUS_YOY": "Inflazione IPC, 12 mesi (GUS)",
+      "PL_NBP_REFERENCE": "Tasso di riferimento NBP"
+    },
+    "valuationRefusal": {
+      "PURCHASE_OUTSIDE_SALE_WINDOW": "Questa serie può essere acquistata solo dal {from} al {to}. Questo lotto è stato acquistato il {purchaseDate}, quindi non viene valutato."
+    },
+    "partial": {
+      "title": "Questa valutazione è incompleta: leggi le cifre come parziali.",
+      "terms": "Le condizioni dell'obbligazione sono incomplete (ad esempio, un calendario non è installato).",
+      "reference": "Mancano dati di riferimento; vedi sotto l'elenco dei dati ancora necessari.",
+      "earlyRedemption": "Le condizioni di rimborso anticipato sono incomplete, quindi i valori di rimborso anticipato potrebbero mancare.",
+      "other": "Almeno un lotto non può ancora essere valutato per intero (ad esempio, un tasso non è noto)."
+    },
+    "projectionMissing": {
+      "title": "I periodi successivi non possono essere proiettati",
+      "item": "{benchmark}: non è pubblicato alcun valore e non è impostata alcuna ipotesi, quindi i periodi successivi non possono essere proiettati (pubblicato da {publisher})",
+      "itemNoPublisher": "{benchmark}: non è pubblicato alcun valore e non è impostata alcuna ipotesi, quindi i periodi successivi non possono essere proiettati (editore sconosciuto)"
+    },
+    "coverage": {
+      "asOf": "Dati {benchmark} al {date}",
+      "none": "Nessun dato {benchmark} è ancora memorizzato"
+    },
+    "issuers": {
+      "PL_MF": "Ministero delle Finanze (PL)"
+    },
+    "redemption": {
+      "title": "Condizioni del rimborso anticipato",
+      "fixedFee": "Commissione di rimborso anticipato: {amount} per obbligazione.",
+      "forfeitAccrued": "In caso di rimborso anticipato, gli interessi maturati nel periodo corrente vengono persi.",
+      "floorAllPeriods": "La commissione non riduce mai il rimborso al di sotto del valore nominale, in nessun periodo.",
+      "floorFirstPeriod": "Solo nel primo periodo la commissione non può ridurre il rimborso al di sotto del valore nominale; nei periodi successivi non c'è questo minimo."
+    },
+    "programs": {
+      "OTS": "OTS: obbligazioni di risparmio a 3 mesi a tasso fisso",
+      "ROR": "ROR: obbligazioni di risparmio a 1 anno a tasso variabile",
+      "DOR": "DOR: obbligazioni di risparmio a 2 anni a tasso variabile",
+      "TOS": "TOS: obbligazioni di risparmio a 3 anni a tasso fisso",
+      "COI": "COI: obbligazioni di risparmio a 4 anni indicizzate all'inflazione",
+      "EDO": "EDO: obbligazioni di risparmio a 10 anni indicizzate all'inflazione",
+      "ROS": "ROS: obbligazioni di risparmio familiari a 6 anni indicizzate all'inflazione",
+      "ROD": "ROD: obbligazioni di risparmio familiari a 12 anni indicizzate all'inflazione"
+    },
+    "series": {
+      "title": "Le tue serie",
+      "column": "Serie",
+      "nextRateChange": "Prossima revisione del tasso",
+      "total": "Totale del tipo di obbligazione",
+      "purchasedRange": "dal {from} al {to}",
+      "expand": "Mostra i dettagli di {series}",
+      "collapse": "Nascondi i dettagli di {series}",
+      "partial": "Parziale"
+    },
+    "program": {
+      "title": "Il tipo di obbligazione",
+      "newest": "Condizioni della serie più recente, {series}.",
+      "noTerms": "Le condizioni non sono ancora note: non possiedi alcuna serie di questo tipo di obbligazione e nessuna è in vendita.",
+      "autoFetchFailed": "Impossibile salvare l'impostazione."
+    },
+    "onSale": {
+      "title": "In vendita ora"
+    }
+  }
+}

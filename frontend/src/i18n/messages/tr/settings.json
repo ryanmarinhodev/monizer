@@ -1,0 +1,1902 @@
+{
+  "language": {
+    "label": "Dil",
+    "browserOption": "Tarayıcı yerel ayarını kullan (otomatik algılama: {locale})",
+    "helpText": "Monize arayüzünde kullanılan dili seçin. Sayı ve tarih biçimlendirmesi aşağıda ayrıca kontrol edilir.",
+    "saved": "Dil güncellendi",
+    "saveFailed": "Dil kaydedilemedi"
+  },
+  "profile": {
+    "heading": "Profil",
+    "firstNameLabel": "Ad",
+    "firstNamePlaceholder": "Adınızı girin",
+    "lastNameLabel": "Soyad",
+    "lastNamePlaceholder": "Soyadınızı girin",
+    "emailLabel": "E-posta",
+    "emailPlaceholder": "E-posta adresinizi girin",
+    "currentPasswordLabel": "Mevcut Şifre",
+    "currentPasswordPlaceholder": "E-posta değişikliği için gerekli",
+    "passwordRequired": "E-posta adresini değiştirmek için mevcut şifre gereklidir",
+    "noChanges": "Kaydedilecek değişiklik yok",
+    "passwordConfirmNote": "E-posta adresinizi değiştirirken şifre onayı gereklidir.",
+    "pendingEmailNotice": "{email} adresine bir onay bağlantısı gönderildi. Bağlantıyı açtığınızda e-posta adresiniz değişecek.",
+    "saveButton": "Profili Kaydet",
+    "toasts": {
+      "success": "Profil başarıyla güncellendi",
+      "confirmationSent": "Yeni e-posta adresinizi onaylamak için bağlantıyı {email} adresinde kontrol edin",
+      "updateFailed": "Profil güncellenemedi"
+    },
+    "validation": {
+      "firstNameMax": "Ad 100 karakter veya daha az olmalıdır",
+      "lastNameMax": "Soyad 100 karakter veya daha az olmalıdır",
+      "emailRequired": "E-posta zorunludur",
+      "emailInvalid": "Lütfen geçerli bir e-posta adresi girin",
+      "emailMax": "E-posta 254 karakter veya daha az olmalıdır",
+      "passwordMax": "Şifre 128 karakter veya daha az olmalıdır"
+    }
+  },
+  "security": {
+    "heading": "Güvenlik",
+    "ssoPasswordFallbackNotice": "Hesabınız Tek Oturum Açma (SSO) kullanmaktadır. SSO kullanılamadığında aşağıdaki şifreyle de oturum açabilirsiniz. Bu yedek oturum açma yöntemini korumak için iki faktörlü kimlik doğrulamayı etkinleştirin.",
+    "ssoNotice": "Hesabınız Çoklu Oturum Açma (SSO) kullanıyor. Bu sunucuda SSO hesapları için parola ile oturum açma kapalı.",
+    "currentPasswordLabel": "Mevcut Şifre",
+    "currentPasswordPlaceholder": "Mevcut şifreyi girin",
+    "newPasswordLabel": "Yeni Şifre",
+    "newPasswordPlaceholder": "Yeni şifreyi girin",
+    "confirmPasswordLabel": "Yeni Şifreyi Onayla",
+    "confirmPasswordPlaceholder": "Yeni şifreyi onaylayın",
+    "changePasswordButton": "Şifreyi Değiştir",
+    "toasts": {
+      "passwordChanged": "Şifre başarıyla değiştirildi",
+      "passwordChangeFailed": "Şifre değiştirilemedi"
+    },
+    "twoFactor": {
+      "heading": "İki Faktörlü Kimlik Doğrulama",
+      "ssoUnavailable": "SSO hesapları için iki faktörlü kimlik doğrulama mevcut değildir. Kimlik doğrulama güvenliği kimlik sağlayıcınız tarafından yönetilmektedir.",
+      "enabledBadge": "Etkin",
+      "enabledDescription": "Hesabınız TOTP doğrulamasıyla korunmaktadır.",
+      "requiredByAdmin": "Yönetici tarafından zorunlu kılındı",
+      "addLayerDescription": "Hesabınıza ekstra bir güvenlik katmanı ekleyin.",
+      "enableButton": "2FA'yı Etkinleştir",
+      "disableButton": "2FA'yı Devre Dışı Bırak",
+      "resetButton": "2FA'yı Sıfırla",
+      "disableModal": {
+        "title": "İki Faktörlü Kimlik Doğrulamayı Devre Dışı Bırak",
+        "description": "2FA'yı devre dışı bırakmayı onaylamak için kimlik doğrulama uygulamanızdaki 6 haneli kodu veya yedek kodlarınızdan birini (xxxx-xxxx) girin.",
+        "verificationCodeLabel": "Doğrulama Kodu",
+        "disablingButton": "Devre Dışı Bırakılıyor...",
+        "toasts": {
+          "disabled": "İki faktörlü kimlik doğrulama devre dışı bırakıldı",
+          "disableFailed": "2FA devre dışı bırakılamadı"
+        }
+      },
+      "resetModal": {
+        "title": "İki Faktörlü Kimlik Doğrulamayı Sıfırla",
+        "description": "Kimlik doğrulama uygulamanız veya yedek kodlarınız açığa çıkmış olabilirse ya da kimlik doğrulama kodlarınız çalışmayı durdurduysa (örneğin sunucu sırrı değiştirildikten sonra) bunu kullanın.",
+        "effect": "Mevcut kimlik doğrulayıcınız, yedek kodlarınız ve güvenilir cihazlarınız çalışmayı durdurur ve diğer tüm cihazlarda oturumunuz kapatılır. Ardından hemen yeni bir kimlik doğrulayıcı kurarsınız.",
+        "passwordLabel": "Hesap Şifresi",
+        "codeLabel": "Kimlik Doğrulama veya Yedek Kod",
+        "codeHint": "Kimlik doğrulama uygulamanızdaki 6 haneli kodu girin. Kimlik doğrulayıcınız artık çalışmıyorsa bunun yerine yedek kodlarınızdan birini (xxxx-xxxx) girin.",
+        "resettingButton": "Sıfırlanıyor...",
+        "toasts": {
+          "reset": "İki faktörlü kimlik doğrulama sıfırlandı. Şimdi yeni kimlik doğrulayıcınızı kurun.",
+          "resetFailed": "2FA sıfırlanamadı"
+        }
+      }
+    },
+    "backupCodes": {
+      "heading": "Yedek Kodlar",
+      "description": "Kimlik doğrulama uygulamanıza erişimi kaybederseniz oturum açmak için yedek kodları kullanın.",
+      "regenerateButton": "Kodları yeniden oluştur",
+      "regenerateModal": {
+        "title": "Yedek Kodları Yeniden Oluştur",
+        "description": "Yedek kodları yeniden oluşturmayı onaylamak için mevcut 6 haneli kodunuzu girin. Bu işlem mevcut tüm kodları geçersiz kılar.",
+        "verificationCodeLabel": "Doğrulama Kodu",
+        "regeneratingButton": "Yeniden oluşturuluyor...",
+        "regenerateButton": "Yeniden Oluştur"
+      },
+      "toasts": {
+        "generateFailed": "Yedek kodlar oluşturulamadı"
+      }
+    },
+    "trustedDevices": {
+      "heading": "Güvenilen Cihazlar",
+      "revokeAllButton": "Tümünü İptal Et",
+      "noDevices": "Güvenilen cihaz yok. 2FA girişi sırasında \"Bu tarayıcıda tekrar sorma\" seçeneğini işaretlediğinizde cihaz burada görünecektir.",
+      "currentBadge": "Mevcut",
+      "revokeButton": "İptal Et",
+      "ipAddress": "IP: {ip}",
+      "dates": "Eklendi {added} · Son kullanım {lastUsed} · Bitiş {expires}",
+      "revokeAllModal": {
+        "title": "Tüm Güvenilen Cihazları İptal Et",
+        "description": "Bu işlem tüm güvenilen cihazları kaldıracaktır. Herhangi bir cihazdan bir sonraki oturum açışınızda 2FA kodunuzu girmeniz gerekecektir."
+      },
+      "toasts": {
+        "revoked": "Cihaz iptal edildi",
+        "revokedAll": "{count} cihaz iptal edildi",
+        "revokeFailed": "Cihaz iptal edilemedi",
+        "revokeAllFailed": "Cihazlar iptal edilemedi"
+      }
+    },
+    "validation": {
+      "currentPasswordRequired": "Mevcut şifre zorunludur",
+      "passwordMax": "Şifre 128 karakter veya daha az olmalıdır",
+      "confirmRequired": "Lütfen yeni şifrenizi onaylayın",
+      "newPasswordsNoMatch": "Yeni şifreler eşleşmiyor"
+    }
+  },
+  "preferences": {
+    "heading": "Tercihler",
+    "groups": {
+      "languageRegion": "Dil ve Bölge",
+      "appearance": "Görünüm",
+      "datesNumbers": "Tarih ve Sayılar",
+      "investments": "Yatırımlar",
+      "transactions": "İşlemler",
+      "application": "Uygulama",
+      "defaultViews": "Varsayılan görünümler"
+    },
+    "themeLabel": "Tema",
+    "defaultCurrencyLabel": "Varsayılan Para Birimi",
+    "defaultCurrencyNoCrypto": "Kripto paralar burada sunulmaz: toplamlar ve raporlar her zaman itibari bir para biriminde gösterilir.",
+    "preferredExchangesLabel": "Tercih Edilen Borsalar (menkul kıymet aramaları için)",
+    "preferredExchangesHelp": "Öncelik sırasına göre en fazla 3 borsa seçin. Menkul kıymet ararken bunlar tercih edilecektir.",
+    "exchangePriorityPlaceholder": "Öncelik {n}",
+    "defaultQuoteProviderLabel": "Varsayılan Hisse Fiyat Teklifi Sağlayıcısı",
+    "defaultQuoteProviderHelp": "Menkul kıymetin sağlayıcı geçersiz kılması olmadığında kullanılır. Seçilen sağlayıcı başarısız olursa Monize otomatik olarak diğerini dener.",
+    "msnNoIntradayNote": "Not: MSN Money gün içi fiyat teklifi verileri sağlamamaktadır; bu nedenle MSN tarafından takip edilen varlıklar için Zaman İçinde Portföy Değeri grafiğindeki 1G / 1H / 1A aralıkları kullanılamaz.",
+    "msnNotConfigured": "Varsayılan fiyat teklifi sağlayıcısı olarak MSN seçildi, ancak sunucuda MSN_API_KEY yapılandırılmamış. Bir yönetici ortam değişkenini ayarlayıp arka ucu yeniden başlatana kadar MSN fiyat teklifleri başarısız olacak.",
+    "dateFormatLabel": "Tarih Biçimi",
+    "numberFormatLabel": "Sayı Biçimi",
+    "timezoneLabel": "Saat Dilimi",
+    "timezonePlaceholder": "Saat dilimi ara...",
+    "weekStartsOnLabel": "Hafta başlangıcı",
+    "showCreatedAtLabel": "İşlem formlarında Oluşturma Tarihini Göster",
+    "showCreatedAtTooltip": "İşlem formlarında bir işlemin ilk oluşturulduğu tarih ve saati görüntüler. Bu, işlem tarihinden ayrıdır ve bir kaydın Monize'ye gerçekte ne zaman eklendiğini anlamanıza yardımcı olabilir.",
+    "showWhatsNewLabel": "Yükseltmeden sonra Yenilikler'i göster",
+    "showWhatsNewTooltip": "Monize yeni bir sürüme güncellendikten sonra ilk oturum açtığınızda sürüm notlarının bir özetini gösterir. Bu sayfanın altındaki veya oturum açma ekranındaki sürüm numarasına tıklayarak istediğiniz zaman yeniden açabilirsiniz.",
+    "lockReconciledLabel": "Mutabık kılınan işlemleri kilitle",
+    "lockReconciledTooltip": "Bu kapalıyken Monize, mutabık kılınmış bir işlemin tarihini veya tutarını değiştirecek bir düzenlemeden önce sizi uyarır ve ardından izin verir. Açıkken mutabık kılınmış işlemler hiç düzenlenemez, silinemez ve mutabakatları geri alınamaz. Bir düzeltme yapmak için tekrar kapatın.",
+    "timeFormatLabel": "Saat Biçimi",
+    "timeFormatOptions": {
+      "h24": "24 saat (14:30)",
+      "h12": "12 saat (2:30 PM)"
+    },
+    "recentTransactionsLabel": "Hızlı doldurma için son işlemler",
+    "recentTransactionsHelp": "İşlem formlarında Alacaklı alanı yanındaki geçmiş düğmesi açılır penceresinde gösterilen kayıt sayısı.",
+    "mapProviderLabel": "Adresler için harita sağlayıcısı",
+    "mapProviderHelp": "Masaüstü tarayıcıda bir adrese tıkladığınızda hangi harita hizmetinin açılacağı. Telefonlar ve tabletler, burada ne seçerseniz seçin her zaman kendi harita uygulamalarını açar. Otomatik, masaüstünde OpenStreetMap kullanır.",
+    "mapProviderOptions": {
+      "device": "Otomatik",
+      "apple": "Apple Maps",
+      "bing": "Bing Maps",
+      "google": "Google Maps",
+      "openstreetmap": "OpenStreetMap",
+      "waze": "Waze"
+    },
+    "toasts": {
+      "saved": "Tercihler kaydedildi",
+      "saveFailed": "Tercihler kaydedilemedi",
+      "themeSaveFailed": "Tema kaydedilemedi",
+      "colorThemeSaveFailed": "Renk teması kaydedilemedi"
+    },
+    "browserLocale": "Tarayıcı yerel ayarını kullan (otomatik algıla)",
+    "numberFormatOptions": {
+      "browser": "Tarayıcı yerel ayarını kullan (otomatik algılama: {sample})",
+      "enUS": "İngilizce (ABD) - 1,234.56",
+      "enGB": "İngilizce (İngiltere) - 1,234.56",
+      "deDE": "Almanca - 1.234,56",
+      "frFR": "Fransızca - 1 234,56"
+    },
+    "weekDays": {
+      "sunday": "Pazar",
+      "monday": "Pazartesi",
+      "tuesday": "Salı",
+      "wednesday": "Çarşamba",
+      "thursday": "Perşembe",
+      "friday": "Cuma",
+      "saturday": "Cumartesi"
+    },
+    "themeOptions": {
+      "system": "Sistem (cihaz ayarını takip et)",
+      "light": "Açık",
+      "dark": "Koyu"
+    },
+    "colorThemeLabel": "Renk teması",
+    "colorThemeHint": "Önizlemeler geçerli açık veya koyu modunuzu kullanır.",
+    "colorThemeOptions": {
+      "default": "Varsayılan",
+      "latte": "Latte",
+      "msmoney": "MS Money",
+      "newspaper": "Newspaper",
+      "burgundy": "Burgundy",
+      "nord": "Nord",
+      "forest": "Forest",
+      "solarized": "Solarized",
+      "gruvbox": "Gruvbox",
+      "dracula": "Dracula",
+      "tokyonight": "Tokyo Night",
+      "rosepine": "Rosé Pine",
+      "midnight": "Midnight",
+      "highcontrast": "Yüksek kontrast",
+      "colorblind": "Renk körü uyumlu"
+    },
+    "timezoneBrowserOption": "Tarayıcı saat dilimini kullan (otomatik algılandı: {tz})",
+    "defaultViews": {
+      "intro": "Kendi ayarı olmayan her tarayıcıda (yeni bir cihaz veya gizli pencere gibi) uygulanır. Bir sayfada yaptığınız değişiklik o tarayıcı tarafından hatırlanır ve önceliklidir.",
+      "rowsLabel": "Satır yoğunluğu",
+      "hideRegisterYearLabel": "Kayıt tarihlerinde yılı gizle",
+      "chartCollapsedLabel": "İşlemler sayfasındaki grafik daraltılmış olarak başlasın",
+      "widgetsCollapsedLabel": "Hesap, alacaklı ve kategori bilgileri daraltılmış olarak başlasın",
+      "accountOpenTargetLabel": "Varsayılan Hesap Görünümü",
+      "accountOpenTargetOptions": {
+        "register": "İşlemlerini göster",
+        "dashboard": "Panosunu göster"
+      },
+      "accountOpenTargetHelp": "Hesaplar sayfasında veya panodaki Favori Hesaplar'da bir hesaba tıkladığınızda geçerlidir.",
+      "columnsLabel": "Gösterilen sütunlar",
+      "columnsHelp": "Bir sütunu varsayılan olarak gizlemek için kutusunun işaretini kaldırın. Bir tablonun Sütunlar menüsü bunu yalnızca o tarayıcıda değiştirir.",
+      "columnTables": {
+        "transactions": "İşlemler",
+        "investmentHoldings": "Yatırım varlıkları",
+        "investmentRegister": "Yatırım işlemleri"
+      },
+      "applyHere": "Bu varsayılanları bu tarayıcıda kullan",
+      "applyHereHelp": "Bu tarayıcının kaydettiği görünüm ayarlarını temizler, böylece yukarıdaki varsayılanlar burada da geçerli olur.",
+      "appliedHere": "Bu tarayıcı artık varsayılan görünümlerinizi kullanıyor"
+    }
+  },
+  "notifications": {
+    "heading": "Bildirimler",
+    "portfolioAlert": {
+      "title": "Yatırım değeri değişimi",
+      "description": "Yatırım hesaplarım bir eşiğin ötesinde hareket ettiğinde günde bir kez bildir; piyasa değişimleri ve temettülerden ölçülür (para yatırma ve çekmeler hariç tutulur).",
+      "enableLabel": "Yatırım hareketi uyarılarını etkinleştir",
+      "thresholdLabel": "Günlük hareket en az şu değere ulaştığında bildir",
+      "saveError": "Eşik kaydedilemedi",
+      "loadError": "Yatırım uyarısı ayarı yüklenemedi",
+      "retry": "Yeniden dene"
+    },
+    "smtpNotConfigured": "E-posta bildirimleri mevcut değil. SMTP yönetici tarafından yapılandırılmamış.",
+    "emailNotificationsTitle": "E-posta Bildirimleri",
+    "emailNotificationsDescription": "Yaklaşan faturalar ve bütçe uyarıları için e-posta hatırlatıcıları alın",
+    "budgetNotificationsHeading": "Bütçe Bildirimleri",
+    "weeklyBudgetDigestTitle": "Haftalık Bütçe Özeti",
+    "weeklyBudgetDigestDescription": "Bütçe uyarıları ve durumunun haftalık özetini alın",
+    "toggleBudgetDigestLabel": "Bütçe özetini aç/kapat",
+    "digestDayLabel": "Özet günü",
+    "digestDayAriaLabel": "Bütçe özeti günü",
+    "mondayOption": "Pazartesi",
+    "fridayOption": "Cuma",
+    "immediateAlertsNote": "Kritik bütçe uyarıları (bütçe aşımı, gelir açığı) özet ayarlarından bağımsız olarak anında gönderilir.",
+    "sendTestEmailDescription": "Bildirimlerinizin çalıştığını doğrulamak için test e-postası gönderin.",
+    "sendTestEmailButton": "Test E-postası Gönder",
+    "sendingTestEmailButton": "Gönderiliyor...",
+    "toasts": {
+      "emailEnabled": "E-posta bildirimleri etkinleştirildi",
+      "emailDisabled": "E-posta bildirimleri devre dışı bırakıldı",
+      "digestEnabled": "Bütçe özeti etkinleştirildi",
+      "digestDisabled": "Bütçe özeti devre dışı bırakıldı",
+      "digestDaySet": "Bütçe özeti günü {day} olarak ayarlandı",
+      "testEmailSent": "Test e-postası gönderildi! Gelen kutunuzu kontrol edin.",
+      "emailUpdateFailed": "Bildirim tercihi güncellenemedi",
+      "digestUpdateFailed": "Bütçe özeti tercihi güncellenemedi",
+      "digestDayFailed": "Özet günü güncellenemedi",
+      "testEmailFailed": "Test e-postası gönderilemedi"
+    },
+    "push": {
+      "heading": "Tarayıcı anlık bildirimi",
+      "collapsedDevices": "{count, plural, =0 {Kayıtlı cihaz yok} one {# cihaz kayıtlı} other {# cihaz kayıtlı}}",
+      "collapsedDevicesWithRetired": "{count, plural, =0 {Kayıtlı cihaz yok} one {# cihaz kayıtlı} other {# cihaz kayıtlı}}, {retired, plural, one {# emekli} other {# emekli}}",
+      "collapsedDevicesUnavailable": "Cihaz listesi kullanılamıyor",
+      "diagnostics": {
+        "summary": "Bildirim tanılaması",
+        "intro": "Bu tarayıcının ve cihazın bildirimler hakkında Monize'a bildirdikleri. Bir ayarı değiştirdikten sonra yenileyin, ardından tam raporu göndermek için Kopyala'yı kullanın.",
+        "refresh": "Yenile",
+        "copy": "Raporu kopyala",
+        "copied": "Tanılama panoya kopyalandı"
+      },
+      "description": "Bu cihazı kaydedin, böylece uygulama kapalıyken de Monize ona ulaşabilir. Şimdilik bu yolla yalnızca test bildirimi teslim ediliyor; diğer her şey yine zil simgesine geliyor.",
+      "androidNotify": "Android'de izin vermeniz yetmez: sistem bildirimleri yine de gizleyebilir. Ana ekrandaki Monize simgesini basılı tutun, Uygulama bilgileri'ne, ardından Bildirimler'e dokunun ve açık olduklarından emin olun.",
+      "permissionHint": "Bunu açtığınızda tarayıcınız bildirim gösterme izni ister. İzin verilene kadar hiçbir şey gönderilmez.",
+      "enableButton": "Bu cihazda etkinleştir",
+      "enablingButton": "Etkinleştiriliyor...",
+      "sendTestButton": "Test bildirimi gönder",
+      "sendingTestButton": "Gönderiliyor...",
+      "removeButton": "Kaldır",
+      "removeDialog": {
+        "title": "Cihazı Kaldır",
+        "message": "{device} kaldırılsın mı? Orada push yeniden açılana kadar push bildirimi almaz."
+      },
+      "thisDevice": "Bu cihaz",
+      "held": "Bu cihazda oturum kapatıldı. Burada yeniden oturum açtığınızda anlık bildirimler devam eder.",
+      "unifiedpushBadge": "UnifiedPush",
+      "unnamedDevice": "Adsız cihaz",
+      "noLiveDevices": "Henüz kayıtlı cihaz yok. Test göndermek için bu cihazda anlık bildirimleri açın.",
+      "noDeliverableDevices": "Tüm cihazlarda oturum kapatıldı, bu yüzden test bildirimi gönderilecek bir yer yok. Bir cihazda yeniden oturum açtığınızda anlık bildirimler orada devam eder.",
+      "notConfigured": "Bu Monize örneğinde tarayıcı anlık bildirimi kullanılamıyor. Bir yönetici Admin bölümünden etkinleştirebilir.",
+      "disabledByAdmin": "Bir yönetici bu Monize örneği için tarayıcı anlık bildirimini kapattı.",
+      "keyUnreadable": "Monize bu örneğin anlık bildirim anahtar çiftini okuyamıyor; bu yüzden hiçbir şey teslim edilmiyor. Bir yönetici Admin bölümünde anahtar çiftini değiştirerek kurtarabilir.",
+      "serverKeyMissing": "Bu Monize örneğinde push anahtar çiftini açmak için gereken şifreleme anahtarı yok, bu yüzden hiçbir şey iletilemiyor. Bir yöneticinin bunu dağıtımda ayarlayıp yeniden başlatması gerekiyor.",
+      "statusUnavailable": "Monize, tarayıcı anlık bildiriminin kullanılabilir olup olmadığını kontrol edemedi. Yeniden denemek için sayfayı yenileyin.",
+      "devicesUnavailable": "Monize kayıtlı cihazlarınızı yükleyemedi. Bu sayfadaki diğer her şey çalışıyor; yeniden denemek için sayfayı yenileyin.",
+      "unsupported": {
+        "unsupported": "Bu tarayıcı anlık bildirim alamaz.",
+        "denied": "Bu tarayıcıda Monize bildirimleri engellenmiş. Tarayıcının site ayarlarından izin verin ve bu sayfayı yenileyin.",
+        "ios-browser": "iPhone ve iPad'de anlık bildirimler yalnızca Monize Ana Ekrana eklendikten sonra çalışır. Paylaş, ardından Ana Ekrana Ekle'yi kullanın ve Monize'ı oradan açın."
+      },
+      "disabledReason": {
+        "GONE": "Artık erişilebilir değil. O tarayıcıda anlık bildirimleri yeniden açın.",
+        "KEY_ROTATED": "Bu örnek anlık bildirim anahtar çiftini değiştirdiğinde devre dışı bırakıldı. O tarayıcıda anlık bildirimleri yeniden açın.",
+        "FAILING": "Tekrarlanan teslim hatalarından sonra devre dışı bırakıldı. O tarayıcıda anlık bildirimleri yeniden açın."
+      },
+      "toasts": {
+        "enabled": "Bu cihazda anlık bildirimler etkinleştirildi",
+        "enableFailed": "Anlık bildirimler etkinleştirilemedi",
+        "permissionDenied": "Bu tarayıcı Monize bildirimlerini engelliyor. Site ayarlarından izin verip yeniden deneyin.",
+        "permissionDeniedIos": "Monize için bildirimler engellenmiş. İzin vermek için iOS Ayarlar'ı, sonra Bildirimler'i, sonra Monize'yi açın.",
+        "permissionDismissed": "Bildirimler etkinleştirilmedi. Tarayıcı sorduğunda İzin Ver'i seçin.",
+        "permissionNoPrompt": "Bildirimler açılmadı ve hiçbir istek görünmedi. iOS Ayarlar'ı açın, sonra Bildirimler, sonra Monize, ve orada izin verin. Monize listede yoksa ana ekrandan kaldırın, yeniden ekleyin (Paylaş, sonra Ana Ekrana Ekle) ve bir daha deneyin.",
+        "removed": "Cihaz kaldırıldı",
+        "removeFailed": "Cihaz kaldırılamadı",
+        "testSent": "{count, plural, one {Test bildirimi 1 cihaza gönderildi} other {Test bildirimi # cihaza gönderildi}}",
+        "testPartial": "Test bildirimi {attempted} cihazın {delivered} tanesine ulaştı",
+        "testFailed": "Test bildirimi teslim edilemedi",
+        "pushServiceRefused": "Tarayıcının push hizmeti kaydı reddetti. Biraz sonra yeniden deneyin; başarısız olmaya devam ederse tarayıcının push ayarlarını kontrol edin.",
+        "pushServiceRefusedBrave": "Brave, push hizmetini varsayılan olarak engeller. Brave'de Ayarlar, ardından Gizlilik ve güvenlik bölümünü açın, \"Push mesajları için Google hizmetlerini kullan\" seçeneğini açın, tarayıcıyı yeniden başlatın ve yeniden deneyin."
+      },
+      "testResults": {
+        "heading": "Son test, cihaz başına",
+        "status": {
+          "sent": "push hizmetine iletildi",
+          "expired": "abonelik süresi doldu; o cihazda push'u yeniden etkinleştirin",
+          "transient": "iletilmedi (geçici hata); yeniden deneyin",
+          "unconfigured": "bu örnek şu anda push mesajlarını imzalayamıyor"
+        }
+      },
+      "transport": {
+        "webpush": "Web push",
+        "unifiedpush": "UnifiedPush"
+      },
+      "facts": {
+        "endpoint": "Uç nokta",
+        "transport": "Şununla iletilir",
+        "registeredIp": "Şuradan kaydedildi",
+        "registered": "Kaydedildi",
+        "lastSeen": "Son etkinlik",
+        "lastDelivery": "Son teslimat",
+        "noDelivery": "Henüz hiçbir şey iletilmedi",
+        "userAgent": "Tarayıcı",
+        "unknownIp": "Bilinmiyor"
+      }
+    },
+    "preferences": {
+      "heading": "Beni nasıl bilgilendirelim",
+      "description": "Monize'ın e-posta veya push ile hangi türleri, ne sıklıkta göndereceğini seçin.",
+      "categoryHeader": "Bildirim",
+      "channels": {
+        "emailReport": "E-posta (rapor)",
+        "emailNotification": "E-posta (uyarı)",
+        "push": "Push",
+        "unifiedpush": "UnifiedPush",
+        "unifiedpushHint": "Bildirimler, tarayıcı sağlayıcısının push hizmeti yerine ntfy gibi kendi çalıştırdığınız bir dağıtıcı uygulama üzerinden iletilir. Bu kanalı kullanmak için o uygulamada bir uç nokta kaydedin."
+      },
+      "categories": {
+        "PAYMENTS": "Faturalar ve planlananlar",
+        "BUDGETS": "Bütçeler",
+        "SYSTEM": "Sistem uyarıları",
+        "BALANCES": "Hesap bakiyeleri",
+        "INVESTMENTS": "Yatırım değeri",
+        "STRATEGIES": "Strateji sinyalleri",
+        "BANK_SYNC": "Banka bağlantıları",
+        "BANK_SYNC_ACTIVITY": "Banka senkronizasyonu sonuçları",
+        "EMAIL_RECEIPTS": "E-posta makbuzları",
+        "BONDS": "Tahviller",
+        "AI_REVIEW": "Yapay zeka inceleme önerileri",
+        "WARRANTIES": "Garanti hatırlatıcıları",
+        "SHARED_EXPENSES": "Paylaşılan giderler"
+      },
+      "channelNotApplicable": "Bu bildirim türü için geçerli değil",
+      "emailToggleLabel": "{category} için rapor e-postası",
+      "emailNotificationToggleLabel": "{category} için uyarı e-postası",
+      "pushToggleLabel": "{category} için push",
+      "unifiedpushToggleLabel": "{category} için UnifiedPush",
+      "saveFailed": "Bu ayar kaydedilemedi",
+      "emailUnavailable": "Bunları e-postayla göndermek için yukarıdan e-posta bildirimlerini açın.",
+      "pushUnavailable": "Push için kayıtlı cihaz yok, bu yüzden bu kanal hiçbir şey iletemez.",
+      "throttle": {
+        "label": "Bekleme",
+        "ariaLabel": "{category} için bekleme süresi",
+        "hint": "Aynı gruptan biri bu süre içinde gönderildiyse bir uyarı veya push'u atla.",
+        "options": {
+          "0": "Kapalı",
+          "5": "5 dakika",
+          "15": "15 dakika",
+          "30": "30 dakika",
+          "60": "1 saat",
+          "360": "6 saat",
+          "1440": "24 saat"
+        }
+      },
+      "pushEnableHint": "Bu tarayıcı push bildirimleri için kayıtlı değil."
+    }
+  },
+  "help": {
+    "heading": "Yardım ve Destek",
+    "description": "Belgeler bulun, sorun bildirin veya konuşmaya katılın.",
+    "github": {
+      "label": "GitHub",
+      "description": "Kaynak kodunu görüntüleyin ve projeyi yıldızlayın."
+    },
+    "openIssue": {
+      "label": "Sorun Bildir",
+      "description": "Hata bildirin veya özellik talep edin."
+    },
+    "discussions": {
+      "label": "Tartışmalar",
+      "description": "Toplulukla soru sorun ve fikir paylaşın."
+    },
+    "docs": {
+      "label": "Belgeler",
+      "description": "Kullanım kılavuzuna göz atın."
+    },
+    "supportBackup": {
+      "label": "Destek yedeği oluştur",
+      "description": "Bir bakımcının gerçek adlarınızı veya tutarlarınızı görmeden bir hatayı yeniden üretebilmesi için verilerinizin şifrelenmiş, kimliksizleştirilmiş bir kopyasını paylaşın."
+    }
+  },
+  "about": {
+    "heading": "Hakkında",
+    "description": "Bu örneğin hangi sürümü çalıştırdığı ve sürüm notlarını, lisansı ve güvenlik politikasını nerede bulacağınız.",
+    "appName": "Monize",
+    "tagline": "Kendi sunucunuzda barındırılan kişisel finans yönetimi.",
+    "versionLabel": "Sürüm",
+    "versionUnknown": "Bilinmiyor",
+    "versionButtonTitle": "v{version} sürüm notlarını görüntüle",
+    "apiVersionLabel": "API sürümü",
+    "versionMismatch": "Web uygulaması ile API farklı sürümleri çalıştırıyor. Bu genellikle yükseltmenin yalnızca kısmen yayıldığı anlamına gelir; geride kalan hizmeti yeniden başlatın veya yeniden dağıtın.",
+    "updateLabel": "Güncellemeler",
+    "updateUpToDate": "Güncel",
+    "updateAvailable": "v{version} mevcut",
+    "updateAvailableGeneric": "Daha yeni bir sürüm mevcut",
+    "updateViewRelease": "Sürümü görüntüle",
+    "whatsNew": {
+      "label": "v{version} sürümündeki yenilikler",
+      "labelGeneric": "Yenilikler",
+      "description": "Bu sürümün notlarını uygulamadan ayrılmadan okuyun."
+    },
+    "allReleases": {
+      "label": "Tüm sürümler",
+      "description": "GitHub'da her sürümü ve notlarını inceleyin."
+    },
+    "license": {
+      "label": "Lisans",
+      "description": "Monize, GNU AGPL v3 kapsamında özgür yazılımdır."
+    },
+    "securityPolicy": {
+      "label": "Güvenlik politikası",
+      "description": "Bir güvenlik açığını özel olarak nasıl bildirirsiniz."
+    },
+    "diagnostics": {
+      "label": "Tanılamayı kopyala",
+      "description": "Hata bildirimine yapıştırmak için sürüm, tarayıcı ve dil bilgilerini kopyalayın.",
+      "copied": "Tanılama panoya kopyalandı",
+      "copyFailed": "Tanılama panoya kopyalanamadı"
+    }
+  },
+  "supportBackup": {
+    "title": "Destek yedeği oluştur",
+    "howItWorks": "Yedeğinizin kimliksizleştirilmiş bir kopyasını üretir: adlar maskelenir (ilk ve son iki karakter kalır), notlar/açıklamalar/hesap numaraları kaldırılır ve her tutar tek bir gizli çarpanla çarpılırken kamuya açık değerler (döviz kurları, fiyatlar, faiz oranları) olduğu gibi kalır. Dosya her zaman aşağıdaki parolayla şifrelenir ve normal bir yedek gibi geri yüklenir. Bu, sıradan ifşaya karşı korur; sizi zaten tanıyan birine karşı değil — hatalar yeniden üretilebilsin diye tarihler, sıklıklar ve yapı korunur.",
+    "sectionsLabel": "Dahil Edilecek Bölümler",
+    "sections": {
+      "investments": "Yatırımlar (menkul kıymetler, pozisyonlar, fiyatlar)",
+      "scheduled": "Planlı işlemler",
+      "budgets": "Bütçeler",
+      "reports": "Raporlar ve projeksiyonlar",
+      "importMappings": "İçe aktarma sütun eşlemeleri",
+      "autoBackup": "Otomatik yedek ayarları"
+    },
+    "priceHistoryLabel": "Menkul kıymet fiyat geçmişini dahil et",
+    "priceHistoryHint": "Varsayılan olarak kapalı: tam fiyat serisi halka açık piyasa verileriyle eşleşir ve maskelenmiş bir sembolü açığa çıkarabilir. Yalnızca hata fiyatlar veya değerlemelerle ilgiliyse açın.",
+    "accountsLabel": "Belirli hesaplarla sınırla",
+    "accountsHint": "Her hesabı dahil etmek için tümünü işaretsiz bırakın. Bir alt küme seçmek, başvurulan hesapları ve alacaklıları da içeri çeker.",
+    "dateRangeLabel": "Tarih aralığı (isteğe bağlı)",
+    "dateRangeHint": "Dışa aktarılan geçmişi bu tarihlerle sınırlayın. Kırpılmış dosya tutarlı kalsın diye açılış bakiyeleri ayarlanır.",
+    "dateFromLabel": "Başlangıç",
+    "dateToLabel": "Bitiş",
+    "multiplierLabel": "Tutar çarpanı",
+    "multiplierHint": "Her özel tutar, gerçek değerleri gizlemek ve tutarlılığı korumak için bu sayıyla çarpılır. 1’den büyük, tam sayı olmayan herhangi bir sayı olur; “Yeniden üret” yenisini seçer.",
+    "multiplierWarning": "Çarpanı kimseyle paylaşmayın — gizlenen tutarları geri çeviren anahtar odur.",
+    "multiplierInvalid": "1’den büyük, tam sayı olmayan bir sayı girin.",
+    "regenerate": "Yeniden üret",
+    "passwordLabel": "Şifreleme parolası",
+    "preview": "Önizleme",
+    "previewLabel": "Önizleme",
+    "previewBefore": "Önce",
+    "previewAfter": "Sonra",
+    "previewEmpty": "Bu seçim için önizlenecek örnek satır yok.",
+    "previewFailed": "Önizleme oluşturulamadı. Lütfen tekrar deneyin.",
+    "generate": "Oluştur",
+    "confirmPasswordTitle": "Parolayı kaydettiniz mi?",
+    "confirmPasswordMessage": "Dosya yalnızca yukarıda gösterilen şifreleme parolasıyla açılabilir. Hiçbir yerde saklanmaz ve sonradan kurtarılamaz — oluşturmadan önce kaydettiğinizden emin olun.",
+    "confirmPasswordConfirm": "Kaydettim — oluştur",
+    "generatedToast": "Destek yedeği indirildi.",
+    "generateFailed": "Destek yedeği oluşturulamadı. Lütfen tekrar deneyin.",
+    "passwordHint": "Dosya her zaman şifrelidir. Bu parolayı incelemeyi yapacak kişiye dosyayla birlikte değil, ayrı bir kanaldan iletin.",
+    "passwordInvalid": "En az 8 karakter girin."
+  },
+  "dangerZone": {
+    "heading": "Tehlikeli Alan",
+    "deleteData": {
+      "heading": "Verileri Sil",
+      "description": "Hesabınızdaki finansal verileri kaldırın. Bu işlem geri alınamaz.",
+      "openButton": "Verileri Sil...",
+      "alwaysDeletedHeading": "Aşağıdakiler her zaman silinecektir:",
+      "alwaysDeletedItems": {
+        "transactions": "Tüm işlemler ve bölünmeler",
+        "scheduled": "Tüm zamanlanmış/tekrarlayan işlemler",
+        "securities": "Tüm menkul kıymetler, fiyatlar, pozisyonlar ve yatırım işlemleri",
+        "budgets": "Tüm bütçeler ve bütçe uyarıları",
+        "monthlySummaries": "Aylık hesap bakiyesi özetleri",
+        "customReports": "Özel raporlar, etiketler ve içe aktarma eşlemeleri",
+        "actionHistory": "İşlem geçmişi (geri al/yeniden yap)"
+      },
+      "optionalHeading": "İsteğe bağlı olarak ayrıca şunları silin:",
+      "accountsOption": "Hesaplar",
+      "categoriesOption": "Kategoriler",
+      "payeesOption": "Alacaklılar",
+      "currencyPreferencesOption": "Para birimi tercihleri",
+      "balanceResetNote": "Hesap bakiyeleri açılış bakiyelerine sıfırlanacaktır.",
+      "oidcConfirmLabel": "Onaylamak için kimlik sağlayıcınızla yeniden kimlik doğrulayın:",
+      "passwordConfirmLabel": "Onaylamak için şifrenizi girin:",
+      "passwordPlaceholder": "Şifrenizi girin",
+      "oidcReauthButton": "Yeniden Kimlik Doğrula ve Sil",
+      "deletingButton": "Siliniyor...",
+      "confirmButton": "Veri Silmeyi Onayla",
+      "toasts": {
+        "success": "{count} kayıt başarıyla silindi",
+        "failed": "Veriler silinemedi"
+      }
+    },
+    "deleteAccount": {
+      "heading": "Hesabı Sil",
+      "description": "Hesabınızı ve ilgili tüm verileri kalıcı olarak silin. Bu işlem geri alınamaz.",
+      "delegateNotice": {
+        "title": "Başka bir hesabın temsilcisisiniz.",
+        "body": "Hesabınızı silmek kendi verilerinizi kaldırır, ancak oturumunuz ve başkalarının size verdiği paylaşılan erişim, temsilcilik işlevsel kalacak şekilde korunur. Bu erişimi iptal etmek için önce sahibinden sizi Paylaşılan Erişim listesinden kaldırmasını isteyin."
+      },
+      "openButton": "Hesabı Sil",
+      "typeDeleteLabel": "Hesap silmeyi onaylamak için DELETE yazın:",
+      "typeDeletePlaceholder": "DELETE yazın",
+      "enterPasswordLabel": "Şifrenizi girin:",
+      "enterPasswordPlaceholder": "Şifrenizi girin",
+      "deletingButton": "Siliniyor...",
+      "confirmButton": "Silmeyi Onayla",
+      "toasts": {
+        "downgraded": "Kendi verileriniz kaldırıldı. Temsilcilik yerinde kalsın diye oturumunuz ve paylaşılan erişim korunmaktadır.",
+        "deleted": "Hesap silindi",
+        "failed": "Hesap silinemedi",
+        "reauthRedirect": "Kimliğinizi doğrulamak için sizi kimlik sağlayıcınıza yönlendiriyoruz. Sonrasında buraya döneceksiniz."
+      },
+      "errors": {
+        "typeDelete": "Onaylamak için lütfen DELETE yazın",
+        "passwordRequired": "Onaylamak için lütfen şifrenizi girin"
+      }
+    }
+  },
+  "apiAccess": {
+    "heading": "API Erişimi",
+    "description": "MCP aracılığıyla Claude Desktop gibi harici AI araçlarını bağlamak için kişisel erişim belirteçleri oluşturun.",
+    "createTokenButton": "Belirteç Oluştur",
+    "mcpServerUrlLabel": "MCP Sunucu URL'si",
+    "mcpServerUrlHelp": "Claude Code veya Claude Desktop gibi MCP istemcilerini yapılandırırken bu URL'yi kullanın.",
+    "copyButton": "Kopyala",
+    "copiedButton": "Kopyalandı",
+    "noTokens": "Henüz API belirteci yok. Başlamak için bir tane oluşturun.",
+    "tokenPrefix": "Son kullanım",
+    "expires": "Bitiş",
+    "created": "Oluşturuldu",
+    "lastUsed": "Son kullanım",
+    "revokeButton": "İptal Et",
+    "revokeModal": {
+      "title": "Belirteci İptal Et",
+      "message": "Bu belirteç hemen çalışmayı durduracak. Bunu kullanan MCP bağlantıları kesilecektir.",
+      "confirmLabel": "İptal Et"
+    },
+    "createModal": {
+      "title": "API Belirteci Oluştur",
+      "tokenNameLabel": "Belirteç Adı",
+      "tokenNamePlaceholder": "örn., Claude Desktop",
+      "scopesLabel": "Kapsamlar",
+      "expirationLabel": "Bitiş",
+      "creatingButton": "Oluşturuluyor...",
+      "createButton": "Belirteç Oluştur",
+      "scopes": {
+        "read": {
+          "label": "Oku",
+          "description": "Hesapları, işlemleri ve kategorileri görüntüle"
+        },
+        "write": {
+          "label": "Yaz",
+          "description": "İşlemler, alacaklılar ve kategoriler oluştur"
+        }
+      },
+      "expiry": {
+        "none": "Bitiş yok",
+        "d30": "30 gün",
+        "d90": "90 gün",
+        "y1": "1 yıl"
+      },
+      "validation": {
+        "nameRequired": "Belirteç adı zorunludur",
+        "nameMax": "Belirteç adı 100 karakter veya daha az olmalıdır"
+      }
+    },
+    "createdModal": {
+      "title": "Belirteç Oluşturuldu",
+      "warningNote": "Bu belirteci şimdi kopyalayın. Bir daha göremezsiniz.",
+      "doneButton": "Tamam"
+    },
+    "toasts": {
+      "copied": "Belirteç panoya kopyalandı",
+      "mcpUrlCopied": "MCP URL'si panoya kopyalandı",
+      "revoked": "Belirteç iptal edildi",
+      "selectScope": "En az bir kapsam seçin",
+      "copyTokenFailed": "Belirteç kopyalanamadı",
+      "copyUrlFailed": "URL kopyalanamadı",
+      "loadFailed": "API belirteçleri yüklenemedi",
+      "createFailed": "Belirteç oluşturulamadı",
+      "revokeFailed": "Belirteç iptal edilemedi",
+      "reauthFailed": "Yeniden kimlik doğrulama onaylanamadı"
+    },
+    "stepUp": {
+      "reason": "Bir belirteç oturum açmadan hesabınıza erişebilir; bu nedenle oluşturmadan önce siz olduğunuzu onaylayın."
+    },
+    "relative": {
+      "never": "Hiçbir zaman"
+    }
+  },
+  "autoBackup": {
+    "heading": "Otomatik Yedekleme",
+    "description": "Tüm kurulum için tek bir zamanlama: sunucu her hesabın verisini aşağıdaki depolamaya yedekler. Monize Docker'da çalıştığı için yerel bir klasörün kapsayıcıya birim olarak bağlanması gerekir (ör. -v /host/backups:/data/backups).",
+    "adminManagedNote": "Bu ilkeyi yalnızca yöneticiler değiştirebilir ve ilke bu kurulumdaki her hesap için geçerlidir; her biri kendi klasörüne yedeklenir.",
+    "demoDisabledNote": "Bu denetimler demo modunda salt okunurdur.",
+    "loadingText": "Yükleniyor...",
+    "enableLabel": "Otomatik yedeklemeyi etkinleştir",
+    "backupFolderLabel": "Yedekleme Klasörü",
+    "backupFolderPlaceholder": "/data/backups",
+    "perUserFolderHelp": "Her hesabın yedekleri, bunun içinde hesap kimliğiyle adlandırılmış kendi klasörüne yazılır.",
+    "perUserFolderHelpWithPath": "Her hesabın yedekleri, bunun içinde hesap kimliğiyle adlandırılmış kendi klasörüne yazılır. Örnek: {path}",
+    "browseButton": "Göz at...",
+    "validateButton": "Doğrula",
+    "validatingButton": "Doğrulanıyor...",
+    "folderValid": "Klasör geçerli ve yazılabilir",
+    "selectThisFolder": "Bu Klasörü Seç",
+    "noSubdirectories": "Alt dizin yok",
+    "frequencyLabel": "Yedekleme Sıklığı",
+    "backupTimeLabel": "Yedekleme Saati ({timezone})",
+    "backupTimeHelpInterval": "Günün ilk yedeklemesi bu saatte başlar ({timezone}). Sonraki yedeklemeler yapılandırılan aralıkta devam eder.",
+    "backupTimeHelpDaily": "Yerel saat diliminizde ({timezone}) yedeklemenin çalışacağı günün saati.",
+    "retention": {
+      "heading": "Saklama Politikası",
+      "description": "Kaç yedeklemenin tutulacağını yapılandırın. Bu sınırların ötesindeki eski yedeklemeler otomatik olarak silinir.",
+      "dailyLabel": "Günlük yedeklemeler",
+      "dailyHelp": "Tutulacak en son yedekleme sayısı",
+      "weeklyLabel": "Haftalık yedeklemeler",
+      "weeklyHelp": "Haftada bir tutulur",
+      "monthlyLabel": "Aylık yedeklemeler",
+      "monthlyHelp": "Ayda bir tutulur"
+    },
+    "status": {
+      "heading": "Kurulum Durumu",
+      "lastBackup": "En son yedek",
+      "nextBackup": "Sonraki zamanlanmış yedek",
+      "error": "Hata",
+      "success": "Başarılı",
+      "partial": "Kısmi",
+      "failed": "Başarısız"
+    },
+    "saveButton": "İlkeyi Kaydet",
+    "runNowButton": "Tüm Hesapları Şimdi Yedekle",
+    "runningButton": "Yedekleniyor...",
+    "toasts": {
+      "saved": "Yedekleme ilkesi kaydedildi ve tüm hesaplara uygulandı",
+      "folderValid": "Klasör geçerli ve yazılabilir",
+      "loadFailed": "Otomatik yedekleme ayarları yüklenemedi",
+      "saveFailed": "Ayarlar kaydedilemedi",
+      "runFailed": "Yedekleme çalıştırılamadı",
+      "browseFailed": "Klasörler incelenemedi",
+      "backupRunFinished": "{requested} hesabın {backedUp} tanesi yedeklendi",
+      "backupRunIncomplete": "{requested} hesabın {backedUp} tanesi yedeklendi: {partial} kısmi, {failed} başarısız. Aşağıdaki durumu kontrol edin."
+    },
+    "folderErrors": {
+      "required": "Klasör yolu zorunludur",
+      "validationFailed": "Klasör doğrulaması başarısız",
+      "validationError": "Doğrulama başarısız"
+    },
+    "frequencyOptions": {
+      "every6hours": "Her 6 Saatte Bir",
+      "every12hours": "Her 12 Saatte Bir",
+      "daily": "Günlük",
+      "weekly": "Haftalık"
+    },
+    "noStorage": {
+      "title": "Bu kurulumda yedek deposu yok",
+      "body": "Otomatik yedekler {folderPath} konumuna yazılacaktı, ancak bu kurulum oraya yazamıyor. Bir zamanlamanın çalışabilmesi için bir yöneticinin o depolamayı kullanılabilir kılması gerekir."
+    },
+    "never": "Hiçbir zaman",
+    "coverage": {
+      "accounts": "Bu kurulumdaki {total} etkin hesabın {scheduled} tanesinde zamanlandı.",
+      "unknown": "Bu ilkenin ne kadarını kapsadığı kullanılamıyor."
+    },
+    "storage": {
+      "heading": "Yedek Depolaması",
+      "providerLocal": "Yerel klasör",
+      "providerS3": "S3 uyumlu nesne depolaması",
+      "providerUnknown": "Depolama",
+      "localHelp": "BACKUP_STORAGE_PROVIDER ile belirlenir. Her hesabın yedekleri, bunun içinde hesap kimliğiyle adlandırılmış kendi klasörüne yazılır.",
+      "fixedHelp": "BACKUP_STORAGE_PROVIDER ile belirlenir. Paket ve anahtar öneki kuruluma aittir, bu yüzden burada seçilecek bir klasör yoktur; her hesabın yedekleri kendi anahtar önekinin altına yazılır.",
+      "artifactCount": "Bu depolamada şu anda hesabınıza ait {count} yedek dosyası var. Depolamayı değiştirmek mevcut yedekleri taşımaz."
+    }
+  },
+  "backupRestore": {
+    "heading": "Yedekleme ve Geri Yükleme",
+    "encryption": {
+      "heading": "Yedekleme Şifreleme",
+      "descriptionOidc": "Manuel ve otomatik yedeklemeleri burada ayarladığınız özel bir yedekleme şifresiyle şifreleyin. Geri yükleme için şifre gereklidir.",
+      "descriptionLocal": "Yedekleriniz oturum açma parolanızla şifrelenir. Başka bir şey hatırlamanız gerekmez: aynı parola onları geri yükler.",
+      "unavailable": "Bu sunucu yedekleri şifrelemek üzere yapılandırılmamış, bu yüzden yedekler şifrelenmeden yazılıyor.",
+      "enabledBadge": "Etkin",
+      "disabledBadge": "Etkin değil",
+      "enabledLocalNote": "Yedekler oturum açma parolanızla şifreleniyor.",
+      "disabledLocalNote": "Oturum açma parolanızı onaylayana kadar yedekler şifrelenmeden yazılıyor.",
+      "enableWithLoginPasswordButton": "Oturum açma parolamla etkinleştir",
+      "loading": "Yükleniyor...",
+      "changePasswordButton": "Yedekleme Şifresini Değiştir",
+      "disableButton": "Devre Dışı Bırak",
+      "setPasswordButton": "Yedekleme Şifresi Ayarla",
+      "setupModal": {
+        "titleOidc": "Yedekleme Şifresi Ayarla",
+        "titleLocal": "Şifreli yedeklemeyi etkinleştir",
+        "descriptionOidc": "Yedeklemelerinizi şifrelemek için kullanılacak şifreyi seçin. Güvenli bir yere kaydedin -- geri yükleme için ihtiyacınız olacak.",
+        "descriptionLocal": "Şifreli yedeklemeyi açmak için oturum açma parolanızı onaylayın. Yedekleriniz bu parolayla şifrelenir ve geri yüklemek için de bu parola gerekir.",
+        "placeholderOidc": "Yeni yedekleme şifresi (en az 12 karakter)",
+        "placeholderLocal": "Oturum açma parolanız",
+        "savingButton": "Kaydediliyor...",
+        "confirmButton": "Onayla"
+      },
+      "toasts": {
+        "enabled": "Şifreli yedeklemeler etkinleştirildi",
+        "disabled": "Şifreli yedeklemeler devre dışı bırakıldı",
+        "enableFailed": "Şifreleme etkinleştirilemedi",
+        "disableFailed": "Şifreleme devre dışı bırakılamadı"
+      }
+    },
+    "export": {
+      "heading": "Yedekleme Oluştur",
+      "description": "Finansal verilerinizin tam yedeğini indirin. Bu, hesapları, işlemleri, kategorileri, alacaklıları, bütçeleri, yatırımları ve diğer tüm kullanıcı verilerini içerir.",
+      "downloadButton": "Yedeği İndir",
+      "creatingButton": "Yedekleme Oluşturuluyor...",
+      "exportPasswordModal": {
+        "title": "Yedeği Şifrele",
+        "description": "Bu yedeği şifrelemek için şifreyi girin. Geri yükleme için ihtiyacınız olacak.",
+        "placeholderOidc": "Yedekleme şifresi",
+        "placeholderLocal": "Oturum açma şifresi",
+        "encryptingButton": "Şifreleniyor...",
+        "downloadButton": "İndir"
+      },
+      "toasts": {
+        "success": "Yedekleme başarıyla indirildi",
+        "failed": "Yedekleme oluşturulamadı",
+        "incomplete": "Yedek indirildi, ancak EKSİK: {total} ekten {unusable} tanesi bozulmadan kaydedilemedi ({missing} eksik, {inconsistent} bütünlük denetiminden geçemedi). Bu dosyayı tam bir yedek olarak değerlendirmeyin — ek depolamasını onarın ve yeniden dışa aktarın."
+      }
+    },
+    "restore": {
+      "heading": "Yedekten Geri Yükle",
+      "description": "Mevcut tüm verilerinizi daha önce dışa aktarılan bir yedekleme dosyasındaki verilerle değiştirin. Bu işlem mevcut verilerinizin üzerine kalıcı olarak yazar.",
+      "openButton": "Yedekten Geri Yükle...",
+      "warning": "Uyarı: Bu işlem mevcut tüm verilerinizi silecek ve yerine yedekleme içeriğini koyacaktır. Bu işlem geri alınamaz.",
+      "selectFileLabel": "Yedekleme dosyası seçin",
+      "encryptedBackupLabel": "Bu yedekleme şifrelenmiş. Oluşturulduğu yedekleme şifresini girin:",
+      "backupPasswordPlaceholder": "Yedekleme şifresi",
+      "oidcConfirmLabel": "Onaylamak için kimlik sağlayıcınızla yeniden kimlik doğrulayın:",
+      "passwordConfirmLabel": "Onaylamak için hesap şifrenizi girin:",
+      "passwordPlaceholder": "Şifrenizi girin",
+      "oidcRestoreButton": "Yeniden Kimlik Doğrula ve Geri Yükle",
+      "restoringButton": "Geri Yükleniyor...",
+      "confirmRestoreButton": "Geri Yüklemeyi Onayla",
+      "toasts": {
+        "pleaseSelectFile": "Lütfen bir yedekleme dosyası seçin",
+        "pleaseEnterPassword": "Onaylamak için lütfen şifrenizi girin",
+        "encryptedNeedsPassword": "Bu yedekleme şifrelenmiş. Oluşturulduğu şifreyi \"Yedekleme şifresi\" alanına girin ve tekrar deneyin.",
+        "failed": "Yedekleme geri yüklenemedi",
+        "interrupted": "Geri yükleme, sunucu yanıt vermeden önce kesildi. Geri yükleme ya tamamen uygulanır ya da hiç uygulanmaz; bu nedenle verileriniz ya tamamen geri yüklendi ya da değişmedi. Tekrar denemeden önce hangisi olduğunu görmek için sayfayı yeniden yükleyin.",
+        "reauthRedirect": "Kimliğinizi doğrulamak için sizi kimlik sağlayıcınıza yönlendiriyoruz. Döndüğünüzde yedek dosyasını yeniden seçin."
+      },
+      "selectedFile": "Seçilen: {filename}"
+    },
+    "restoreResult": {
+      "title": "Geri Yükleme Tamamlandı",
+      "totalRecords": "Toplam kayıt",
+      "skippedAttachments": "{count, plural, other {# ek geri yüklenmedi}}: yedek bunlar için kullanılabilir bayt içermiyordu — dışa aktarma sırasında eksiktiler veya sağlama toplamından geçemediler, ya da dosya kendi kendine yeten yedeklerden öncesine ait. Ek depolaması düzeldiğinde yeni bir yedek alın.",
+      "unusableAiProviderKeys": "{count, plural, other {# AI sağlayıcısı kullanılabilir API anahtarı olmadan geri yüklendi}}: bu yedek, sağlayıcı anahtarları yedeğe eklenmeden önce oluşturulmuştu; bu yüzden kayıtlı anahtar dosyayı üreten sunucuya ait ya da bu sunucuda anahtarı saklayacak bir şifreleme anahtarı tanımlı değil. Ayarlar → AI Sağlayıcıları bölümünü açıp API anahtarını yeniden girin.",
+      "unlinkedBondSecurities": "{count, plural, other {# tahvil menkul kıymeti tahvil enstrümanına bağlanmadan geri yüklendi}}: bu sunucunun tahvil kataloğu seriyi içermiyor (veya başka bir para biriminde içeriyor), bu yüzden tahvil motoru artık bunları fiyatlamıyor ve hesaplanmış fiyatları geri yüklenmedi. Her menkul kıymeti açın ve yeniden bir tahvil enstrümanına bağlayın.",
+      "unlinkedBondSeries": "{count, plural, other {# tahvil işlemi serisini kaybetti}} çünkü seri resmi kaynaktan alınamadı. İşlemler serisiz geri yüklendi; siz seriyi getirene kadar serisiz kalacak.",
+      "unrecoveredBondSeries": "Yedekte adı geçen ve getirilemeyen tahvil serileri: {count}.",
+      "unrecoveredBondSeriesItem": "{series} ({country}): {reason}",
+      "unrecoveredBondSeriesMore": "ve {count} tane daha",
+      "unrecoveredBondSeriesAction": "Geri yüklemek için tahvil menkul kıymetini açın, sayfasından seriyi getirin (Yenile) ve serisi olmayan işlemlerde seriyi seçin.",
+      "unrecoveredBondSeriesReason": {
+        "not-published": "ihraççı bu seriyi (henüz) yayımlamadı",
+        "source-unavailable": "resmi kaynak yanıt vermedi; daha sonra tekrar deneyin",
+        "no-adapter": "bu sunucuda bu ihraççının ülkesi için kaynak yok",
+        "refused": "resmi kaynağın yanıtı kabul edilmedi",
+        "rate-limited": "resmi kaynak yavaşlamayı istedi; daha sonra tekrar deneyin",
+        "not-attempted": "tek geri yüklemede çok fazla seri var; denenmedi",
+        "other": "bilinmeyen neden"
+      },
+      "doneButton": "Tamam",
+      "unlinkedBondSecuritiesList": "Etkilenen menkul kıymetler: {symbols}.",
+      "unlinkedBondSecuritiesMore": "ve {count} tane daha",
+      "currencyKindMismatchAccounts": "{count, plural, other {# hesap, türü hesap tipiyle uyuşmayan bir para birimiyle geri yüklendi}}: kripto para hesabı bir kripto para, diğer her hesap ise itibari bir para birimi gerektirir. Bu sunucuda para birimi diğer türdendir. Hesabın para birimini veya Para Birimleri sayfasında para biriminin türünü düzenleyin.",
+      "currencyKindMismatchAccountsList": "Etkilenen hesaplar: {names}.",
+      "currencyKindMismatchSecurities": "{count, plural, other {# menkul kıymet}} bu sunucuda bir kripto para cinsinden fiyatlanıyor, oysa bir menkul kıymet itibari bir para birimi gerektirir. Menkul kıymetin para birimini veya Para Birimleri sayfasında para biriminin türünü düzenleyin.",
+      "currencyKindMismatchSecuritiesList": "Etkilenen menkul kıymetler: {symbols}.",
+      "currencyKindMismatchMore": "ve {count} tane daha",
+      "currencyKindMismatchDefaultCurrency": "Varsayılan para biriminiz {code} bu sunucuda bir kripto para, ancak toplamlar ve raporlar her zaman itibari bir para biriminde gösterilir. Ayarlar → Tercihler bölümünden itibari bir Varsayılan Para Birimi seçin.",
+      "counts": {
+        "sharedGroups": "Ortak gider grupları",
+        "sharedParticipants": "Grup katılımcıları",
+        "sharedEntries": "Grup kayıtları",
+        "sharedAllocations": "Gider paylaşımları",
+        "sharedActivity": "Grup etkinliği",
+        "sharedPeople": "Ortak gider kişileri",
+        "sharedPersonLinks": "Bağlı kişiler",
+        "sharedIntegrations": "Kişisel finans bağlantıları",
+        "sharedPostings": "Ortak giderlerin kişisel kayıtları",
+        "sharedLedgerLinks": "Bağlı kişisel işlemler"
+      }
+    },
+    "storedBackups": {
+      "heading": "Otomatik Yedekler",
+      "description": "Bu sunucunun kendi zamanlamasına göre sizin için oluşturduğu yedekler. Kendi kopyanızı saklamak için birini indirin veya aşağıdaki formla birinden geri yükleyin.",
+      "adminScheduleNote": "Otomatik yedekleme ayarları <link>Yönetici → Yedekler</link> bölümündedir.",
+      "loading": "Yedekler yükleniyor...",
+      "loadFailed": "Sunucuda saklanan yedekler yüklenemedi",
+      "retryButton": "Yeniden Dene",
+      "empty": "Bu sunucu sizin için henüz otomatik yedek tutmuyor.",
+      "columns": {
+        "filename": "Dosya",
+        "modified": "Değiştirilme Tarihi",
+        "size": "Boyut",
+        "actions": "İşlemler"
+      },
+      "downloadButton": "İndir",
+      "restoreButton": "Geri Yükle",
+      "workingButton": "İşleniyor...",
+      "downloadFailed": "Yedek indirilemedi",
+      "offsite": {
+        "disclosure": "Site dışı hedefler",
+        "disclosureDescription": "Tamamlanan her otomatik yedeklemeden sonra şifreli bir kopya S3 depolamasına, e-postayla veya her ikisine gönderilebilir: üç kopya, iki tür depolama, biri bu makinenin dışında. Yalnızca şifreli yedekler gönderilir.",
+        "encryptionUnavailable": "Bu sunucuda şifreleme anahtarı tanımlı değil, bu yüzden kendi bucket'ınızın kimlik bilgileri saklanamaz. Sunucunun kendi bucket'ı ve e-postayla gönderilen kopyalar çalışmaya devam eder.",
+        "loading": "Site dışı hedefleriniz yükleniyor...",
+        "loadFailed": "Site dışı yedekleme hedefleriniz yüklenemedi",
+        "retryButton": "Yeniden Dene",
+        "demoNote": "Demo modunda site dışı hedefler değiştirilemez.",
+        "saveButton": "Hedefleri Kaydet",
+        "saved": "Site dışı hedefler kaydedildi",
+        "saveFailed": "Site dışı yedekleme hedefleriniz kaydedilemedi",
+        "s3": {
+          "heading": "S3 depolama",
+          "modeLabel": "Kopya Hedefi",
+          "modeOff": "Kapalı",
+          "modeDeployment": "Bu sunucunun bucket'ı",
+          "modeOwn": "Kendi bucket'ım",
+          "deploymentUnavailable": "Bu sunucunun kendine ait bir site dışı bucket'ı yok; bunu bir yöneticinin kurması gerekir. Bunun yerine kendi bucket'ınızı kullanabilirsiniz.",
+          "bucketLabel": "Bucket",
+          "regionLabel": "Bölge",
+          "regionHelp": "S3 uyumlu birçok hizmet bunu yok sayar.",
+          "prefixLabel": "Anahtar öneki",
+          "prefixHelp": "Bucket içinde isteğe bağlı bir klasör; böylece yedekleriniz bucket'ı başka verilerle paylaşabilir.",
+          "endpointLabel": "Uç nokta",
+          "endpointHelp": "Yalnızca MinIO, R2 veya B2 gibi S3 uyumlu hizmetler için. AWS için boş bırakın.",
+          "forcePathStyleLabel": "Yol tabanlı adresleme kullan",
+          "forcePathStyleHelp": "MinIO ve bazı diğer S3 uyumlu hizmetler için gereklidir.",
+          "accessKeyIdLabel": "Erişim anahtarı kimliği",
+          "secretAccessKeyLabel": "Gizli erişim anahtarı",
+          "storedPlaceholder": "•••• kayıtlı",
+          "credentialsHelp": "Kimlik bilgileri bu sunucuda şifrelenerek saklanır ve bir daha gösterilmez. Hâlihazırda kayıtlı olanları korumak için bu kutuları boş bırakın.",
+          "clearCredentialsButton": "Kayıtlı Kimlik Bilgilerini Kaldır",
+          "clearConfirmTitle": "Kayıtlı kimlik bilgileri kaldırılsın mı?",
+          "clearConfirmMessage": "Bu sunucu erişim anahtarı kimliğinizi ve gizli erişim anahtarınızı unutacak. Bunları yeniden girene kadar bucket'ınıza başka kopya gönderilmez.",
+          "credentialsCleared": "Kayıtlı kimlik bilgileri kaldırıldı",
+          "clearFailed": "Kayıtlı kimlik bilgileri kaldırılamadı"
+        },
+        "email": {
+          "heading": "E-posta",
+          "toggleLabel": "Tamamlanan her otomatik yedeğin bir kopyasını bana e-postayla gönder",
+          "addressLabel": "Kopyaların gönderileceği adres",
+          "addressPlaceholder": "kullanici@ornek.com",
+          "sizeNote": "Bu sunucunun boyut sınırını aşan bir yedek eklenmez; bunun yerine dosyanın adını bildiren bir bildirim alırsınız."
+        },
+        "rowStatus": {
+          "iconTitle": "{destination}: {status}",
+          "destinationS3": "S3",
+          "destinationEmail": "E-posta",
+          "statusPending": "Beklemede",
+          "statusUploading": "Gönderiliyor",
+          "statusUploaded": "Kopyalandı",
+          "statusFailed": "Başarısız",
+          "statusConflict": "Çakışma",
+          "statusSkippedUnencrypted": "Atlandı: şifresiz",
+          "statusSkippedTooLarge": "Atlandı: çok büyük"
+        }
+      }
+    }
+  },
+  "sharedAccess": {
+    "description": "Temsilciler kendi kimlik bilgileriyle oturum açar ve şifrenizi asla görmez. Yalnızca onlara verdiğiniz hesapları ve bölümleri görürler.",
+    "addDelegateButton": "Temsilci ekle",
+    "loading": "Yükleniyor...",
+    "noDelegates": "Henüz temsilci yok.",
+    "statusLabel": "Durum: {status}",
+    "sectionsLabel": "Bölümler: {count}",
+    "accountsLabel": "Hesaplar: {count}",
+    "sharedDataLabel": "Paylaşılan veri: {count}",
+    "editAccessButton": "Erişimi düzenle",
+    "resetPasswordButton": "Şifreyi sıfırla",
+    "resetPasswordDisabledTitle": "Bu kişi kendi şifresini yönetiyor (kendi Monize hesabı var veya başka bir yerde temsilci erişimi var).",
+    "removeButton": "Kaldır",
+    "createModal": {
+      "title": "Temsilci ekle",
+      "description": "Başka bir kişiye hesaplarınıza kapsamlı erişim verin.",
+      "emailLabel": "E-posta",
+      "emailPlaceholder": "Temsilci e-postası",
+      "checkingEmail": "Bu e-posta mevcut Monize hesaplarıyla karşılaştırılıyor…",
+      "retryEmailCheck": "Yeniden denetle",
+      "firstNameLabel": "Ad",
+      "firstNamePlaceholder": "Ad (isteğe bağlı)",
+      "lastNameLabel": "Soyad",
+      "lastNamePlaceholder": "Soyad (isteğe bağlı)",
+      "existingAccountNotice": "Bu kişinin zaten bir Monize girişi var. Kendi kimlik bilgilerini koruyacak ve yalnızca ek paylaşılan erişim verilecek — şifre veya davet gerekmez.",
+      "sendInviteLabel": "Şifre ayarlamak yerine e-posta daveti gönder",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Şifre belirle",
+      "submitButton": "Temsilci ekle"
+    },
+    "revokeDialog": {
+      "title": "Temsilciyi kaldır",
+      "message": "Bu temsilciyi kaldır? Hesabınıza erişimini kaybeder. Başka paylaşılan erişimi yoksa ve bu e-postayı kendi Monize hesabı olarak talep etmediyse, sahibi tarafından yönetilen girişi de kaldırılır.",
+      "removingButton": "Kaldırılıyor...",
+      "removeButton": "Kaldır"
+    },
+    "tempPasswordModal": {
+      "title": "Geçici şifre",
+      "description": "Bunu temsilciyle güvenli bir şekilde paylaşın. İlk oturum açışlarında değiştirmeleri istenecektir. Bir daha gösterilmeyecektir.",
+      "copyButton": "Kopyala",
+      "copiedButton": "Kopyalandı",
+      "doneButton": "Tamam"
+    },
+    "toasts": {
+      "created": "Temsilci oluşturuldu",
+      "createdWithTempPassword": "Temsilci oluşturuldu. Geçici şifre: {password}",
+      "invited": "Davet e-postası gönderildi",
+      "removed": "Temsilci kaldırıldı"
+    },
+    "errors": {
+      "setPasswordOrInvite": "Şifre belirleyin veya e-posta daveti gönderin.",
+      "loadFailed": "Paylaşılan erişim yüklenemedi",
+      "createFailed": "Temsilci oluşturulamadı",
+      "revokeFailed": "Temsilci iptal edilemedi",
+      "resetPasswordFailed": "Şifre sıfırlanamadı",
+      "copyFailed": "Panoya kopyalanamadı",
+      "lookupFailed": "Bu e-posta mevcut Monize hesaplarıyla karşılaştırılamadı. Mevcut bir parolanın yanlışlıkla üzerine yazılmaması için, bu denetim başarılı olana kadar temsilci ekleme duraklatıldı."
+    },
+    "jointLabel": "{count, plural, other {# ortak hesap}}"
+  },
+  "delegateAccessModal": {
+    "title": "Erişimi düzenle",
+    "tabs": {
+      "accounts": "Hesaplar",
+      "sections": "Bölümler",
+      "shared": "Paylaşılan veri"
+    },
+    "ops": {
+      "read": "Okuma",
+      "create": "Oluşturma",
+      "edit": "Düzenle",
+      "delete": "Sil",
+      "joint": "Ortak"
+    },
+    "sections": {
+      "description": "Uygulama bölümlerine salt okunur erişim verin. Hesap kapsamlı veriler yine de hesap başına erişim gerektirir.",
+      "bills": {
+        "label": "Faturalar ve Mevduatlar",
+        "description": "Verilen hesapların planlanmış işlemleri"
+      },
+      "investments": {
+        "label": "Yatırımlar",
+        "description": "Verilen hesapların varlıkları ve yatırım işlemleri"
+      },
+      "budgets": {
+        "label": "Bütçeler",
+        "description": "Salt okunur bütçe rakamları"
+      },
+      "reports": {
+        "label": "Raporlar",
+        "description": "Salt okunur raporlar"
+      },
+      "ai": {
+        "label": "Yapay Zeka Asistanı",
+        "description": "Sahibin yapılandırdığı yapay zekâ sağlayıcısını kullanır"
+      },
+      "aiRequiresFullAccess": "Yapay Zeka Asistanı tüm hesapları ve bölümleri okur; bu nedenle bu temsilci için yalnızca tüm hesaplarınızı ve diğer tüm bölümleri okuyabildiğinde yanıt verir.",
+      "warranties": {
+        "label": "Garantiler",
+        "description": "Garantiler, belgeleri ve talepleri. Bağlı bir satın alma yalnızca temsilcinin okuyabildiği bir hesaptaysa görünür."
+      },
+      "toggleLabel": "{section} bölümü"
+    },
+    "accounts": {
+      "noAccounts": "Verilecek hesap yok.",
+      "grantAll": "Tümüne ver",
+      "jointRequiresFullAccount": "Ortak hesaplar yalnızca kendi Monize hesabı olan kullanıcılarla paylaşılabilir",
+      "grantAllLabel": "Tüm {type} hesapları için {op}",
+      "grantLabel": "{account} için {op} erişimi"
+    },
+    "shared": {
+      "description": "Alacaklılar, kategoriler ve etiketlerin OKUNMASI her zaman izin verilir. Bunlar oluşturma/düzenleme/silmeyi kontrol eder.",
+      "toggleLabel": "{op} {resource}",
+      "resources": {
+        "payees": "Alacaklılar",
+        "categories": "Kategoriler",
+        "tags": "Etiketler"
+      }
+    },
+    "saveButton": "Kaydet",
+    "toasts": {
+      "saved": "Erişim güncellendi",
+      "saveFailed": "Erişim güncellenemedi"
+    }
+  },
+  "nav": {
+    "sectionsAriaLabel": "Ayarlar bölümleri",
+    "profile": "Profil",
+    "preferences": "Tercihler",
+    "tours": "Rehberli Turlar",
+    "notifications": "Bildirimler",
+    "security": "Güvenlik",
+    "sharedAccess": "Paylaşılan Erişim",
+    "emergencyAccess": "Acil Durum Erişimi",
+    "apiAccess": "API Erişimi",
+    "aiSettings": "AI Ayarları",
+    "emailReceipts": "E-posta Makbuzları",
+    "backupRestore": "Yedekleme ve Geri Yükleme",
+    "help": "Yardım ve Destek",
+    "dangerZone": "Tehlikeli Alan",
+    "about": "Hakkında",
+    "payeeLookup": "Alacaklı arama",
+    "bankSync": "Banka Senkronizasyonu"
+  },
+  "page": {
+    "title": "Ayarlar",
+    "demoRestricted": {
+      "heading": "Demo Modunda Kısıtlandı",
+      "body": "Profil düzenleme, şifre değiştirme, iki faktörlü kimlik doğrulama ve hesap silme demo modunda devre dışıdır."
+    },
+    "sharedAccessCard": {
+      "title": "Paylaşılan Erişim",
+      "description": "Başka bir kişiye belirli hesaplara ayrıntılı erişim verin."
+    },
+    "toursCard": {
+      "title": "Rehberli Turlar",
+      "description": "Monize'in sunduğu tüm turlar ve hangilerini gördüğünüz. İstediğinizi başlatın ya da tekrar alın."
+    },
+    "emergencyAccessCard": {
+      "title": "Acil Durum Erişimi",
+      "description": "Uzun süre oturum açmadığınızda hesabınıza otomatik olarak tam erişim alacak kişileri belirleyin."
+    },
+    "aiSettingsCard": {
+      "title": "AI Ayarları",
+      "description": "AI sağlayıcılarını yapılandırın, API anahtarlarını yönetin ve kullanım istatistiklerini görüntüleyin."
+    },
+    "emailReceiptsCard": {
+      "title": "E-posta Makbuzları",
+      "description": "Sipariş onayları için bir posta kutusu bağlayın ve onları okuyan profilleri yönetin."
+    },
+    "bankSyncCard": {
+      "title": "Banka Senkronizasyonu",
+      "description": "Bankanızı Open Banking üzerinden bağlayın ve hesaba işlenmiş işlemlerini hesaplarınıza aktarın."
+    },
+    "delegateSecurityError": "Güvenlik ayarlarınız yüklenemiyor.",
+    "toasts": {
+      "securityLoadFailed": "Güvenlik ayarları yüklenemedi",
+      "loadFailed": "Ayarlar yüklenemedi"
+    }
+  },
+  "aiSettings": {
+    "backLink": "Ayarlara Geri Dön",
+    "title": "AI Ayarları",
+    "subtitle": "Akıllı finansal özellikler için AI sağlayıcılarını yapılandırın",
+    "bubble": {
+      "title": "Yüzen sohbet balonu",
+      "subtitle": "Her sayfada bir sohbet düğmesi göstererek yapay zeka asistanına her yerden soru sormanızı sağlar. Tam ekrana genişletebileceğiniz, alttan açılan bir panel olarak açılır.",
+      "toggleLabel": "Yüzen yapay zeka sohbet balonunu etkinleştir",
+      "enabled": "Yüzen sohbet balonu etkinleştirildi",
+      "disabled": "Yüzen sohbet balonu devre dışı bırakıldı",
+      "saveFailed": "Sohbet balonu ayarı güncellenemedi"
+    },
+    "demoRestricted": {
+      "heading": "Demo Modunda Kısıtlandı",
+      "body": "AI sağlayıcı yapılandırması demo modunda devre dışıdır."
+    },
+    "toasts": {
+      "loadFailed": "AI ayarları yüklenemedi",
+      "usageLoadFailed": "Kullanım verileri yüklenemedi"
+    },
+    "mcpRelay": {
+      "title": "Kendi asistanınızı kullanın (MCP aktarıcı)",
+      "subtitle": "Sohbet istemlerini sunucu tarafı bir yapay zeka sağlayıcısı yerine kendi MCP aracınızla yanıtlayın.",
+      "toggleLabel": "MCP aktarıcı kullan",
+      "saved": "Aktarıcı ayarı kaydedildi",
+      "saveFailed": "Aktarıcı ayarı kaydedilemedi",
+      "how": {
+        "intro": "Etkinleştirildiğinde, yapay zeka sohbeti sunucu tarafı bir LLM çağırmaz. Bunun yerine:",
+        "step1": "Aboneliğinizde oturum açmış bir MCP aracını (ör. Claude CLI) kendi makinenizde çalıştırırsınız.",
+        "step2": "Aracı, sohbete yazdığınız istemler için Monize'e long-polling yapar ve bunları Monize araçlarıyla yanıtlar.",
+        "step3": "Yanıtlar sohbete geri akışla gelir. Bir durum noktası, aracınızın bağlı olup olmadığını gösterir.",
+        "note": "Aracınız bağlanıp dinlemeye başlayana kadar hiçbir şey çalışmaz. Sohbet, bağlantı talimatlarını gösterir."
+      }
+    }
+  },
+  "sharedAccessPage": {
+    "backLink": "Ayarlara Geri Dön",
+    "title": "Paylaşılan Erişim",
+    "subtitle": "Başka bir kişiye belirli hesaplara ayrıntılı erişim verin",
+    "demoRestricted": {
+      "heading": "Demo Modunda Kısıtlandı",
+      "body": "Temsilci yönetimi demo modunda devre dışıdır."
+    }
+  },
+  "emergencyAccess": {
+    "backLink": "Ayarlara Geri Dön",
+    "title": "Acil Durum Erişimi",
+    "subtitle": "Uzun süre oturum açmadığınızda hesabınıza otomatik olarak tam erişim alacak kişileri belirleyin",
+    "delegateRestricted": "Acil durum erişimi yalnızca hesap sahibi tarafından yapılandırılabilir.",
+    "demoRestricted": "Acil durum erişimi demo modunda devre dışıdır.",
+    "emailNotConfigured": {
+      "heading": "E-posta yapılandırılmamış",
+      "body": "Acil durum erişimi e-posta teslimatına bağlıdır. Yöneticinizden SMTP ortam değişkenlerini (SMTP_HOST, SMTP_USER, SMTP_PASSWORD) yapılandırmasını isteyin ve tekrar deneyin."
+    },
+    "encryptionNotConfigured": {
+      "heading": "Şifreleme anahtarı gerekli",
+      "body": "Acil durum erişimi, sunucuda ENCRYPTION_KEY ayarlanmış olmasını gerektirir. Erişim verme işlemi her kişinin erişim bağlantısını şifreli olarak saklar; böylece yeniden deneme aynı bağlantıyı tekrar gönderebilir. Bu anahtar olmadan hiçbir bağlantı gönderilemez."
+    },
+    "alreadyGranted": {
+      "heading": "Acil durum erişimi zaten verildi",
+      "description": "belirlediğiniz kişiler hesabı devralmaları için sihirli bağlantılar aldı. Bu istenmediyse, bekleyen bağlantıları geçersiz kılmak için aşağıdan verilen durumu temizleyin.",
+      "clearButton": "Verilen durumu temizle"
+    },
+    "loadError": "Acil durum erişim ayarları yüklenemiyor.",
+    "settings": {
+      "heading": "Ayarlar",
+      "enableLabel": "Acil durum erişimini etkinleştir",
+      "grantAfterDaysLabel": "Erişim verilmeden önceki hareketsizlik günleri",
+      "reminderAfterDaysLabel": "Hatırlatma e-postalarından önceki hareketsizlik günleri",
+      "saveButton": "Ayarları kaydet",
+      "toasts": {
+        "saved": "Acil durum erişim ayarları kaydedildi",
+        "saveFailed": "Ayarlar kaydedilemedi"
+      }
+    },
+    "message": {
+      "heading": "Kişilerinize mesaj",
+      "description": "Depolamada şifreli. Görüntüleme veya düzenleme için kimliğinizi yeniden doğrulamanız gerekir.",
+      "unlockTimer": "{mins}:{secs} için kilidi açıldı",
+      "messageSet": "Mesaj ayarlandı",
+      "charCount": "({count} karakter",
+      "updatedAt": ", {timestamp} güncellendi",
+      "noMessage": "Mesaj ayarlanmadı",
+      "revealButton": "Mesajı göster",
+      "editButton": "Mesajı düzenle",
+      "addButton": "Mesaj ekle",
+      "emptyMessage": "(boş)",
+      "lockNowButton": "Şimdi kilitle",
+      "editMessageButton": "Düzenle",
+      "messagePlaceholder": "Notlar, talimatlar, önemli belgelerin yerleri...",
+      "maxCharsNote": "Maksimum 4000 karakter. Depolamada şifreli olarak saklanır.",
+      "saveButton": "Mesajı kaydet",
+      "toasts": {
+        "saved": "Mesaj kaydedildi",
+        "verifyAgain": "Doğrulama süresi doldu -- kaydetmek için lütfen tekrar doğrulayın",
+        "loadFailed": "Mesaj yüklenemedi",
+        "saveFailed": "Mesaj kaydedilemedi"
+      }
+    },
+    "contacts": {
+      "heading": "Acil Durum Kişileri",
+      "description": "Erişim verildiğinde her kişi e-postayla bir sihirli bağlantı alır. Yeni şifre belirlemek ve hesabı devralmak için kullanırlar. İlk talep eden kazanır.",
+      "addButton": "Kişi ekle",
+      "noContacts": "Henüz kişi yok.",
+      "editButton": "Düzenle",
+      "removeButton": "Kaldır",
+      "contactModal": {
+        "addTitle": "Acil durum kişisi ekle",
+        "editTitle": "Kişiyi düzenle",
+        "firstNameLabel": "Ad",
+        "emailLabel": "E-posta",
+        "addButton": "Kişi ekle",
+        "saveButton": "Değişiklikleri kaydet"
+      },
+      "removeDialog": {
+        "title": "Kişiyi kaldır",
+        "message": "Bu kişi artık acil durum erişimi almayacak. Daha sonra tekrar ekleyebilirsiniz.",
+        "removingButton": "Kaldırılıyor...",
+        "removeButton": "Kaldır"
+      },
+      "toasts": {
+        "added": "Kişi eklendi",
+        "updated": "Kişi güncellendi",
+        "removed": "Kişi kaldırıldı",
+        "saveFailed": "Kişi kaydedilemedi",
+        "removeFailed": "Kişi kaldırılamadı"
+      }
+    },
+    "status": {
+      "heading": "Durum",
+      "lastAccess": "Son erişim: ",
+      "lastReminderSent": "Son hatırlatma gönderildi: ",
+      "grantStatus": "Verme durumu: ",
+      "unknown": "bilinmiyor",
+      "never": "hiçbir zaman",
+      "withRelative": "{timestamp} ({relative})",
+      "grantedOn": "{timestamp} tarihinde verildi",
+      "notYetGranted": "henüz verilmedi",
+      "timerNote": "Zamanlayıcı, uygulamayı her kullandığınızda otomatik olarak sıfırlanır — oturum açma, sayfa görüntüleme, işlem kaydetme, herhangi bir kimlik doğrulamalı eylem."
+    },
+    "resetConfirm": {
+      "title": "Verilen durumu temizle",
+      "message": "Bu işlem bekleyen sihirli bağlantıları geçersiz kılar, hatırlatma kadansının yeniden başlamasına izin verir ve başka bir hareketsizlik döneminden sonra verme zincirinin tekrar tetiklenmesine izin verir.",
+      "clearingButton": "Temizleniyor...",
+      "clearButton": "Temizle",
+      "toasts": {
+        "cleared": "Verilen durum temizlendi",
+        "resetFailed": "Verilen durum sıfırlanamadı"
+      }
+    },
+    "stepUp": {
+      "reason": "Acil durum erişim mesajınızı görüntülemek veya düzenlemek için kimliğinizi yeniden doğrulayın."
+    },
+    "validation": {
+      "wholeDays": "Yalnızca tam gün",
+      "minDays": "{min, plural, other {En az # gün olmalıdır}}",
+      "maxDays": "{max, plural, other {En fazla # gün olmalıdır}}",
+      "reminderBeforeGrant": "Hatırlatma günleri erişim verme günlerinden az olmalıdır",
+      "messageMax": "Mesaj en fazla {max} karakter olmalıdır",
+      "firstNameRequired": "Ad zorunludur",
+      "firstNameMax": "Ad en fazla {max} karakter olmalıdır",
+      "emailInvalid": "Geçerli bir e-posta adresi girin",
+      "emailMax": "E-posta en fazla {max} karakter olmalıdır"
+    },
+    "toasts": {
+      "loadFailed": "Acil durum erişimi yüklenemedi",
+      "reauthFailed": "Yeniden kimlik doğrulama onaylanamadı"
+    }
+  },
+  "aiProviders": {
+    "heading": "AI Sağlayıcıları",
+    "addButton": "Sağlayıcı Ekle",
+    "encryptionWarning": "ENCRYPTION_KEY yapılandırılmamış. Ollama'yı (yerel, API anahtarı gerekmez) kullanabilirsiniz, ancak bulut sağlayıcıları API anahtarlarını güvenle depolamak için şifreleme gerektirir.",
+    "systemDefault": {
+      "heading": "Sistem Varsayılan AI Sağlayıcısı Mevcut",
+      "description": "Yöneticiniz tarafından merkezi bir AI sağlayıcısı yapılandırıldı",
+      "usedAutomatically": "Kişisel sağlayıcı yapılandırmadığınızdan otomatik olarak kullanılacak.",
+      "personalPriority": "Kişisel sağlayıcılarınız sistem varsayılanına göre önceliklidir.",
+      "limitsManaged": "Tek bir soru için ne kadar çalışabileceği dahil olmak üzere ayarları yöneticiniz tarafından yönetilir. Bunları kendiniz denetlemek için kendi sağlayıcınızı ekleyin."
+    },
+    "noProviders": {
+      "withSystemDefault": "Kişisel AI sağlayıcısı yapılandırılmadı. Sistem varsayılan sağlayıcısı kullanılacak.",
+      "withoutSystemDefault": "AI sağlayıcısı yapılandırılmadı. AI özelliklerini etkinleştirmek için sağlayıcı ekleyin."
+    },
+    "providerCard": {
+      "activeBadge": "Aktif",
+      "inactiveBadge": "Pasif",
+      "priorityLabel": "Öncelik: {n}",
+      "modelLabel": "Model: {model}",
+      "keyLabel": "Anahtar: {key}",
+      "urlLabel": "URL: {url}",
+      "costLabel": "Maliyet/1M ({currency}): {input} giriş / {output} çıkış",
+      "disableButton": "Devre Dışı Bırak",
+      "enableButton": "Etkinleştir",
+      "editButton": "Düzenle",
+      "deleteButton": "Sil"
+    },
+    "deleteDialog": {
+      "title": "Yapay Zekâ Sağlayıcısını Sil",
+      "message": "{name} silinsin mi? Kayıtlı API anahtarı da onunla birlikte kaldırılır. Bu işlem geri alınamaz."
+    },
+    "configForm": {
+      "addTitle": "AI Sağlayıcısı Ekle",
+      "editTitle": "Sağlayıcıyı Düzenle",
+      "providerLabel": "Sağlayıcı",
+      "displayNameLabel": "Görünen Ad",
+      "modelLabel": "Model",
+      "testButton": "Test Et",
+      "testingButton": "Test ediliyor...",
+      "ollamaCloudNote": "Model adları -cloud sonekini içermelidir (örn. gpt-oss:20b-cloud).",
+      "apiKeyLabel": "API Anahtarı",
+      "baseUrlLabel": "Temel URL",
+      "baseUrlPrivateNote": "Özel veya yerel bir adres (localhost, 192.168.x.x veya bir kapsayıcı adı) yalnızca bir yönetici için ya da sunucu operatörü bu adrese izin verdiğinde çalışır. Aksi takdirde internetten erişilebilen bir adres kullanın.",
+      "priorityLabel": "Öncelik",
+      "priorityHelp": "Düşük sayı = yüksek öncelik. Yedek sıralama için kullanılır.",
+      "costRatesHeading": "Maliyet oranları (isteğe bağlı)",
+      "costRatesHelp": "Kullanım panosunda tahmini maliyet görmek için sağlayıcınızın 1.000.000 token başına yayımlanmış oranlarını girin. Maliyet tahminlerini atlamak için boş bırakın.",
+      "inputCostLabel": "Giriş maliyeti / 1M token",
+      "outputCostLabel": "Çıkış maliyeti / 1M token",
+      "rateCurrencyLabel": "Oran Para Birimi",
+      "rateCurrencyHelp": "Bu, ana para biriminizden farklıysa, Kullanım panosu kaydedilmiş döviz kurlarınızı kullanarak maliyetleri dönüştürebilir.",
+      "saveButton": "Değişiklikleri Kaydet",
+      "addProviderButton": "Sağlayıcı Ekle",
+      "modelPlaceholder": "Model adı girin",
+      "testModelAria": "Modeli test et",
+      "apiKeyPlaceholder": "API anahtarı girin",
+      "saveFailed": "Yapılandırma kaydedilemedi",
+      "inputCostPlaceholder": "örn., 3.00",
+      "outputCostPlaceholder": "örn., 15.00",
+      "toasts": {
+        "notReachable": "Sağlayıcıya ulaşılamadı.",
+        "modelUnavailable": "\"{model}\" modeli bu sağlayıcıda mevcut değil.",
+        "modelReady": "\"{model}\" modeli hazır.",
+        "success": "Bağlantı başarılı.",
+        "testFailed": "Model testi başarısız"
+      },
+      "costCurrencies": {
+        "USD": "USD - ABD Doları",
+        "EUR": "EUR - Euro",
+        "GBP": "GBP - İngiliz Sterlini",
+        "CAD": "CAD - Kanada Doları",
+        "AUD": "AUD - Avustralya Doları",
+        "JPY": "JPY - Japon Yeni",
+        "CNY": "CNY - Çin Yuanı",
+        "INR": "INR - Hindistan Rupisi"
+      },
+      "validation": {
+        "displayNameMax": "Görünen ad 100 karakter veya daha az olmalıdır",
+        "mustBeNumber": "Sayı olmalıdır",
+        "currencyCode": "3 harfli para birimi kodu olmalıdır",
+        "budgetRange": "{min} ile {max} arasında olmalıdır"
+      },
+      "queryBudgets": {
+        "heading": "Sorgu sınırları (isteğe bağlı)",
+        "help": "Bu sağlayıcının tek bir soruyu yanıtlamak için ne kadar çalışabileceği. Gösterilen varsayılan değeri kullanmak için alanı boş bırakın. Asistan aramasını bitirmeden sık sık duruyorsa önce analiz adımlarını artırın.",
+        "defaultPlaceholder": "Varsayılan: {value}",
+        "maxIterationsLabel": "Analiz adımları",
+        "maxIterationsHelp": "Araç çağırma döngüsündeki tur sayısı. Küçük bir yerel model genellikle her sorgu için bir adım harcar.",
+        "maxToolCallsLabel": "Veri sorguları",
+        "maxToolCallsHelp": "Asistanın tek bir soruyu yanıtlarken yapabileceği toplam sorgu sayısı.",
+        "timeoutMinutesLabel": "Süre sınırı (dakika)",
+        "timeoutMinutesHelp": "Tek bir soru için ayrılan süre. Yavaş yerel çıkarım için artırın.",
+        "maxInputTokensLabel": "Giriş token'ları",
+        "maxInputTokensHelp": "Tüm adımlardaki toplam giriş token'ı. Ücretli bir sağlayıcıda başlıca maliyet denetimi.",
+        "maxToolResultCharsLabel": "Sonuç boyutu (karakter)",
+        "maxToolResultCharsHelp": "Tek bir sorgunun sonucunun ne kadarını modelin kısaltılmadan önce gördüğü."
+      }
+    },
+    "testButton": {
+      "testLabel": "Test Et",
+      "connectionFailed": "Bağlantı başarısız",
+      "modelUnavailable": "\"{model}\" modeli bu sağlayıcıda mevcut değil.",
+      "successWithModel": "Bağlantı başarılı. \"{model}\" modeli hazır.",
+      "success": "Bağlantı başarılı",
+      "testFailed": "Bağlantı testi başarısız"
+    },
+    "toasts": {
+      "added": "Sağlayıcı eklendi",
+      "updated": "Sağlayıcı güncellendi",
+      "removed": "Sağlayıcı kaldırıldı",
+      "modelReady": "\"{model}\" modeli hazır.",
+      "notReachable": "Kaydedildi, ancak sağlayıcıya ulaşılamadı. URL/API anahtarını kontrol edin.",
+      "modelUnavailable": "Kaydedildi, ancak \"{model}\" modeli bu sağlayıcıda mevcut değil.",
+      "deleteFailed": "Sağlayıcı silinemedi",
+      "updateFailed": "Sağlayıcı güncellenemedi"
+    }
+  },
+  "usage": {
+    "heading": "Kullanım",
+    "totalRequests": "Toplam İstek",
+    "inputTokens": "Giriş Token'ları",
+    "outputTokens": "Çıkış Token'ları",
+    "estCost": "Tahmini Maliyet",
+    "setRatesToEnable": "Etkinleştirmek için sağlayıcıda oranları ayarlayın",
+    "inHomeCurrency": "{currency} cinsinden",
+    "inProviderCurrency": "Sağlayıcı para birimi cinsinden",
+    "byProvider": {
+      "heading": "Sağlayıcıya Göre",
+      "provider": "Sağlayıcı",
+      "requests": "İstekler",
+      "inputTokens": "Giriş Token'ları",
+      "outputTokens": "Çıkış Token'ları",
+      "estCost": "Tahmini Maliyet"
+    },
+    "recentActivity": {
+      "heading": "Son Aktivite",
+      "date": "Tarih",
+      "provider": "Sağlayıcı",
+      "feature": "Özellik",
+      "tokens": "Token'lar",
+      "duration": "Süre",
+      "estCost": "Tahmini Maliyet"
+    },
+    "noUsage": "Henüz kullanım verisi yok. AI özelliklerini kullanmaya başladığınızda kullanım burada görünecektir.",
+    "periods": {
+      "d7": "7 gün",
+      "d30": "30 gün",
+      "d90": "90 gün",
+      "all": "Tüm zamanlar"
+    },
+    "estCostTooltip": "Her sağlayıcıda yapılandırdığınız maliyet oranları kullanılarak tahmin edildi. Eşleşen oran ayarlanmamış aktiviteler hariçtir."
+  },
+  "payeeLookup": {
+    "title": "Alacaklı arama",
+    "subtitle": "Bir alacaklının web sitesi, adresi, e-postası ve telefon numarasının nereden geldiği ve aramanın kendiliğinden ne zaman çalıştığı.",
+    "saved": "Alacaklı arama ayarları kaydedildi",
+    "saveFailed": "Alacaklı arama ayarları kaydedilemedi",
+    "loadFailed": "Alacaklı arama ayarları yüklenemedi. Yeniden denemek için sayfayı yenileyin.",
+    "googlePlaces": {
+      "toggleLabel": "Alacaklı aramasında Google Places kullan",
+      "notConfigured": "İşletmeleri yapay zekâ sağlayıcınız yerine Google rehberinde aramak için bir Google Places API anahtarı ekleyin.",
+      "operatorManaged": "Bu sunucunun yöneticisi tarafından yapılandırıldı. Kendi alacaklılarınız için kapatabilirsiniz.",
+      "configure": "Kur",
+      "edit": "Düzenle",
+      "removeKey": "Anahtarı kaldır",
+      "usage": "Bu ay kullanılan: {cap} isteğin {used} tanesi",
+      "usageNoCap": "Bu ay kullanılan: {used}. Aylık sınır yok.",
+      "keyUnreadable": "Bu sunucu kayıtlı API anahtarını okuyamıyor. Bu, bir yedek başka bir örneğe geri yüklendiğinde ya da şifreleme anahtarı değiştiğinde olur. Düzeltmek için anahtarı yeniden girin.",
+      "encryptionUnavailable": "Bu sunucuda şifreleme anahtarı yapılandırılmamış, bu yüzden bir API anahtarı güvenle saklanamaz. Yöneticinizden bir tane ayarlamasını isteyin.",
+      "modalTitle": "Google Places",
+      "modalSubtitle": "Monize, alacaklının adını ve halihazırdaki adresi Google'a gönderir ve orada hiçbir şey saklamaz.",
+      "apiKeyLabel": "API anahtarı",
+      "apiKeyPlaceholder": "Google Places API anahtarınızı yapıştırın",
+      "apiKeyHelp": "Google Cloud konsolunda Places API (New) etkinleştirilmiş bir anahtar oluşturun. Kayıtlı anahtarı korumak için boş bırakın.",
+      "capToggleLabel": "Aylık istekleri sınırla",
+      "capHelp": "Google, bu aramanın ihtiyaç duyduğu alanlar için ayda {free} ücretsiz Text Search isteği verir. Sınırın ötesinde arama, yapay zekâ sağlayıcınıza döner.",
+      "capLabel": "Aylık istek sayısı",
+      "capRange": "{min} ile {max} arasında bir sayı girin.",
+      "test": "Test et",
+      "testing": "Test ediliyor...",
+      "testSuccess": "Google anahtarı kabul etti.",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "setupInstructions": "Kurulum talimatları"
+    },
+    "automatic": {
+      "title": "Otomatik alacaklı iletişim araması",
+      "subtitle": "Yeni bir alacaklının web sitesini, adresini, e-postasını ve telefon numarasını otomatik olarak arayın. Aramanın doğru işletmeyi ve doğru şubeyi ayırt edebilmesi için alacaklının adıyla birlikte mevcut notlar, web sitesi, adres, e-posta ve telefon da gönderilir.",
+      "toggleLabel": "Otomatik alacaklı iletişim aramasını etkinleştir",
+      "enabled": "Otomatik alacaklı iletişim araması etkinleştirildi",
+      "disabled": "Otomatik alacaklı iletişim araması devre dışı bırakıldı",
+      "saveFailed": "Alacaklı iletişim arama ayarı güncellenemedi",
+      "noSource": "Alacaklıları otomatik aramak için yukarıdan bir kaynağı açın. İkisi de kapalıyken hiçbir şey aramayı yanıtlayamaz."
+    },
+    "order": {
+      "title": "Önce hangi kaynak yanıtlar",
+      "placesTitle": "Google Places",
+      "placesHelp": "Rehber bilgileri, arama başına daha ucuz. Google e-posta adresi tutmaz.",
+      "aiTitle": "Mevcut yapay zekâ sağlayıcısı",
+      "aiHelp": "E-posta adresi bulabilir ve her aramada bir model çağrısı maliyeti vardır.",
+      "aiToggleLabel": "Alacaklı aramaları için yapay zekâ sağlayıcısı kullan",
+      "aiProviderLabel": "Kullanılacak sağlayıcı",
+      "aiProviderAny": "Öncelik sırasına göre herhangi bir sağlayıcı",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı"
+    }
+  },
+  "bankSync": {
+    "backLink": "Ayarlara Dön",
+    "title": "Banka Senkronizasyonu",
+    "subtitle": "Banka hesaplarınızın hesaba işlenmiş işlemlerini Open Banking üzerinden içe aktarın",
+    "demoRestricted": {
+      "heading": "Demo Modunda Kısıtlandı",
+      "body": "Banka senkronizasyonu demo modunda devre dışıdır."
+    },
+    "loadFailed": {
+      "title": "Banka senkronizasyonu yüklenemedi",
+      "retry": "Tekrar dene"
+    },
+    "credentials": {
+      "title": "Enable Banking uygulaması",
+      "subtitle": "Monize, banka hesaplarınızı kendi Enable Banking uygulamanız üzerinden okur. Enable Banking kontrol panelinde bir uygulama kaydedin, ardından uygulama kimliğini ve özel anahtarını buraya girin.",
+      "notConfigured": "Henüz bir uygulama kurulmadı.",
+      "applicationId": "Uygulama kimliği",
+      "keyStored": "Bir özel anahtar kayıtlı.",
+      "keyMissing": "Kayıtlı özel anahtar yok.",
+      "configure": "Kimlik bilgilerini ayarla",
+      "edit": "Kimlik bilgilerini düzenle",
+      "remove": "Kimlik bilgilerini kaldır",
+      "test": "Bağlantıyı test et",
+      "testing": "Test ediliyor...",
+      "encryptionUnavailable": "Bu sunucuda yapılandırılmış bir şifreleme anahtarı olmadığından kimlik bilgileri saklanamaz.",
+      "redirectUrlLabel": "Yönlendirme URL'si",
+      "redirectUrlHelp": "Bu URL'yi tam olarak Enable Banking kontrol panelinde yönlendirme URL'si olarak kaydedin. Erişimi onayladıktan sonra bankanız sizi bu adrese geri gönderir.",
+      "redirectUrlNotPublic": "Yönlendirme URL'sinin internetten erişilebilir olması gerekmez. Onu yalnızca tarayıcınız açar.",
+      "redirectUrlHttpWarning": "“Production” uygulaması yalnızca https yönlendirme URL'sini kabul eder. Bu URL http kullanır, bu yüzden yalnızca “Sandbox” uygulamasıyla çalışır. PUBLIC_APP_URL değerini Monize'in https adresine ayarlayın.",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "copyFailed": "Kopyalanamadı",
+      "testSuccess": "Uygulama çalışıyor: {name}",
+      "testSuccessNoName": "Uygulama çalışıyor.",
+      "testRedirectMissing": "Uygulama çalışıyor, ancak yukarıdaki yönlendirme URL'si bu uygulama için kayıtlı değil. Enable Banking kontrol panelinde ekleyin.",
+      "testFailed": "Sağlayıcı bu kimlik bilgilerini kabul etmedi.",
+      "testError": "Kimlik bilgileri test edilemedi",
+      "saved": "Kimlik bilgileri kaydedildi. Kontrol etmek için Bağlantıyı test et'i kullanın.",
+      "saveFailed": "Kimlik bilgileri kaydedilemedi",
+      "removed": "Kimlik bilgileri kaldırıldı",
+      "removeFailed": "Kimlik bilgileri kaldırılamadı",
+      "removeConfirm": {
+        "title": "Kimlik bilgilerini kaldır",
+        "message": "Kayıtlı uygulama kimliği ve özel anahtar Monize'den silinir. Bir banka bağlamadan veya senkronize etmeden önce bunları yeniden girmeniz gerekir.",
+        "confirm": "Kaldır"
+      },
+      "help": {
+        "show": "Kurulum yardımını göster",
+        "hide": "Kurulum yardımını gizle",
+        "whatIsTitle": "Enable Banking nedir?",
+        "whatIsBody": "Enable Banking, AB'de PSD2 kapsamında hesap bilgisi hizmet sağlayıcısı (AISP) olarak lisanslı bir şirkettir. Sizin adınıza bankanıza bağlanır ve Monize'ye hesaplarınıza, bakiyelerinize ve işlemlerinize salt okunur erişim verir. Kendi bankanızda oturum açarsınız. Monize ve Enable Banking banka parolanızı hiçbir zaman görmez. Enable Banking, Avrupa Ekonomik Alanı'ndaki bankalarla çalışır.",
+        "dataFlow": "Bankanızı bağladıktan sonra Enable Banking banka verilerinizi okuyabilir: hesap verileriniz Monize'ye giderken onun hizmetinden geçer. Enable Banking bu verileri saklamadığını belirtir. Koşulları geçerlidir: <terms>Enable Banking API koşulları</terms>.",
+        "whatIsFree": "Kişisel kullanım için kısıtlı üretim modunda ücretsiz bir uygulama yeterlidir. Yalnızca kontrol panelinde ona bağladığınız hesapları okur.",
+        "setupTitle": "Nasıl kurulur",
+        "step1": "<link>Enable Banking</link> sitesinde bir hesap oluşturun (“Get Started” seçeneğini seçin ve onay e-postasını bekleyin). Ardından kontrol paneline giriş yapın ve “API applications” sekmesini açın.",
+        "step2": "“Production” seçeneğini seçin. Monize gerçek banka hesaplarınızı yalnızca Production uygulaması üzerinden okur. “Sandbox” seçeneğini yalnızca bağlantıyı önce denemek istiyorsanız seçin: yalnızca test bankalarının demo verilerini gösterir.",
+        "step3": "Özel anahtar için “Generate in the browser” seçeneğini olduğu gibi bırakın.",
+        "step4": "Aşağıdaki değerleri forma girin. “Production” için her alan zorunludur.",
+        "registrationValuesTitle": "Forma yapıştırılacak değerler",
+        "registrationValuesNote": "Kontrol paneli İngilizce olduğu için etiketler ve değerler İngilizce kalır.",
+        "registrationTemplatesNote": "İki URL, Monize şablonlarını gösterir. Kısıtlı modda Enable Banking bunları denetlemez. Monize örneğinizi başkaları da kullanıyorsa, bunun yerine kendi adınızla kendi sayfalarınızı yayımlayın.",
+        "emailPlaceholder": "E-posta adresiniz",
+        "copyField": "{field} alanını kopyala",
+        "step5": "“Register” seçeneğini seçin. Tarayıcınız özel anahtar dosyasını (.pem) kaydeder. Bu dosyayı gizli tutun.",
+        "step6": "“Production” için yeni uygulama “Inactive” gösterir. “Activate by linking accounts” seçeneğini seçin; ülkeyi, bankanızı ve kullanım türünü (kişisel hesap için “personal”, şirket hesabı için “business”) seçin ve “Link” seçeneğini seçin. Ardından bankanızda oturum açın ve hesaplarınızı yetkilendirin. “Request activation” seçeneğini seçmeyin: genel kullanılabilirlik ister, kişisel kullanımın buna ihtiyacı yoktur. Bağlı hesap olmadan banka hiç hesap döndürmez. Daha sonra Monize'de bankayı bağladığınızda aynı kullanım türünü seçin.",
+        "step7": "Uygulama listesindeki uygulama kimliğini girin ve özel anahtar dosyasını buraya yükleyin.",
+        "sandboxNote": "Sandbox uygulamasındaki işlemler demo verisidir. Bir Sandbox banka hesabını yalnızca Monize'daki bir test hesabına bağlayın, gerçek işlemlerinizi içeren bir hesaba bağlamayın.",
+        "networkTitle": "Ağ erişimi",
+        "networkBody": "Banka sizi geri gönderdiğinde tarayıcınız yönlendirme URL'sini açar. Enable Banking sunucuları Monize'ye bağlanmaz. Bu yüzden Monize'nin internetten veya Enable Banking IP adreslerinden erişilebilir olması gerekmez. Yönlendirme URL'si, erişimi onaylamak için kullandığınız tarayıcıda açılmalıdır.",
+        "networkOutbound": "Monize sunucusu, HTTPS (bağlantı noktası 443) üzerinden api.enablebanking.com adresine bağlanabilmelidir."
+      },
+      "modalSource": "Uygulama kimliğini ve özel anahtarı <link>Enable Banking kontrol panelinden</link> alın."
+    },
+    "credentialsModal": {
+      "title": "Enable Banking kimlik bilgileri",
+      "subtitle": "Bu sunucuda şifrelenmiş olarak saklanır. Özel anahtar bir daha gösterilmez.",
+      "applicationIdLabel": "Uygulama kimliği",
+      "applicationIdPlaceholder": "Enable Banking uygulamanızın kimliği",
+      "applicationIdRequired": "Uygulama kimliğini girin",
+      "applicationIdTooLong": "Uygulama kimliği çok uzun",
+      "privateKeyLabel": "Özel anahtar (PEM)",
+      "privateKeyPlaceholder": "Uygulamanızın PEM özel anahtarını yapıştırın",
+      "privateKeyStoredPlaceholder": "Bir anahtar kayıtlı. Korumak için bunu boş bırakın veya değiştirmek için yenisini yapıştırın.",
+      "privateKeyHelp": "Uygulamayı kaydettiğinizde indirdiğiniz PEM dosyasının tamamını yapıştırın.",
+      "privateKeyRequired": "Özel anahtarı girin",
+      "privateKeyInvalid": "Bu bir PEM özel anahtarına benzemiyor. BEGIN ile başlayan ve PRIVATE KEY ile biten bir blok olmalıdır.",
+      "privateKeyTooLong": "Özel anahtar çok uzun",
+      "loadKeyFile": "Anahtar dosyasını yükle",
+      "keyFileTooLarge": "Dosya 16 KB'tan büyük. Enable Banking'in kaydettiği .pem dosyasını seçin.",
+      "keyFileReadFailed": "Dosya okunamadı.",
+      "cancel": "İptal",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor..."
+    },
+    "connections": {
+      "title": "Bağlı bankalar",
+      "subtitle": "Her banka hesabı bir Monize hesabına bağlanır ve hesaba işlenmiş işlemleri o hesaba aktarılır.",
+      "connect": "Banka bağla",
+      "credentialsFirst": "Bir banka bağlamadan önce yukarıda Enable Banking kimlik bilgilerinizi ayarlayın.",
+      "loadFailed": "Banka bağlantılarınız yüklenemedi.",
+      "empty": {
+        "title": "Bağlı banka yok",
+        "description": "Hesaba işlenmiş işlemlerini Monize hesaplarınıza aktarmak için bir banka bağlayın."
+      }
+    },
+    "connect": {
+      "title": "Banka bağla",
+      "subtitle": "Salt okunur erişimi onaylamak için bankanıza yönlendirileceksiniz.",
+      "whySecondAuthorization": "Aynı hesapları Enable Banking kontrol panelinde daha önce bağlamış olsanız bile burada bankanızda yeniden yetkilendirme yaparsınız. Kontrol paneli yalnızca uygulamanın hangi hesapları okuyabileceğini listeler ve onun onayı aynı gün sona erer. Bu adım Monize'ye bakiyeleri ve işlemleri okumak için 180 güne kadar geçerli kendi onayını verir. Onay sona ermek üzereyken bağlantı kartında “Onayı yenile” görünür.",
+      "countryLabel": "Ülke",
+      "countryPlaceholder": "Bir ülke seçin",
+      "institutionLabel": "Banka",
+      "institutionPlaceholder": "Bankanızı arayın",
+      "institutionsLoading": "Bankalar yükleniyor...",
+      "institutionsFailed": "Banka listesi yüklenemedi.",
+      "retry": "Tekrar dene",
+      "noInstitutions": "Sağlayıcı bu ülke için hiçbir banka listelemiyor.",
+      "psuTypeLabel": "Hesap sahibi",
+      "psuPersonal": "Bireysel",
+      "psuBusiness": "Kurumsal",
+      "consentDays": "{days, plural, one {Bu banka, yenilemeniz gerekmeden önce en fazla # gün erişime izin verir.} other {Bu banka, yenilemeniz gerekmeden önce en fazla # gün erişime izin verir.}}",
+      "continue": "Bankaya devam et",
+      "continuing": "Bağlanıyor...",
+      "cancel": "İptal",
+      "unsafeUrl": "Sunucunun döndürdüğü banka adresi güvenli bir https adresi olmadığından Monize onu açmadı.",
+      "failed": "Bağlantı başlatılamadı"
+    },
+    "connection": {
+      "status": {
+        "pending": "Beklemede",
+        "active": "Aktif",
+        "expired": "Süresi doldu",
+        "revoked": "İptal edildi",
+        "failed": "Başarısız"
+      },
+      "validUntil": "Erişim {date} tarihine kadar geçerli",
+      "expiresSoon": "Yakında sona eriyor",
+      "autoSync": "Günde bir kez otomatik senkronize et",
+      "autoSyncOn": "Otomatik senkronizasyon açıldı",
+      "autoSyncOff": "Otomatik senkronizasyon kapatıldı",
+      "autoSyncFailed": "Otomatik senkronizasyon değiştirilemedi",
+      "renew": "Onayı yenile",
+      "renewFailed": "Yenileme başlatılamadı",
+      "syncAll": "Tümünü senkronize et",
+      "syncingAll": "Senkronize ediliyor...",
+      "syncAllFailed": "Bu banka senkronize edilemedi",
+      "disconnect": "Bağlantıyı kes",
+      "disconnected": "Banka bağlantısı kesildi",
+      "disconnectFailed": "Banka bağlantısı kesilemedi",
+      "disconnectConfirm": {
+        "title": "{bank} bağlantısını kes",
+        "message": "Monize bu bankayı senkronize etmeyi bırakır ve bankadan erişimi sonlandırmasını ister. Önceden içe aktarılan işlemler kalır ve bankayı yeniden bağlamak onları ikinci kez içe aktarmaz.",
+        "confirm": "Bağlantıyı kes"
+      },
+      "pendingHint": "Bankadaki yetkilendirme tamamlanmadı. Yeniden denemek için onayı yenileyin; bağladığınız hesaplar korunur.",
+      "noAccounts": "Banka bu bağlantı için herhangi bir hesap bildirmedi.",
+      "accountsHeading": "Banka hesapları",
+      "matchAccounts": "Hesap numarasına göre eşleştir",
+      "matching": "Eşleştiriliyor...",
+      "matchLinked": "{count, plural, one {# banka hesabı aynı numaralı hesaba bağlandı} other {# banka hesabı aynı numaralı hesaplara bağlandı}}",
+      "matchSuggested": "{count, plural, one {# banka hesabı birden fazla hesabınızla eşleşiyor: hesabı kendiniz seçin} other {# banka hesabı birden fazla hesabınızla eşleşiyor: hesapları kendiniz seçin}}",
+      "matchBoth": "{linked}. {suggested}",
+      "matchNone": "Hiçbir banka hesabı bağlanmadı: hiçbirinin hesap numarası hesaplarınızdan biriyle eşleşmiyor.",
+      "matchFailed": "Banka hesapları eşleştirilemedi",
+      "syncAllNeedsPreview": "Tümünü senkronize et, yeni bağlanan her hesabın ilk içe aktarması onaylanana kadar bekler. Önizlemeyi açmak için o hesapta Şimdi senkronize et düğmesini kullanın.",
+      "notifySuccess": "Günlük senkronizasyondan sonra bildir",
+      "notifySuccessOptions": {
+        "always": "Her senkronizasyondan sonra",
+        "when_imported": "Yalnızca işlemler içe aktarıldığında",
+        "never": "Hiçbir zaman"
+      },
+      "notifySuccessSaved": "Bildirim ayarı kaydedildi",
+      "notifySuccessFailed": "Bildirim ayarı değiştirilemedi",
+      "tagOperationType": "İşlemleri bankanın işlem türüyle etiketle",
+      "tagOperationTypeHelp": "İçe aktarılan her işlem, bankanın işlem türünün adını taşıyan bir etiket alır (ör. Kart ödemesi veya Gelen havale); böylece kurallar ve raporlar bunu kullanabilir.",
+      "tagOperationTypeOn": "İşlem türü etiketleri açıldı",
+      "tagOperationTypeOff": "İşlem türü etiketleri kapatıldı",
+      "tagOperationTypeFailed": "İşlem türü etiketleri değiştirilemedi"
+    },
+    "profileNotes": {
+      "title": "Bu bankanın API'si nasıl çalışır",
+      "show": "Bu bankanın API'sinin nasıl çalıştığını göster",
+      "hide": "Bu bankanın API'sinin nasıl çalıştığını gizle",
+      "severity": {
+        "warning": "Uyarı:",
+        "info": "Not:"
+      }
+    },
+    "account": {
+      "unnamed": "Adsız banka hesabı",
+      "linkLabel": "Monize hesabı",
+      "notLinked": "Bağlı değil",
+      "noEligibleAccounts": "Bağlanabilecek, bu para biriminde açık bir Monize hesabı yok.",
+      "linkFailed": "Hesap bağlanamadı",
+      "unlinked": "Hesap bağlantısı kaldırıldı",
+      "unlinkFailed": "Hesap bağlantısı kaldırılamadı",
+      "syncFrom": "{date} tarihinden itibaren içe aktarılıyor",
+      "changeCutoff": "Başlangıç tarihini değiştir",
+      "syncNow": "Şimdi senkronize et",
+      "syncing": "Senkronize ediliyor...",
+      "syncFailed": "Bu hesap senkronize edilemedi",
+      "neverSynced": "Henüz senkronize edilmedi",
+      "lastSynced": "Son senkronizasyon: {time}",
+      "lastSyncOk": "Başarılı",
+      "lastSyncFailed": "Başarısız",
+      "bankBalance": "Banka bakiyesi",
+      "bankBalanceAsOf": "{date} itibarıyla {amount}",
+      "balanceNotReported": "Banka tarafından bildirilmedi",
+      "balanceNotSynced": "Henüz senkronize edilmedi",
+      "monizeBalance": "Monize bakiyesi",
+      "difference": "Fark",
+      "differenceHelp": "Banka bakiyesi, bankanın gösterilen tarihte bildirdiği tutardır. Bankanın henüz hesaba işlemediği veya o tarihten sonra işlediği işlemleri içerebilir, bu nedenle senkronizasyonlar arasında küçük bir fark normaldir.",
+      "differenceHidden": "Banka bakiyesi {bankCurrency}, Monize hesabı ise {monizeCurrency} cinsinden olduğundan fark gösterilmiyor.",
+      "deletedNote": "Monize'de sildiğiniz bir işlem sonraki bir senkronizasyonda yeniden içe aktarılmaz, yani silinen satır silinmiş kalır.",
+      "createNew": "Yeni hesap oluştur",
+      "suggestedName": "{type} {number}",
+      "createdLinked": "Hesap oluşturuldu ve bağlandı",
+      "createdLinkFailed": "Hesap oluşturuldu ancak bağlanamadı",
+      "preview": "Önizleme",
+      "firstSyncPreview": "İlk içe aktarma, işlemlerin önizlemesiyle onaylanır."
+    },
+    "link": {
+      "title": "{account} hesabına bağla",
+      "editTitle": "{account} için başlangıç tarihi",
+      "syncFromLabel": "İşlemleri şu tarihten itibaren içe aktar",
+      "syncFromHelp": "Monize'un varsayılan olarak seçtiği tarihle dolduruldu. Alanı boşaltırsanız Monize tarihi sizin için seçer.",
+      "beforeCutoff": "Bankanın bu tarihten önce hesaba işlediği işlemler hiçbir zaman içe aktarılmaz.",
+      "duplicateWarning": "Hesaptaki en yeni işlemden önceki bir tarih, zaten girdiğiniz işlemlerin kopyalarını oluşturabilir.",
+      "save": "Hesabı bağla",
+      "saveEdit": "Kaydet",
+      "saving": "Kaydediliyor...",
+      "cancel": "İptal",
+      "saved": "Hesap bağlandı",
+      "editSaved": "Başlangıç tarihi kaydedildi",
+      "saveFailed": "Bağlantı kaydedilemedi",
+      "loadingDefaults": "Hesap okunuyor...",
+      "defaultsFailed": "Bu hesaptaki en yeni işlem okunamadı; bu nedenle Monize bu başlangıç tarihinin kopyalar oluşturup oluşturmayacağını söyleyemez.",
+      "newestTransaction": "Bu hesaptaki en yeni işlem: {date}",
+      "emptyAccount": "{days, plural, one {Hesap boş: içe aktarma son günü kapsıyor} other {Hesap boş: içe aktarma son # günü kapsıyor}}"
+    },
+    "sync": {
+      "summary": "{imported, plural, =0 {İşlem içe aktarılmadı} one {# işlem içe aktarıldı} other {# işlem içe aktarıldı}}, {skipped, plural, =0 {atlanan yok} one {# tanesi zaten içe aktarıldığı için atlandı} other {# tanesi zaten içe aktarıldığı için atlandı}}, {refused, plural, =0 {reddedilen yok} one {# tanesi reddedildi} other {# tanesi reddedildi}}",
+      "summaryWithReasons": "{summary}. Reddedilenler: {reasons}",
+      "outcomeUnknown": "Senkronizasyonun sonucu henüz bilinmiyor. Nelerin içe aktarıldığını görmek için sayfayı yeniden yükleyin.",
+      "failedAccountItem": "{account} ({message})",
+      "allFailed": "Senkronize edilemeyenler: {accounts}",
+      "partialFailure": "{summary}. Senkronize edilemeyenler: {accounts}",
+      "reason": {
+        "missing_date": "{count, plural, one {# tanesi tarihsiz} other {# tanesi tarihsiz}}",
+        "future_date": "{count, plural, one {# tanesi gelecek tarihli} other {# tanesi gelecek tarihli}}",
+        "invalid_amount": "{count, plural, one {# tanesi geçersiz tutarlı} other {# tanesi geçersiz tutarlı}}",
+        "unknown_direction": "{count, plural, one {# tanesi bilinmeyen yönlü} other {# tanesi bilinmeyen yönlü}}",
+        "currency_mismatch": "{count, plural, one {# tanesi başka para biriminde} other {# tanesi başka para biriminde}}",
+        "other": "{count, plural, one {# tanesi başka bir nedenle} other {# tanesi başka bir nedenle}}",
+        "missing_identity": "Banka işlem kimliği eksik: {count, number}"
+      },
+      "needsPreview": "{accounts} için önizlemeyi açın ve ilk içe aktarmayı onaylayın",
+      "withNeedsPreview": "{message}. {needsPreview}"
+    },
+    "callback": {
+      "title": "Bankanız bağlanıyor",
+      "subtitle": "Monize bağlantıyı tamamlarken lütfen bekleyin",
+      "success": "Banka bağlandı",
+      "successNamed": "{bank} bankasına bağlandı",
+      "bankError": "Bankanız erişim vermedi: {message}",
+      "missingState": "Banka geçerli bir yanıt döndürmedi. Bağlantıyı yeniden başlatın.",
+      "notActive": "Bağlantı tamamlanamadı",
+      "failed": "Bağlantı tamamlanamadı",
+      "autoLinked": "{count, plural, one {# banka hesabı aynı numaralı hesaba bağlandı. İlk içe aktarmadan önce kontrol edin.} other {# banka hesabı aynı numaralı hesaplara bağlandı. İlk içe aktarmadan önce kontrol edin.}}",
+      "autoSuggested": "{count, plural, one {# banka hesabı birden fazla hesabınızla eşleşiyor: hesabı listeden seçin.} other {# banka hesabı birden fazla hesabınızla eşleşiyor: hesapları listeden seçin.}}"
+    },
+    "accountType": {
+      "CACC": "Vadesiz hesap",
+      "CARD": "Kart",
+      "SVGS": "Birikim hesabı",
+      "LOAN": "Kredi",
+      "other": "Hesap türü {code}"
+    },
+    "mismatch": {
+      "bankCard": "Banka bu hesabı kart olarak bildiriyor, ancak {account} hesabının türü {creditCard} değil, {type}. Bir kartın işlemleri yanlış türde bir hesaba içe aktarılırdı.",
+      "monizeCard": "{account} hesabının türü {creditCard}, ancak banka bu hesabı şöyle bildiriyor: {bankType}. Bunun doğru banka hesabı olduğunu kontrol edin.",
+      "confirm": "Anladım, yine de hesapları bağla"
+    },
+    "preview": {
+      "title": "{account} hesabına içe aktarma önizlemesi",
+      "description": "Onaylayana kadar hiçbir şey içe aktarılmaz. Bu, bankanın bildirdiği ve Monize'un her işlemle yapacağı şeydir.",
+      "loading": "Banka okunuyor...",
+      "loadFailed": "Bu hesap için önizleme yapılamadı",
+      "retry": "Tekrar dene",
+      "close": "Kapat",
+      "import": "{count, plural, =0 {Onayla: içe aktarılacak yeni bir şey yok} one {# işlemi içe aktar} other {# işlemi içe aktar}}",
+      "importing": "İçe aktarılıyor...",
+      "importFailed": "İşlemler içe aktarılamadı",
+      "planChanged": "Bankanın verileri bu önizlemeden sonra değişti, bu yüzden hiçbir şey içe aktarılmadı. Önizleme yeniden okundu: kontrol edip bir kez daha içe aktarın.",
+      "monizeBalance": "Şu anki Monize bakiyesi",
+      "balanceAfter": "İçe aktarmadan sonraki Monize bakiyesi",
+      "bankBalance": "Banka bakiyesi",
+      "bankBalanceAsOf": "{date} itibarıyla {amount}",
+      "bankBalanceNotReported": "Banka tarafından bildirilmedi",
+      "difference": "İçe aktarmadan sonraki fark",
+      "differenceHelp": "Banka bakiyesinden içe aktarmadan sonraki Monize bakiyesinin çıkarılmış hâli. Sıfır, ikisinin uyuştuğu anlamına gelir. Banka bakiyesi, bankanın henüz hesaba işlemediği işlemleri içerebilir; bu yüzden küçük bir fark normaldir.",
+      "differenceHidden": "Banka bakiyesi {bankCurrency} cinsinden, Monize hesabı ise {monizeCurrency} cinsinden; bu yüzden fark gösterilmiyor.",
+      "filterLabel": "İşlemleri göster",
+      "filter": {
+        "all": "Tümü",
+        "new": "Yeni",
+        "duplicate": "Zaten içe aktarılmış",
+        "refused": "Reddedilen",
+        "pending": "Bekleyen",
+        "before_cutoff": "Başlangıç tarihinden önce",
+        "withCount": "{label} ({count})",
+        "excluded": "İstisnalar"
+      },
+      "outcome": {
+        "new": "Yeni",
+        "duplicate": "Zaten içe aktarılmış",
+        "refused": "Reddedildi",
+        "pending": "Bekliyor",
+        "before_cutoff": "Başlangıç tarihinden önce",
+        "excluded": "İstisna"
+      },
+      "refusal": {
+        "missing_date": "Tarih yok",
+        "future_date": "Gelecek tarihli",
+        "invalid_amount": "Geçersiz tutar",
+        "unknown_direction": "Bilinmeyen yön",
+        "currency_mismatch": "Başka para birimi",
+        "other": "Reddedildi",
+        "missing_identity": "Banka işlem kimliği eksik"
+      },
+      "columns": {
+        "date": "Tarih",
+        "payee": "Alacaklı",
+        "category": "Kategori",
+        "status": "Durum",
+        "amount": "Miktar",
+        "select": "Seçim ve ayrıntılar"
+      },
+      "noPayee": "Alacaklı yok",
+      "dateUnknown": "Tarih yok",
+      "amountUnknown": "Bilinmiyor",
+      "empty": {
+        "all": "Banka bu dönem için işlem döndürmedi.",
+        "filtered": "Bu listede işlem yok."
+      },
+      "selectAllNew": "Bu listedeki tüm yeni işlemleri seç",
+      "selectAllExceptions": "Bu listedeki tüm istisnaları seç",
+      "selectRow": "İçe aktar: {payee}",
+      "selectException": "İstisnalardan kaldır: {payee}",
+      "summary": "{import} içe aktar, {skip} atla, {except} istisnalara ekle",
+      "importNothing": "İçe aktarmadan onayla",
+      "exceptions": {
+        "intro": "İstisnalardaki işlemler asla içe aktarılmaz. Yeniden yeni olarak görmek için bir işlemi istisnalardan kaldırın.",
+        "remove": "{count, plural, =0 {İstisnalardan kaldır} other {# işlemi istisnalardan kaldır}}",
+        "removing": "Kaldırılıyor...",
+        "removed": "{count, plural, one {# işlem istisnalardan kaldırıldı} other {# işlem istisnalardan kaldırıldı}}",
+        "removedNone": "İstisnalardan hiçbir şey kaldırılmadı",
+        "removeFailed": "İstisnalar kaldırılamadı"
+      },
+      "details": {
+        "operation": {
+          "heading": "İşlem türü",
+          "none": "Bu işlem için işlem türü etiketi yok.",
+          "tag": "Bankanın işlem türünden etiket: {tag}"
+        }
+      },
+      "historyBatch": "Geçmiş grubu: {from} – {to}.",
+      "historyBatchRemaining": "Geçmiş grubu: {from} – {to}. Daha fazla geçmiş var. Bu grubu içe aktardıktan sonra sonraki grubun önizlemesini açın."
+    },
+    "simplefin": {
+      "provider": "Veri sağlayıcısı",
+      "description": "Bankaları <bridge>SimpleFIN Bridge</bridge> üzerinden bağlayın, ardından tek kullanımlık kurulum belirtecini buraya yapıştırın. Erişim salt okunurdur.",
+      "openBridge": "SimpleFIN Bridge'i aç",
+      "setupToken": "Kurulum belirteci",
+      "connect": "SimpleFIN'i bağla",
+      "connected": "SimpleFIN bağlı.",
+      "savedDiscoveryFailed": "Bağlandı, ancak hesap keşfi ilgi gerektiriyor. Yeni bir belirteç olmadan yeniden deneyin.",
+      "refresh": "Hesapları yenile",
+      "failed": "İstek tamamlanamadı. Yeni bir belirteç kullanmadan önce bağlantı durumunu kontrol edin.",
+      "loadFailed": "SimpleFIN durumu yüklenemedi.",
+      "encryptionRequired": "SimpleFIN'i bağlamadan önce yöneticiden şifrelemeyi yapılandırmasını isteyin.",
+      "remove": "SimpleFIN'i Monize'dan kaldır",
+      "removeTitle": "Tüm kurumların erişimi kaldırılsın mı?",
+      "removeBody": "Bu işlem Monize'daki tüm SimpleFIN eşitlemesini devre dışı bırakır ve geçmişi korur. Uzaktan erişimi sonlandırmak için Bridge'deki uygulama belirtecini iptal edin.",
+      "replaceTitle": "SimpleFIN erişimi değiştirilsin mi?",
+      "replaceBody": "Bu işlem tüm kurumların erişimini değiştirir. Mevcut hesap eşleştirmeleri korunur; değişen kimlikler incelenmelidir.",
+      "quota": "{remaining} istek kaldı",
+      "nextEligible": "Sonraki kullanılabilirlik: {date}",
+      "stopTitle": "{bank} eşitlemesi durdurulsun mu?",
+      "stopBody": "Mevcut eşlemeler ve işlemler korunur.",
+      "stop": "Eşitlemeyi durdur",
+      "stopped": "Eşitleme durduruldu",
+      "title": "SimpleFIN",
+      "enableBanking": "Enable Banking",
+      "errors": {
+        "unauthorized": "Yeni bir kurulum belirteciyle yeniden bağlanın.",
+        "payment_required": "SimpleFIN Bridge aboneliğinizi kontrol edin.",
+        "rate_limited": "İstek sınırına ulaşıldı. Yenilemeden önce bekleyin.",
+        "no_accounts": "Hiçbir hesap paylaşılmadı. Bridge'de hesap erişimini kontrol edin.",
+        "partial_data": "Bazı hesap verileri eksik. Bridge'i kontrol edip yenileyin.",
+        "identity_review": "Hesap kimlikleri değişti. Eşitlemeyi etkinleştirmeden önce eşleştirmeleri inceleyin.",
+        "invalid_response": "Bridge desteklenmeyen veriler döndürdü. Daha sonra yenileyin.",
+        "unavailable": "SimpleFIN yanıt vermedi. Daha sonra deneyin."
+      },
+      "resume": "Eşitlemeyi sürdür",
+      "lastKnownConnected": "Son başarılı kontrolde SimpleFIN bağlıydı."
+    }
+  }
+}

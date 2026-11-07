@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "Spending Insights",
+    "subtitle": "AI-powered analysis of your spending patterns and anomalies"
+  },
+  "list": {
+    "refreshButton": "Refresh Insights",
+    "refreshAge": "({time})",
+    "summary": {
+      "active": "Active Insights",
+      "alerts": "Alerts",
+      "warnings": "Warnings"
+    },
+    "allTypes": "All Types",
+    "typeFilterLabel": "Type",
+    "severityFilterLabel": "Severity",
+    "severityFilter": {
+      "all": "All ({count})",
+      "alert": "Alerts ({count})",
+      "warning": "Warnings ({count})",
+      "info": "Info ({count})"
+    },
+    "showDismissed": "Show dismissed",
+    "emptyNoInsights": "No insights generated yet. Click \"Refresh Insights\" to analyze your spending patterns.",
+    "emptyFiltered": "No insights match your current filters.",
+    "generateButton": "Generate Insights",
+    "errorLoadFailed": "Failed to load insights. Please try again.",
+    "errorGenerateFailed": "Failed to generate insights. Make sure you have an AI provider configured.",
+    "errorDismissFailed": "Failed to dismiss the insight. Please try again.",
+    "errorTimeout": "Insight generation is taking longer than expected. Please wait or refresh the page."
+  },
+  "card": {
+    "dismiss": "Dismiss",
+    "dismissing": "Dismissing..."
+  },
+  "notConfigured": {
+    "heading": "AI Not Configured",
+    "message": "No AI provider is configured. To use Spending Insights, please {link} in your settings."
+  },
+  "insightTypes": {
+    "anomaly": "Anomaly",
+    "trend": "Trend",
+    "subscription": "Subscription",
+    "budget_pace": "Budget Pace",
+    "seasonal": "Seasonal",
+    "new_recurring": "New Recurring"
+  },
+  "insightSeverities": {
+    "info": "Info",
+    "warning": "Warning",
+    "alert": "Alert"
+  }
+}

@@ -1,0 +1,594 @@
+{
+  "controls": {
+    "next": "Avançar",
+    "back": "Voltar",
+    "done": "Concluir",
+    "endTour": "Encerrar tour",
+    "tryIt": "Experimente — o tour continua quando você fizer isso",
+    "skipStep": "Pular esta etapa",
+    "stepCounter": "{current} de {total}",
+    "skippedTitle": "Tour encerrado",
+    "skippedBody": "Algumas etapas foram puladas porque a tela ou o controle correspondente não estava disponível. Você pode refazer o tour a qualquer momento em Configurações.",
+    "move": "Mover este cartão — arraste-o ou desloque-o com as teclas de seta"
+  },
+  "offer": {
+    "heading": "Faça um tour rápido",
+    "subheading": "Passeios rápidos pelas novidades desta versão. Esta janela sai da frente durante um passeio e volta quando ele termina.",
+    "showMe": "Mostrar",
+    "viewed": "Visualizado",
+    "introTitle": "Novo por aqui? Faça o tour de introdução",
+    "introSubtitle": "Um passeio rápido pelo básico."
+  },
+  "areas": {
+    "intro": "Primeiros Passos",
+    "transactions": "Transações",
+    "accounts": "Contas",
+    "budgets": "Orçamentos",
+    "reports": "Relatórios",
+    "investments": "Investimentos",
+    "settings": "Configurações"
+  },
+  "gettingStarted": {
+    "takeTour": "Fazer o tour",
+    "retakeTour": "Refazer o tour"
+  },
+  "settings": {
+    "title": "Tours guiados",
+    "description": "Percorra as funcionalidades do aplicativo passo a passo.",
+    "backLink": "Voltar às Configurações",
+    "pageTitle": "Tours guiados",
+    "pageSubtitle": "Todos os tours que o Monize oferece, em um só lugar. Comece um quando quiser — você pode sair de um tour com Escape e retomá-lo por aqui.",
+    "meta": "{steps} · {status}",
+    "metaWithRelease": "{steps} · {release} · {status}",
+    "stepCount": "{count, plural, one {# etapa} other {# etapas}}",
+    "releaseLabel": "Novidade na {version}",
+    "requirementsLoading": "Verificando se você pode fazer este tour…",
+    "requires": {
+      "transactionEntry": "Adicione uma conta primeiro — este tour mostra como registrar uma transação.",
+      "securitiesExist": "Adicione um título primeiro — este tour abre um a partir da sua lista de títulos.",
+      "ownerView": "Volte primeiro aos seus próprios dados. Este tour apresenta recursos indisponíveis quando você atua em nome de outra pessoa."
+    },
+    "start": "Iniciar",
+    "restart": "Refazer",
+    "statusNotViewed": "Não visto",
+    "statusDismissed": "Saiu antes do fim",
+    "resetHeading": "Começar de novo",
+    "resetDescription": "Limpa todos os tours registrados para que sejam oferecidos de novo no painel e após uma atualização.",
+    "reset": "Redefinir progresso do tour",
+    "resetSuccess": "Progresso do tour redefinido.",
+    "resetError": "Não foi possível redefinir o progresso do tour. Tente novamente."
+  },
+  "intro": {
+    "basics": {
+      "title": "Introdução ao Monize",
+      "steps": {
+        "welcome": {
+          "title": "Bem-vindo ao Monize",
+          "body": "Este tour rápido apresenta o essencial do aplicativo. Você pode sair a qualquer momento pressionando **Escape** ou **Encerrar tour**."
+        },
+        "dashboard": {
+          "title": "Seu painel",
+          "body": "Este é o seu painel. Use o botão **Personalizar** no canto superior direito para reorganizar ou ocultar os widgets, deixando os resumos que mais importam bem no topo."
+        },
+        "tools": {
+          "title": "O menu Ferramentas",
+          "body": "O menu **Ferramentas** é onde você gerencia os blocos que compõem suas finanças — beneficiários, categorias, moedas, tags e mais."
+        },
+        "accounts": {
+          "title": "Suas contas",
+          "body": "Adicione aqui suas contas bancárias, cartões de crédito, empréstimos e investimentos com o botão destacado. Todo saldo e transação pertence a uma conta."
+        },
+        "openAccountDetail": {
+          "title": "Abra a visão detalhada de uma conta",
+          "body": "Cada conta tem uma página adaptada ao seu tipo. Escolha **Detalhes** — o ícone de olho na linha de uma conta — para abri-la. No celular, mantenha a conta pressionada e escolha **Detalhes**."
+        },
+        "accountDetailView": {
+          "title": "Uma visão feita para esta conta",
+          "body": "Esta página muda conforme o tipo de conta, então uma conta bancária, um cartão de crédito, um empréstimo, uma conta de investimento ou um ativo mostram cada um os números e as ferramentas que lhes servem. Volte aqui quando quiser por **Detalhes** na lista de contas."
+        },
+        "transactions": {
+          "title": "Transações",
+          "body": "Este é o seu registro de transações — todo pagamento e depósito das suas contas fica aqui, pronto para busca e filtro."
+        },
+        "createTransaction": {
+          "title": "Registre uma transação",
+          "body": "Adicione receitas ou despesas com **Nova Transação**. Vá em frente e abra o formulário."
+        },
+        "fields": {
+          "title": "Beneficiário e categoria",
+          "body": "Para cada transação você escolhe um beneficiário e atribui uma categoria. As categorias são o que alimenta seus orçamentos e relatórios; o valor vem na próxima etapa."
+        },
+        "splits": {
+          "title": "Dividir uma transação",
+          "body": "Uma compra que abrange várias categorias? Use **Dividir Transação** para repartir uma única transação entre categorias — mercado e itens de casa em uma mesma compra, por exemplo."
+        },
+        "currencyField": {
+          "title": "Valor e moeda",
+          "body": "Informe aqui o valor da transação. Pagou em outra moeda? Defina a moeda ao lado do valor e informe-o como foi cobrado — o Monize converte para a moeda da conta automaticamente."
+        },
+        "closeForm": {
+          "title": "Feche o formulário para continuar",
+          "body": "Feche o formulário de transação com **Cancelar**, ou salve-a com o outro botão, e o tour vai continuar."
+        },
+        "bills": {
+          "title": "Faturas e depósitos",
+          "body": "Agende faturas e depósitos recorrentes para que os próximos pagamentos sejam previstos e nada passe despercebido."
+        },
+        "investments": {
+          "title": "Investimentos",
+          "body": "Acompanhe seus ativos, preços e retornos em suas contas de investimento."
+        },
+        "budgets": {
+          "title": "Planeje com orçamentos",
+          "body": "Os orçamentos permitem definir metas mensais por categoria e acompanhar seu desempenho em relação a elas."
+        },
+        "reports": {
+          "title": "Entenda o seu dinheiro",
+          "body": "Os relatórios transformam suas transações em gráficos — gastos por categoria, patrimônio líquido ao longo do tempo e muito mais."
+        },
+        "finish": {
+          "title": "Tudo pronto",
+          "body": "Esse foi o tour. Você pode refazê-lo a qualquer momento na seção **Tours guiados** em **Configurações**."
+        }
+      }
+    }
+  },
+  "release": {
+    "v1_13_0": {
+      "foreignCurrency": {
+        "title": "Transações em moeda estrangeira",
+        "steps": {
+          "welcome": {
+            "title": "Acompanhe os gastos em outras moedas",
+            "body": "Comprou algo no exterior? Este tour configura a taxa de transação em moeda estrangeira de uma conta, registra uma compra na moeda que foi cobrada e mostra onde esses custos aparecem. Você pode sair quando quiser com **Esc** ou **Encerrar tour**."
+          },
+          "openAccountEdit": {
+            "title": "Comece pela conta",
+            "body": "As taxas de transação em moeda estrangeira pertencem à conta. Escolha a conta com que você paga no exterior — um cartão de crédito ou de débito, ou a que está por trás dos pagamentos pelo celular — e selecione **Editar** nas ações da linha dela, ou pressione e segure a linha no celular, para abrir as configurações."
+          },
+          "fxFeePercent": {
+            "title": "Defina a taxa de conversão",
+            "body": "Informe aqui a taxa de transação em moeda estrangeira da conta em porcentagem — 2,5, por exemplo. O Monize a incorpora ao valor convertido de cada compra no exterior, de modo que a taxa fica registrada para você."
+          },
+          "closeAccountForm": {
+            "title": "Salvar e fechar",
+            "body": "Use estes botões para concluir: **Atualizar Conta** salva a taxa, **Cancelar** fecha sem salvar. De qualquer forma, o tour continua."
+          },
+          "newTransaction": {
+            "title": "Registre uma compra no exterior",
+            "body": "Agora registre uma compra que você fez com essa conta em outra moeda. Abra **Nova Transação** e escolha essa conta."
+          },
+          "chooseAccount": {
+            "title": "Confira a conta e a data",
+            "body": "A taxa de conversão pertence à conta, então confirme que **Conta** é a conta em que você acabou de defini-la — altere aqui, se não for. Ajuste também a **Data** para o dia da compra: a taxa de câmbio é consultada para essa data."
+          },
+          "enterDetails": {
+            "title": "Preencha os detalhes",
+            "body": "Informe o beneficiário e a categoria como em qualquer outra transação. A parte de moeda estrangeira vem a seguir."
+          },
+          "entryCurrency": {
+            "title": "Escolha a moeda em que você pagou",
+            "body": "Abra isto e escolha a moeda que foi cobrada. Só aparece a sua própria moeda na lista? Escolha **Adicionar moeda...** no fim para adicionar uma — ela é selecionada na hora."
+          },
+          "enterAmount": {
+            "title": "Informe o valor cobrado",
+            "body": "Digite o total exatamente como aparece na sua fatura. O Monize consulta a **taxa de câmbio** para a data da transação, mostra o total convertido ao lado e incorpora a **taxa de transação em moeda estrangeira** que você definiu na conta — a legenda abaixo detalha as duas. O banco arredondou de outro jeito? Edite a taxa ou o total convertido para bater centavo a centavo."
+          },
+          "closeTransactionForm": {
+            "title": "Feche o formulário",
+            "body": "O mesmo aqui: salve a transação com o botão de envio, ou feche-a com **Cancelar**, e o tour continua."
+          },
+          "openAccountDetail": {
+            "title": "De volta à conta",
+            "body": "Abra a página de detalhes dessa conta — escolha **Detalhes** nas ações da linha dele — para ver como a atividade em moeda estrangeira é resumida."
+          },
+          "fxSection": {
+            "title": "Sua seção de moeda estrangeira",
+            "body": "Contas com atividade em moeda estrangeira ganham esta seção: as taxas pagas por moeda, um gráfico ao longo do tempo e as transações correspondentes, exportáveis para CSV e PNG. Ela aparece assim que a conta tiver uma compra no exterior.",
+            "fallbackBody": "Esta conta ainda não tem atividade em moeda estrangeira, então a seção não está na página dela. Registre nela uma compra em outra moeda e a seção aparece: taxas por moeda, um gráfico ao longo do tempo e exportação para CSV e PNG."
+          },
+          "report": {
+            "title": "O relatório Taxas de transação em moeda estrangeira",
+            "body": "Este relatório reúne num só lugar as compras no exterior de todas as suas contas e moedas, para você ver quanto custam de verdade os cartões \"sem taxa no exterior\". Abra-o quando quiser em **Relatórios**.",
+            "fallbackBody": "O relatório **Taxas em moeda estrangeira** reúne as compras no exterior de todas as suas contas e moedas em um só lugar. Ele não está à vista agora — uma busca ou um filtro de categoria pode escondê-lo — mas você o encontra em **Relatórios**."
+          },
+          "finish": {
+            "title": "Isso é moeda estrangeira no Monize",
+            "body": "Defina a taxa uma vez, registre as compras como foram cobradas, e as taxas se acompanham sozinhas. Você pode refazer este tour quando quiser na seção **Tours guiados** das **Configurações**."
+          }
+        }
+      },
+      "settings": {
+        "title": "Resumo de Novidades",
+        "steps": {
+          "whatsNewToggle": {
+            "title": "Destaques da versão",
+            "body": "Esta opção controla se o resumo de Novidades aparece automaticamente após uma atualização."
+          },
+          "appVersion": {
+            "title": "Releia as notas",
+            "body": "Clique no rótulo da versão na parte inferior de **Configurações** a qualquer momento para reabrir as notas da versão."
+          },
+          "done": {
+            "title": "É isso",
+            "body": "Você pode revisitar esses destaques quando quiser aqui em Configurações."
+          }
+        }
+      }
+    },
+    "v1_14_0": {
+      "securityDetail": {
+        "title": "Página de detalhe do ativo",
+        "steps": {
+          "welcome": {
+            "title": "Cada ativo em uma só página",
+            "body": "Os ativos ficavam antes espalhados por três janelas. Agora cada um tem a sua página, que reúne tudo: o que você tem, como se comportou e tudo o que o Monize sabe sobre ele. Esta é a versão curta."
+          },
+          "openDetail": {
+            "title": "Abrir um ativo",
+            "body": "Clique em qualquer ativo da lista: a linha inteira abre a página dele. Um toque longo, ou o clique com o botão direito, mostra em vez disso as demais ações da linha."
+          },
+          "summary": {
+            "title": "Sua posição de relance",
+            "body": "Valor de mercado, custo de aquisição, ganho não realizado, cotas mantidas e em quais contas estão. Os valores vêm na moeda do próprio ativo — a da cotação dele — e o valor de mercado informa de qual fechamento veio.",
+            "fallbackBody": "Esta fila normalmente mostra sua posição. Você não mantém mais este ativo, então a página mostra o que você realizou nele. Abra um que ainda mantenha para ver os números."
+          },
+          "chart": {
+            "title": "Três formas de ler o histórico",
+            "body": "Alterne entre o **preço**, o **valor da sua posição** e o **retorno** na janela. As compras e vendas estão marcadas em todas as séries. Os botões da direita definem quanto histórico aparece, e as **setas** ao lado deslocam essa janela pelo histórico anterior no mesmo zoom: escolha 1A e volte ano a ano em vez de mudar para 5A."
+          },
+          "keyInfo": {
+            "title": "O que é o instrumento",
+            "body": "Ao lado do gráfico: tipo de ativo, bolsa, moeda, o fornecedor de cotações que o Monize usa e o último preço registrado. Abaixo, o cartão **Composição** mostra do que um fundo é feito: alterne entre a composição por setor, por país e por classe de ativos."
+          },
+          "tabs": {
+            "title": "O detalhe mais abaixo",
+            "body": "**Visão geral** traz a descrição, os retornos do próprio ativo, seu retorno total na posição e suas posições por conta. **Transações** e **Histórico de preços** são as mesmas tabelas que as janelas antigas continham. **Documentos** é o lugar para uma ficha técnica ou um relatório anual, e **Notícias** traz as manchetes recentes que citam o símbolo."
+          },
+          "finish": {
+            "title": "É esse o tour",
+            "body": "Todo link que apontava para as janelas antigas chega aqui: os widgets de preços no painel abrem esta página direto na aba Histórico de preços. É uma página de verdade, então você pode salvá-la nos favoritos e voltar."
+          }
+        }
+      },
+      "gemStrategy": {
+        "title": "GEM: regras que escolhem um instrumento por período",
+        "steps": {
+          "welcome": {
+            "title": "Conheça a estratégia GEM",
+            "body": "Uma vez por mês ou por trimestre, a GEM compara como se moveram três mercados de ações e um ativo seguro, e então aponta o único instrumento a manter até a próxima verificação. Quando as ações vão fracas demais, ela aponta o ativo seguro."
+          },
+          "findReport": {
+            "title": "Encontre a GEM em Relatórios",
+            "body": "Abra aqui o relatório **Estratégia GEM**. Ele fica na categoria **Investimentos**. O relatório está disponível mesmo que você ainda não tenha instrumentos de investimento nem posições registradas no Monize.",
+            "fallbackBody": "O cartão do relatório não está visível agora, normalmente por causa de um filtro. Escolha **Avançar** e o tour abrirá o relatório GEM diretamente. Depois você o encontra em **Relatórios**, na categoria **Investimentos**."
+          },
+          "page": {
+            "title": "Um relatório, quatro perguntas",
+            "body": "No topo, um **cenário** é um conjunto salvo de escolhas da GEM, e não uma ordem, um lançamento ou uma conta na corretora. A página responde a quatro perguntas: o que a estratégia escolhe agora? por quê? a carteira das contas selecionadas combina com isso? o que precisaria mudar? A GEM normalmente aponta para um único instrumento até a próxima avaliação mensal ou trimestral."
+          },
+          "summary": {
+            "title": "Quatro cartões num relance",
+            "body": "**Sinal atual** é o instrumento escolhido pelas regras. **Sua carteira** compara esse alvo com o que está registrado nas contas da estratégia. **A transferir** estima o valor que talvez precise mudar. **Ativos da estratégia** mostra qual instrumento preenche cada papel. A informação que falta aparece como ausente, nunca como zero."
+          },
+          "action": {
+            "title": "Uma sugestão, não uma ordem automática",
+            "body": "O gráfico compara os instrumentos atribuídos. **O que eu devo fazer?** traduz o sinal em uma possível operação de venda e compra e estima imposto e corretagem quando há dados suficientes. O Monize nunca envia uma ordem para sua corretora. Depois de operar de verdade pela sua corretora, registre os lançamentos no Monize; então use **Marcar como executada** apenas como anotação de que você cumpriu o sinal."
+          },
+          "reasoning": {
+            "title": "Por que a GEM escolheu isso?",
+            "body": "Aqui, «momentum» significa apenas como os preços variaram no período passado escolhido. A GEM verifica primeiro se o instrumento de ações norte-americanas superou a referência sem risco usada como régua. Se superou, a GEM escolhe o mais forte entre os instrumentos dos Estados Unidos, dos mercados desenvolvidos fora dos Estados Unidos e dos mercados emergentes. Se não superou, a GEM escolhe o ativo seguro. **Por que este sinal?** e o histórico de sinais mostram a decisão inteira, e não apenas um código final."
+          },
+          "tabs": {
+            "title": "Volte para Visão geral para ver o resultado",
+            "body": "Escolha **Visão geral** para ver o que a configuração produz. Vale conhecer as outras abas: **Sinais** mostra decisões anteriores, **Minha carteira** explica o que está registrado nas contas selecionadas e **Backtest** mostra como as regras teriam se comportado com os preços históricos disponíveis; é um modelo, não uma previsão nem uma promessa."
+          },
+          "openSettings": {
+            "title": "Abra as configurações do cenário",
+            "body": "Escolha **Editar configurações**: primeiro configuramos a estratégia e só depois lemos algo dela. Uma configuração vazia produz um relatório vazio, então é aqui que vale começar. Nada nesta tela compra um instrumento nem muda algo na sua corretora."
+          },
+          "accounts": {
+            "title": "Escolha as contas que serão comparadas",
+            "body": "As **Contas da estratégia** são as contas de investimento que pertencem a este cenário GEM. Só as posições e o dinheiro registrados nessas contas entram na comparação da carteira e na estimativa do valor a transferir. Ainda não tem conta de investimento? Deixe a lista vazia. A GEM ainda pode calcular um sinal, mas não vai conseguir compará-lo com sua carteira real."
+          },
+          "timingAndCosts": {
+            "title": "Escolha até onde a GEM olha para trás",
+            "body": "**Frequência de avaliação** decide se a GEM toma uma nova decisão a cada mês ou a cada trimestre. **Janela de momentum (meses)** é simplesmente o número de meses passados cujos preços são comparados; o padrão é 12. **Alíquota de imposto (%)** e **Corretagem por operação** são opcionais e afetam apenas as estimativas de custo; não mudam o sinal. Deixe em branco se você não souber."
+          },
+          "addInstruments": {
+            "title": "Ainda sem instrumentos? Comece aqui",
+            "body": "A GEM precisa de um instrumento em cada papel para poder decidir algo. Quando um papel está vazio, o cartão **Papéis e instrumentos** oferece um atalho que adiciona ETFs de exemplo. Primeiro, em **Cotações a adicionar**, escolha a região em que sua corretora realmente opera: **Américas** ou **Europa (UCITS)**. O botão de adicionar cria os registros dos instrumentos no Monize na hora, antes de você salvar a configuração da GEM; isso não compra nada. Só os papéis vazios são preenchidos, e um instrumento equivalente que já esteja na sua lista pode ser reaproveitado. Confira cada símbolo, cada bolsa e cada moeda. Estes exemplos não são uma recomendação. Se o atalho não aparecer, seus papéis já estão preenchidos e você pode revisá-los abaixo.",
+            "fallbackBody": "O formulário de configurações não carregou, então o tour não consegue apontar para o cartão dos papéis. Nenhuma configuração foi alterada. Use a opção de tentar de novo da página, ou refaça o tour mais tarde em **Tours guiados** nas **Configurações**."
+          },
+          "roles": {
+            "title": "Cinco papéis, um alvo",
+            "body": "Estes cinco seletores são o que o atalho preencheu, e o que você define à mão caso contrário. Os três papéis de ações representam os Estados Unidos (**S&P 500**), os **Mercados desenvolvidos ex-EUA** e os **Mercados emergentes**. **Ativo seguro** é o que a GEM manteria quando as ações não passam no teste de segurança. **Referência sem risco** é apenas a régua desse teste e pode ficar vazia; nesse caso o ativo seguro cumpre as duas funções. São cinco funções no cálculo, não cinco investimentos que a GEM espere que você tenha ao mesmo tempo. O alvo dela é um instrumento por vez."
+          },
+          "save": {
+            "title": "Revise antes de salvar",
+            "body": "Confira a lista de contas, cada cotação e as moedas, e então **Salvar configuração** para guardar o cenário e recalcular o relatório a partir do histórico de preços disponível. É o salvamento que dá aos próximos passos algo para mostrar. Continua sem enviar nenhuma ordem, e você não precisa salvar para terminar este tour. Se faltarem preços ou eles estiverem muito antigos, o Monize mostra que o sinal não está disponível em vez de adivinhar."
+          },
+          "finish": {
+            "title": "Volte na próxima avaliação",
+            "body": "A GEM toma uma decisão por período, e a data da próxima está no topo do relatório. Até esse dia não há nada a fazer. Quando chegar, verifique se o sinal mudou; se mudou, execute as operações pela sua corretora e registre-as no Monize, para que a comparação da carteira continue batendo. Você pode refazer este tour quando quiser em **Tours guiados** nas **Configurações**."
+          }
+        }
+      }
+    },
+    "v1_16_0": {
+      "notifications": {
+        "title": "Notificações",
+        "steps": {
+          "welcome": {
+            "title": "O Monize já pode te avisar",
+            "body": "Uma conta vencendo, um orçamento estourando, um saldo cruzando um limite que você definiu, um backup que falhou. Este tour mostra onde isso chega e como você escolhe o que te alcança por e-mail ou no celular."
+          },
+          "bell": {
+            "title": "O sino é o registro",
+            "body": "Toda notificação que o Monize gera é escrita aqui, independentemente do que você ligue ou desligue. E-mail e push são cópias enviadas depois; esta lista é o original, e o número no sino conta o que você ainda não leu."
+          },
+          "panel": {
+            "title": "O que uma notificação carrega",
+            "body": "Cada uma diz o que aconteceu e leva para a página que mostra aquilo: a conta a pagar, o orçamento, a conta bancária. **Marcar todos como lidos** zera o contador sem remover nada. Se quiser ser lembrado, cada notificação tem **Lembrar-me**: mais uma vez depois de um intervalo, ou repetindo até você parar — e dá para parar pela própria notificação quando ela chega no celular."
+          },
+          "filters": {
+            "title": "Estreite a lista e depois aja sobre ela",
+            "body": "A linha de cima filtra por gravidade e a de baixo separa **Financeiros** de **Sistema** — backups, entrega de e-mail e tudo em que só um administrador pode agir. **Excluir todos** segue o filtro que estiver aplicado e alcança todas as ocorrências, não só as que estão na tela, então dá para limpar uma sequência de alertas de sistema já resolvidos e deixar o resto."
+          },
+          "settings": {
+            "title": "Onde a entrega é decidida",
+            "body": "**Configurações → Notificações** carrega o resto deste tour. No topo do cartão estão o interruptor de e-mail e o resumo semanal de orçamentos; abaixo, a grade que decide todo o resto e, em seguida, seus dispositivos push."
+          },
+          "matrix": {
+            "title": "Uma linha por tipo, uma coluna por canal",
+            "body": "Escolha, para cada tipo de notificação, se ela sai como **Email (relatório)**, **E-mail (alerta)**, **Push** ou via **UnifiedPush** para um distribuidor que você mesmo hospeda. Não há coluna para o sino, porque o sino sempre recebe a linha. **Intervalo** é a última coluna: pula o e-mail e o push quando algo do mesmo grupo já saiu dentro daquela janela — a entrada no sino é escrita mesmo assim. Cada interruptor salva no instante em que você o muda."
+          },
+          "push": {
+            "title": "Seus dispositivos",
+            "body": "Registre um navegador aqui e o Monize consegue alcançá-lo com o aplicativo fechado. Ele assina as próprias mensagens, então não há conta do Google nem da Apple no meio. Cada dispositivo pode ser testado e removido separadamente, e um dispositivo que deixa de ser alcançável diz o motivo. No iPhone isso funciona depois de adicionar o Monize à tela de início; se o seu administrador não tiver ligado o push nesta instância, é isso que aparece aqui."
+          },
+          "portfolio": {
+            "title": "Movimento dos investimentos",
+            "body": "Uma vez por dia, quando suas contas de investimento se movem mais do que o valor definido aqui. Mede movimento de mercado e dividendos: dinheiro que você aporta ou retira não é movimento."
+          },
+          "finish": {
+            "title": "Mais um lugar para olhar",
+            "body": "Os alertas de saldo ficam na própria conta: edite qualquer conta e defina **Avisar abaixo de** ou **Avisar acima de**. Eles disparam quando o saldo *cruza* o limite, então você é avisado uma vez em vez de a cada pagamento que o mantém ali. Você pode refazer este tour quando quiser em Configurações."
+          }
+        }
+      },
+      "reportTagBreakdown": {
+        "title": "Detalhar um relatório por etiqueta",
+        "steps": {
+          "welcome": {
+            "title": "Veja seus relatórios por etiqueta, não só por categoria",
+            "body": "Receitas vs Despesas e a Demonstração de Fluxo de Caixa agora podem ser detalhadas pelo valor de uma etiqueta que você escolher — gastos domésticos versus uma renda extra, por exemplo — e mostram as transferências entre elas sem nunca contar uma transferência como receita."
+          },
+          "breakdown": {
+            "title": "Detalhar por chave de etiqueta",
+            "body": "Escolha aqui uma chave de etiqueta, como **scope**, e o relatório se divide em uma seção para cada valor usado com ela, mais uma seção **Sem etiqueta** para o restante.",
+            "fallbackBody": "Este controle aparece assim que você marcar uma transação com uma etiqueta **chave:valor**, como **scope:household**. Adicione uma, e Detalhar por chave de etiqueta aparecerá aqui."
+          },
+          "buckets": {
+            "title": "Totais por valor, com as transferências separadas",
+            "body": "Escolher uma chave abre uma aba por valor mais **Sem etiqueta**, cada uma com suas próprias receitas e despesas. O dinheiro movido entre contas aparece como **Entradas etiquetadas** e **Saídas etiquetadas** — visível, mas nunca contado como receita."
+          },
+          "finish": {
+            "title": "É isso o detalhamento por etiqueta",
+            "body": "Marque as transações com um par chave:valor como scope:household onde quiser essa visão, e volte a este tour quando quiser em Configurações."
+          }
+        }
+      }
+    },
+    "v1_17_0": {
+      "transactionRules": {
+        "title": "Regras de transações",
+        "steps": {
+          "welcome": {
+            "title": "Regras que organizam suas transações",
+            "body": "Quando uma transação é criada ou importada e atende às condições que você definiu, uma regra pode definir sua categoria ou beneficiário, adicionar etiquetas, reescrever a descrição ou pedir a uma IA que a revise. Uma regra nunca altera um valor, uma conta ou uma data."
+          },
+          "tools": {
+            "title": "As regras ficam em Ferramentas",
+            "body": "Abra **Ferramentas** para encontrar **Regras**. O próximo passo mostra o menu."
+          },
+          "rulesLink": {
+            "title": "Abra Regras",
+            "body": "Escolha **Regras**. Ela lista todas as suas regras e é de lá que você cria uma nova."
+          },
+          "list": {
+            "title": "Suas regras, em ordem",
+            "body": "Cada linha é uma regra, com uma chave para ligá-la ou desligá-la e ações para movê-la, executá-la, duplicá-la ou excluí-la. As regras são verificadas de cima para baixo, então a ordem importa quando duas alteram a mesma coisa. Se você ainda não tem regras, este cartão explica o que é uma regra."
+          },
+          "create": {
+            "title": "Crie uma regra",
+            "body": "**Criar regra** abre o editor com uma regra em branco. Nada é salvo até você escolher **Salvar regra**."
+          },
+          "when": {
+            "title": "Quando: quais transações ela analisa",
+            "body": "Escolha se a regra analisa uma transação quando ela é **criada**, quando é **importada** ou nos dois casos. **Parar de processar as outras regras** ignora as regras abaixo desta para qualquer transação que ela reconheça."
+          },
+          "if": {
+            "title": "Se: quais transações correspondem",
+            "body": "Monte as condições com campos como beneficiário, descrição, valor e categoria. O seletor **Visual** e **Expressão** mostra as mesmas condições como cartões ou como uma linha de texto. Em um padrão, * representa qualquer texto e '{name}' guarda o texto nesse ponto para que uma ação possa reutilizá-lo."
+          },
+          "then": {
+            "title": "Então: o que muda",
+            "body": "As ações são executadas na ordem indicada. Uma regra pode definir a categoria ou o beneficiário, adicionar ou remover etiquetas, definir a descrição ou pedir a uma IA que revise a transação. Não existe ação para um valor, uma conta ou uma data."
+          },
+          "test": {
+            "title": "Testar, executar e desfazer",
+            "body": "**Testar regra** experimenta o rascunho nas suas transações existentes e mostra o que mudaria. Nada é alterado. Depois que a regra é salva, **Executar nas transações existentes** mostra uma prévia e a aplica ao que você já tem, e você pode desfazer essa execução no histórico de ações."
+          },
+          "reviews": {
+            "title": "A caixa de revisão de IA",
+            "body": "Uma regra com **Pedir uma revisão da IA** não altera a transação, ela a coloca aqui. Um assistente propõe uma edição e nada é gravado até você aprovar. Você também pode dispensar um pedido. Ela fica em **IA** como **Caixa de revisão de IA**."
+          }
+        }
+      }
+    },
+    "v1_20_0": {
+      "warranties": {
+        "title": "Garantias",
+        "steps": {
+          "welcome": {
+            "title": "Acompanhe suas garantias",
+            "body": "Uma garantia registra o que você comprou, quando a cobertura termina e de quem você comprou, com o recibo, o manual e eventuais reclamações. Ela pode ser vinculada à compra no seu registro de transações. Uma garantia nunca altera um saldo, um relatório ou um total. Este tour mostra as formas de adicionar uma e onde elas aparecem depois."
+          },
+          "warrantiesLink": {
+            "title": "As garantias ficam em Ferramentas",
+            "body": "Abra **Ferramentas** e escolha **Garantias** para ver todas as suas garantias."
+          },
+          "overview": {
+            "title": "Visão geral da cobertura",
+            "body": "Estes cartões contam suas garantias **Expirando em breve**, **Ativas**, **Expiradas** e **Vitalícias**. Escolha um cartão para filtrar a lista abaixo. Você também pode buscar, ordenar e mostrar garantias arquivadas. Escolha uma garantia na lista para abrir a página dela, com seus documentos, suas reclamações e a compra à qual está vinculada."
+          },
+          "addWarranty": {
+            "title": "Método 1: adicione aqui",
+            "body": "**Adicionar garantia** abre um formulário em branco. Informe o produto, o vendedor e a data de compra e, depois, quando termina a cobertura: **Em uma data**, **Após um prazo** ou **Nunca** para uma garantia vitalícia. Você pode anexar o recibo ou o manual antes de salvar."
+          },
+          "importCsv": {
+            "title": "Método 2: importe um arquivo CSV",
+            "body": "**Importar CSV** lê um arquivo com as colunas do Warracker, como uma exportação do Warracker ou desta página. Você vê todas as linhas e eventuais problemas antes que algo seja salvo."
+          },
+          "inRegister": {
+            "title": "Garantias no registro",
+            "body": "Uma transação com garantia mostra um escudo no registro. Pesquise **has:warranty** para encontrar todas essas transações."
+          },
+          "newTransaction": {
+            "title": "Método 3: ao registrar uma compra",
+            "body": "Escolha **+ Nova Transação** para abrir o formulário."
+          },
+          "warrantiesLine": {
+            "title": "A linha Garantias",
+            "body": "Aqui, **Adicionar garantia** salva primeiro a nova transação e depois abre o formulário da garantia preenchido com os dados dela. Quando você editar a transação mais tarde, esta linha lista as garantias dela, e cada uma abre sua página.",
+            "fallbackBody": "A linha Garantias não aparece em uma conta conjunta, porque uma garantia é só sua. Escolha uma das suas contas e o formulário mostra uma linha **Garantias** acima dos botões. Ali, **Adicionar garantia** salva primeiro a nova transação e depois abre o formulário da garantia preenchido com os dados dela. Quando você editar a transação mais tarde, a linha lista as garantias dela."
+          },
+          "closeForm": {
+            "title": "Feche o formulário",
+            "body": "Escolha **Cancelar** para fechá-lo sem salvar, ou salve a transação se você inseriu uma de verdade."
+          },
+          "dashboardWidget": {
+            "title": "Veja no painel o que está expirando",
+            "body": "Escolha **Personalizar** e ative **Garantias expirando em breve**. Ele lista as próximas garantias a expirar, e o título abre a página Garantias."
+          },
+          "reminders": {
+            "title": "Lembretes antes do fim da cobertura",
+            "body": "O Monize avisa você 30 dias e 7 dias antes de uma garantia expirar, e no próprio dia. Os lembretes chegam aqui, e você pode adiar um deles ou abrir a garantia a partir dele. Escolha como eles chegam até você em **Configurações**, em **Notificações**, como **Lembretes de garantia**."
+          }
+        }
+      },
+      "payrollDeductions": {
+        "title": "Deduções salariais",
+        "steps": {
+          "welcome": {
+            "title": "Pare as deduções no máximo anual",
+            "body": "Algumas deduções do salário, como previdência ou seguro-desemprego, param quando o máximo do ano é atingido e recomeçam no ano seguinte. Uma regra de dedução salarial informa esse máximo ao Monize, para que o salário pare de descontar a dedução quando ele for atingido. **Antes de começar, você precisa de uma fatura de salário agendada:** seu salário configurado como um depósito agendado, com as deduções em linhas separadas."
+          },
+          "payrollBill": {
+            "title": "Primeiro, configure seu salário",
+            "body": "Se ainda não fez isso, escolha **+ Nova agenda** e crie seu salário como um depósito. Divida-o em uma linha para o salário bruto e uma linha negativa para cada dedução, cada uma com sua própria categoria. Se uma dedução não estiver sendo descontada agora porque o máximo deste ano já foi atingido, adicione mesmo assim uma linha de divisão para ela, como uma despesa de valor zero, para que uma regra possa limitá-la e ela recomece após o reinício. Só um depósito ativo que credita mais do que desconta pode ter regras, e só as suas linhas de dedução podem ser limitadas."
+          },
+          "taxesLink": {
+            "title": "As deduções salariais ficam em Impostos",
+            "body": "Abra **Ferramentas** e escolha **Impostos** para encontrar as ferramentas fiscais."
+          },
+          "taxesCard": {
+            "title": "Abra Deduções salariais",
+            "body": "Escolha este cartão para abrir as regras de dedução salarial."
+          },
+          "newRule": {
+            "title": "Crie as regras de um salário",
+            "body": "**+ Nova regra** abre o formulário. Escolha sua fatura de salário agendada e depois um máximo anual para cada categoria de dedução que quiser limitar. Informe a data de reinício, normalmente 1º de janeiro. Se a fatura não tiver linhas de dedução, o formulário pede que você as adicione à fatura primeiro."
+          },
+          "rulesList": {
+            "title": "Suas regras",
+            "body": "Cada regra mostra a fatura, a categoria, o máximo anual, a data de reinício e quanto cada salário desconta. Edite uma regra para mudar o máximo, ou exclua-a para que o salário volte a descontar a linha inteira. Excluir uma regra nunca altera uma transação lançada."
+          },
+          "periodTables": {
+            "title": "O que já foi descontado",
+            "body": "Depois que você tiver uma regra, **Mostrar acumulado do ano** mostra quanto cada categoria descontou neste período e a margem que resta até o máximo. **Mostrar períodos anteriores** mostra quanto ela descontou nos anos anteriores."
+          },
+          "forecast": {
+            "title": "Aplicado quando o salário é lançado",
+            "body": "Quando o salário é lançado, cada linha limitada é reduzida à margem que resta até o máximo, até zero, e recomeça após a data de reinício. A previsão de fluxo de caixa, aqui e no painel, mostra o mesmo com antecedência, para você ver seu salário líquido subir quando um máximo é atingido."
+          },
+          "reminders": {
+            "title": "Um lembrete antes de cada reinício",
+            "body": "Dois meses antes de uma regra reiniciar, o Monize pede aqui que você confirme o máximo do ano seguinte. Se você não fizer nada, a regra mantém o máximo e reinicia na data dela. Escolha como os lembretes chegam até você em **Configurações**, em **Notificações**, como **Contas e agendados**."
+          }
+        }
+      },
+      "sharedExpenses": {
+        "title": "Despesas compartilhadas",
+        "steps": {
+          "welcome": {
+            "title": "Viajem juntos, mantenham as contas claras",
+            "body": "Veja como registrar compras do grupo e reembolsos. Este tour não cria registros por você."
+          },
+          "tools": {
+            "title": "Abra as despesas compartilhadas",
+            "body": "Encontre **Despesas compartilhadas** em **Ferramentas**. No celular, use o menu de navegação."
+          },
+          "newGroup": {
+            "title": "Comece pelo seu grupo",
+            "body": "Em **Novo grupo**, informe o nome da viagem, as pessoas e a moeda do acerto de contas. As pessoas não precisam de contas no Monize. Cada compra pode envolver membros diferentes."
+          },
+          "chooseGroup": {
+            "title": "Explore um grupo",
+            "body": "Abra um grupo para continuar. Se ainda não tiver nenhum, escolha **Pular esta etapa** e crie um depois do tour."
+          },
+          "expenses": {
+            "title": "Quem pagou e para quem?",
+            "body": "Com permissão de edição, use **Adicionar despesa** para escolher quem pagou e os beneficiários. **Dividir entre** permite partes iguais, valores exatos, porcentagens e partes de valor zero."
+          },
+          "balances": {
+            "title": "Confira os saldos e acerte as contas",
+            "body": "**Saldos** mostra quem deve a quem e sugere reembolsos. Registre um reembolso depois de entregar o dinheiro. **Arquivos** e **Atividade** guardam comprovantes e o histórico."
+          },
+          "done": {
+            "title": "Tudo pronto para a próxima viagem",
+            "body": "Os registros compartilhados ficam separados das transações pessoais. Repita este tour quando quiser em **Configurações**, na seção **Tours guiados**."
+          }
+        }
+      }
+    }
+  },
+  "emailReceipts": {
+    "basics": {
+      "title": "Recibos por e-mail",
+      "steps": {
+        "welcome": {
+          "title": "Por que ler recibos por e-mail",
+          "body": "Uma transação bancária mostra quanto você pagou e quando. Ela não mostra o que você comprou. O e-mail de confirmação do pedido mostra. O Monize lê esses e-mails, encontra a transação que cada um pagou e propõe uma descrição, um beneficiário e uma divisão por item, com uma categoria para cada linha. Você aprova cada proposta antes que ela altere uma transação."
+        },
+        "aiRequired": {
+          "title": "Na prática, você precisa de um provedor de IA",
+          "body": "O Monize lê um e-mail com um **perfil**: um conjunto de padrões para um domínio de remetente, por exemplo uma loja. Você pode escrever um perfil à mão, mas cada padrão precisa corresponder às linhas exatas dos e-mails dessa loja, então, na prática, uma IA o escreve. A IA escreve o perfil uma única vez, a partir de alguns e-mails de exemplo. Depois que você o aprova, o perfil lê cada novo e-mail dessa loja sem a IA."
+        },
+        "aiProviders": {
+          "title": "Configure primeiro um provedor de IA",
+          "body": "Adicione um provedor aqui e teste a conexão. Sem um provedor, o assistente de perfis não consegue escrever um perfil, e os e-mails de uma loja sem perfil continuam sem leitura."
+        },
+        "tabs": {
+          "title": "Quatro abas, na ordem de uso",
+          "body": "**Visão geral** mostra o que o Monize leu. Em **Caixa de e-mail**, conecte uma caixa que tenha apenas confirmações de pedidos. O Monize só a lê: nunca move, marca nem exclui uma mensagem. **Perfis** contém um perfil por loja. **E-mails** lista cada e-mail e o seu estado."
+        },
+        "uncovered": {
+          "title": "Lojas sem perfil",
+          "body": "Esta caixa lista os domínios de remetente que nenhum perfil consegue ler ainda. Escolha um para iniciar o assistente. Selecione até cinco e-mails dele e associe cada um à transação bancária que ele pagou. A IA escreve um perfil e o testa nesses pares. Depois você vê uma prévia de todos os e-mails dessa loja e aceita o perfil ou pede uma alteração com uma nota curta.",
+          "fallbackBody": "Você ainda não tem e-mails de uma loja sem perfil. Depois que você conectar a caixa de e-mail, cada domínio de remetente aparece aqui como uma etiqueta, por exemplo **shop.example (12)**: o domínio e o número de e-mails dele. Escolha a etiqueta para iniciar o assistente. Selecione até cinco e-mails dele e associe cada um à transação bancária que ele pagou. A IA escreve um perfil e o testa nesses pares. Depois você vê uma prévia de todos os e-mails dessa loja e aceita o perfil ou pede uma alteração com uma nota curta."
+        },
+        "profiles": {
+          "title": "Seus perfis",
+          "body": "Cada linha é um perfil, aprovado ou rascunho. **Criar um novo perfil manualmente** abre o editor de um perfil escrito à mão. Use-o para corrigir um pequeno detalhe em um rascunho da IA. Quando você aprova um perfil, o Monize lê imediatamente os e-mails do domínio dele.",
+          "fallbackBody": "Você ainda não tem perfis. Cada perfil que você aceita aparece aqui como uma linha, por exemplo **Shop Example**, domínio **shop.example**, status **Aprovado**. **Criar um novo perfil manualmente** abre o editor de um perfil escrito à mão. Use-o apenas para corrigir um pequeno detalhe em um rascunho da IA. Quando você aprova um perfil, o Monize lê imediatamente os e-mails do domínio dele."
+        },
+        "reviews": {
+          "title": "Aprove as propostas",
+          "body": "Cada e-mail que corresponde a uma transação vira uma proposta na **Caixa de revisão de IA**, no menu **IA**. Uma proposta mostra, por exemplo, as linhas de um pedido com uma categoria para cada linha. Nada muda nas suas transações até você aprovar a proposta lá."
+        }
+      }
+    }
+  }
+}

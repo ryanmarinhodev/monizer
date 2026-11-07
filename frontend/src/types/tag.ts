@@ -1,0 +1,29 @@
+export interface Tag {
+  id: string;
+  userId: string;
+  name: string;
+  color: string | null;
+  icon: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * How a tag has been used on non-void transactions (and their splits): the
+ * latest transaction date (YYYY-MM-DD) and the number of links. Keyed by tag
+ * id; a tag that was never used is absent.
+ */
+export interface TagUsage {
+  lastUsed: string;
+  count: number;
+}
+
+export type TagUsageMap = Record<string, TagUsage>;
+
+export interface CreateTagData {
+  name: string;
+  color?: string;
+  icon?: string;
+}
+
+export interface UpdateTagData extends Partial<CreateTagData> {}

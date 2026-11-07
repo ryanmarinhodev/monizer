@@ -1,0 +1,311 @@
+{
+  "page": {
+    "welcomePrefix": "Willkommen",
+    "welcomeWithName": "Willkommen, {name}!",
+    "subtitle": "Hier ist Ihre Finanzübersicht"
+  },
+  "favouriteAccounts": {
+    "title": "Favoritenkonten",
+    "empty": "Noch keine Favoritenkonten. Markieren Sie Konten als Favoriten, um sie hier zu sehen.",
+    "reorder": "Neu anordnen",
+    "dragToReorder": "Ziehen Sie Konten, um sie neu anzuordnen, oder verwenden Sie die Pfeilschaltflächen.",
+    "done": "Fertig",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "marketValue": "Marktwert",
+    "due": "Fällig: {ordinal}",
+    "dueTooltip": "Der Tag des Monats, an dem Ihre Kreditkartenzahlung fällig ist",
+    "settlement": "Abrechnung: {ordinal}",
+    "settlementTooltip": "Der letzte Tag des Abrechnungszeitraums. Buchungen, die an oder vor diesem Tag erfasst werden, erscheinen auf der aktuellen Abrechnung."
+  },
+  "upcomingBills": {
+    "title": "Bevorstehende Rechnungen und Einzahlungen",
+    "empty": "Keine überfälligen oder bevorstehenden Rechnungen, Einzahlungen oder Überweisungen innerhalb der Erinnerungsfenster.",
+    "postTransaction": "Diese Buchung ausführen",
+    "manual": "Manuell",
+    "negativeBalanceWarning": "Diese Buchung bringt den Kontosaldo unter null",
+    "negativeBalanceLegend": "Bringt sein Konto unter null",
+    "moreItems": "+{count} weitere",
+    "overdue": "Überfällig",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "daysUntil": "{count} Tage",
+    "typeBadge": {
+      "bill": "Rechnung",
+      "deposit": "Einzahlung",
+      "transfer": "Überweisung",
+      "reminder": "Erinnerung",
+      "unknown": "Unbekannt"
+    },
+    "scope": {
+      "dueSoon": "Bald fällig",
+      "all": "Alle anstehenden"
+    },
+    "viewLabel": "Ansicht",
+    "viewList": "Liste",
+    "viewCalendar": "Kalender",
+    "previousMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "emptyAll": "Keine aktiven Rechnungen, Einzahlungen oder Überweisungen geplant."
+  },
+  "cashFlowForecast": {
+    "title": "Cashflow-Prognose",
+    "period": "Prognosezeitraum",
+    "loadFailed": "Die bereits nach heute datierten Buchungen konnten nicht geladen werden, daher kann die Prognose nicht angezeigt werden. Laden Sie das Dashboard neu, um es erneut zu versuchen."
+  },
+  "gettingStarted": {
+    "title": "Erste Schritte",
+    "subtitle": "Richten Sie Ihr Konto in wenigen Schritten ein",
+    "dismiss": "Ausblenden",
+    "steps": {
+      "settings": {
+        "title": "Einstellungen überprüfen",
+        "description": "Währung, Datumsformat und Design festlegen"
+      },
+      "categories": {
+        "title": "Kategorien einrichten",
+        "description": "Kategorien erstellen oder einen Standardsatz importieren"
+      },
+      "account": {
+        "title": "Erstes Konto hinzufügen",
+        "description": "Bankkonto erstellen, um die Verwaltung zu starten"
+      },
+      "import": {
+        "title": "Aus QIF importieren",
+        "description": "Konten und Buchungen aus QIF-Dateien importieren"
+      }
+    }
+  },
+  "budgetStatus": {
+    "title": "Budget-Status",
+    "noBudget": "Kein aktives Budget gefunden. Erstellen Sie ein Budget, um Ihre Ausgaben zu verfolgen.",
+    "createBudget": "Budget erstellen",
+    "viewFullBudget": "Vollständiges Budget anzeigen",
+    "daysLeft": "{count} Tage verbleibend",
+    "safeToSpend": "Heute sicher ausgeben",
+    "topCategories": "Top-Kategorien"
+  },
+  "insights": {
+    "title": "Ausgaben-Einblicke",
+    "empty": "Keine Einblicke verfügbar. Besuchen Sie die Einblicke-Seite, um Ihre erste Analyse zu generieren.",
+    "goToInsights": "Zu Einblicken",
+    "activeCount": "{count} aktiv"
+  },
+  "warrantiesExpiring": {
+    "title": "Bald ablaufende Garantien",
+    "empty": "In den nächsten 30 Tagen läuft nichts ab",
+    "loadFailed": "Ihre ablaufenden Garantien konnten nicht geladen werden. Laden Sie das Dashboard neu, um es erneut zu versuchen."
+  },
+  "topMovers": {
+    "title": "Top-Beweger",
+    "empty": {
+      "noInvestments": "Fügen Sie Investmentkonten hinzu, um tägliche Beweger zu verfolgen.",
+      "noPrices": "Noch keine Kursveränderungen verfügbar.",
+      "noGainers": "Heute keine Gewinner.",
+      "noLosers": "Heute keine Verlierer."
+    },
+    "dailyChange": "Tagesveränderung",
+    "dailyChangeOn": "Tagesveränderung · {date}",
+    "openPriceHistory": "Kursverlauf für {symbol}",
+    "refreshPrices": "Kurse aktualisieren",
+    "viewPortfolio": "Portfolio anzeigen",
+    "filter": {
+      "all": "Alle ({count})",
+      "gainers": "Gewinner ({count})",
+      "losers": "Verlierer ({count})",
+      "label": "Richtung"
+    },
+    "metric": {
+      "label": "Anzeigen",
+      "price": "Kurs",
+      "holdings": "Bestand"
+    }
+  },
+  "favouriteSecurities": {
+    "title": "Favoritwertpapiere",
+    "empty": "Noch keine Favoritwertpapiere. Besuchen Sie die <securitiesLink>Wertpapierseite</securitiesLink> und markieren Sie die Wertpapiere, die Sie hier verfolgen möchten.",
+    "noPriceYet": "Noch kein Kurs",
+    "dailyChange": "Tagesveränderung",
+    "dailyChangeOn": "Tagesveränderung · {date}",
+    "openPriceHistory": "Kursverlauf für {symbol}",
+    "refreshPrices": "Kurse aktualisieren"
+  },
+  "netWorth": {
+    "title": "Reinvermögen",
+    "empty": "Noch keine Reinvermögensdaten verfügbar.",
+    "barStyle": "Balkenstil",
+    "barStyleNetWorth": "Reinvermögen",
+    "barStyleAccountType": "Nach Kontotyp",
+    "loadFailed": "Der Verlauf Ihres Reinvermögens konnte nicht geladen werden. Laden Sie das Dashboard neu, um es erneut zu versuchen."
+  },
+  "assetsVsLiabilities": {
+    "title": "Aktiva vs. Verbindlichkeiten",
+    "empty": "Noch keine Reinvermögensdaten verfügbar.",
+    "current": "Aktuell",
+    "netWorthLabel": "Reinvermögen",
+    "assets": "Aktiva",
+    "liabilities": "Verbindlichkeiten",
+    "partialName": "{name} (unvollständig)",
+    "viewCallouts": "Beschriftungen",
+    "viewLegend": "Legende"
+  },
+  "expensesPieChart": {
+    "title": "Ausgaben nach Kategorie",
+    "empty": "Keine Ausgabendaten für diesen Zeitraum.",
+    "total": "Gesamt",
+    "uncategorized": "Nicht kategorisiert",
+    "other": "Sonstiges",
+    "insideOther": "{count, plural, one {# Kategorie unter Sonstige} other {# Kategorien unter Sonstige}}",
+    "topLevelOnly": "Oberkategorien",
+    "topLevelOnlyHint": "Unterkategorien der Oberkategorie zurechnen",
+    "viewCallouts": "Beschriftungen",
+    "viewLegend": "Legende"
+  },
+  "incomeExpenses": {
+    "title": "Einnahmen vs. Ausgaben",
+    "income": "Einnahmen",
+    "expenses": "Ausgaben",
+    "net": "Netto"
+  },
+  "customize": {
+    "button": "Anpassen",
+    "title": "Dashboard anpassen",
+    "description": "Das Layout unten entspricht Ihrem Dashboard: Widgets fließen von links nach rechts, auf großen Bildschirmen zwei pro Zeile.",
+    "moveEarlier": "{name} nach vorne verschieben",
+    "moveLater": "{name} nach hinten verschieben",
+    "dragToReorder": "Ziehen Sie Widgets, um sie neu anzuordnen, oder verwenden Sie die Pfeilschaltflächen.",
+    "hiddenWidgets": "Ausgeblendete Widgets",
+    "hide": "{name} ausblenden",
+    "show": "{name} einblenden",
+    "atLeastOne": "Wählen Sie mindestens ein Widget für das Dashboard aus.",
+    "reset": "Auf Standard zurücksetzen",
+    "toasts": {
+      "saveFailed": "Dashboard-Layout konnte nicht gespeichert werden"
+    }
+  },
+  "favouriteReports": {
+    "title": "Favoritenberichte",
+    "empty": "Noch keine Favoritenberichte. Markieren Sie Berichte auf der Berichteseite mit einem Stern, um sie hier zu sehen.",
+    "browseReports": "Berichte durchsuchen"
+  },
+  "widgets": {
+    "configure": "{name} konfigurieren",
+    "asOf": "Stand {date}",
+    "done": "Fertig",
+    "configSaveFailed": "Widget-Einstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "timeframe": "Zeitraum",
+    "accounts": "Konten",
+    "chartType": "Diagrammtyp",
+    "view": "Ansicht",
+    "viewCalloutsHint": "Beschriftungen brauchen einen breiteren Bildschirm. Wo sie nicht passen, wird die Legende angezeigt.",
+    "displayName": "Anzeigename",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Optionale Beschreibung hinzufügen",
+    "rangeLabels": {
+      "1m": "1M",
+      "3m": "3M",
+      "6m": "6M",
+      "1y": "1Y",
+      "2y": "2Y",
+      "5y": "5Y",
+      "10y": "10Y",
+      "ytd": "YTD",
+      "all": "Alle",
+      "1w": "1W",
+      "mtd": "MTD"
+    }
+  },
+  "portfolioValue": {
+    "title": "Portfolio-Wert",
+    "empty": "Noch keine Anlagehistorie vorhanden.",
+    "refresh": "Aktuellen Wert aktualisieren",
+    "investmentResult": "Anlageergebnis",
+    "periodBreakdownInvestedTooltip": "Der Wert der Wertpapiere hat sich in diesem Zeitraum um {valueChange} verändert. Davon wurden {netInvested} eingezahlt, abzüglich Verkäufen, und sie haben {income} an Dividenden und Zinsen ausgeschüttet. Eine in Anteilen wieder angelegte Ausschüttung zählt in beiden Beträgen. Der Betrag oben ist das, was die Anlagen selbst erwirtschaftet haben, ohne nicht investiertes Bargeld.",
+    "notAvailable": "N/A"
+  },
+  "spendingByPayee": {
+    "title": "Ausgaben nach Zahlungsempfänger",
+    "empty": "Keine Ausgaben in diesem Zeitraum.",
+    "totalLabel": "Gesamt"
+  },
+  "monthlySpendingTrend": {
+    "title": "Monatlicher Ausgabentrend",
+    "empty": "Keine Daten für diesen Zeitraum.",
+    "expenses": "Ausgaben",
+    "income": "Einnahmen"
+  },
+  "incomeBySource": {
+    "title": "Einnahmen nach Quelle",
+    "empty": "Keine Einnahmen in diesem Zeitraum.",
+    "totalLabel": "Gesamteinnahmen"
+  },
+  "creditUtilizationAccounts": {
+    "title": "Kreditauslastung nach Konto",
+    "empty": "Keine Kreditkonten mit festgelegtem Limit.",
+    "utilization": "Auslastung",
+    "used": "Genutzt",
+    "noRate": "nicht verfügbar (kein {currency}-Kurs)"
+  },
+  "creditUtilizationTotal": {
+    "title": "Gesamte Kreditauslastung",
+    "empty": "Keine Kreditkonten mit festgelegtem Limit.",
+    "used": "Genutzt",
+    "available": "Verfügbar"
+  },
+  "sectorWeightings": {
+    "title": "Sektorallokation",
+    "empty": "Keine Sektordaten verfügbar.",
+    "direct": "Direkt",
+    "etf": "ETF"
+  },
+  "securityTypeAllocation": {
+    "title": "Wertpapiertyp-Allokation",
+    "empty": "Keine Bestände vorhanden.",
+    "types": {
+      "STOCK": "Aktien",
+      "ETF": "ETFs",
+      "MUTUAL_FUND": "Investmentfonds",
+      "BOND": "Anleihen",
+      "CASH": "Bargeld"
+    },
+    "viewType": "Wertpapierart",
+    "viewAssetClass": "Anlageklasse",
+    "otherAssetClasses": "Sonstige",
+    "emptyAssetClass": "Noch keine Aufschlüsselung nach Anlageklassen verfügbar."
+  },
+  "geographicAllocation": {
+    "title": "Geografische Allokation",
+    "empty": "Keine Bestände vorhanden.",
+    "viewRegion": "Region",
+    "viewExchange": "Börse",
+    "viewCountry": "Land",
+    "listingBasisNote": "Gruppiert nach dem Börsenplatz jeder Position. Wechseln Sie zu Land, um in Fonds hineinzuschauen."
+  },
+  "recurringExpenses": {
+    "title": "Top wiederkehrende Ausgaben",
+    "empty": "Keine wiederkehrenden Ausgaben gefunden.",
+    "minOccurrences": "Mindestanzahl Vorkommen",
+    "minOccurrencesOption": "{count} oder mehr",
+    "occurrences": "{count} Vorkommen",
+    "monthlyEstimate": "Monatliche Schätzung",
+    "viewCallouts": "Beschriftungen",
+    "viewLegend": "Legende"
+  },
+  "weekendVsWeekday": {
+    "title": "Wochenend- vs. Wochentagsausgaben",
+    "empty": "Keine Ausgaben in diesem Zeitraum.",
+    "weekendLabel": "Wochenende",
+    "weekdayLabel": "Wochentag",
+    "viewOverview": "Übersicht",
+    "viewByDay": "Nach Tag"
+  },
+  "cashFlowSankey": {
+    "title": "Cashflow-Sankey",
+    "empty": "Keine Einnahmen, Ausgaben oder Überweisungen in diesem Zeitraum.",
+    "depth": "Detailtiefe",
+    "depthCategories": "Kategorien",
+    "depthSubcategories": "Unterkategorien",
+    "viewDiagram": "Diagramm",
+    "viewTable": "Tabelle"
+  }
+}

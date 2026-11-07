@@ -1,0 +1,594 @@
+{
+  "controls": {
+    "next": "Dalej",
+    "back": "Wstecz",
+    "done": "Gotowe",
+    "endTour": "Zakończ przewodnik",
+    "tryIt": "Wypróbuj — przewodnik będzie kontynuowany, gdy to zrobisz",
+    "skipStep": "Pomiń ten krok",
+    "stepCounter": "{current} z {total}",
+    "skippedTitle": "Przewodnik zakończony",
+    "skippedBody": "Niektóre kroki zostały pominięte, ponieważ ich ekran lub element sterujący nie był dostępny. Możesz ponownie przejść przewodnik w dowolnym momencie w Ustawieniach.",
+    "move": "Przenieś tę kartę — przeciągnij ją lub przesuń klawiszami strzałek"
+  },
+  "offer": {
+    "heading": "Zobacz krótki przewodnik",
+    "subheading": "Krótkie wprowadzenia do nowości w tym wydaniu. To okno schowa się na czas przewodnika i wróci po jego zakończeniu.",
+    "showMe": "Pokaż mi",
+    "viewed": "Obejrzano",
+    "introTitle": "Nowy tutaj? Skorzystaj z przewodnika wprowadzającego",
+    "introSubtitle": "Krótkie omówienie podstaw."
+  },
+  "areas": {
+    "intro": "Pierwsze kroki",
+    "transactions": "Transakcje",
+    "accounts": "Konta",
+    "budgets": "Budżety",
+    "reports": "Raporty",
+    "investments": "Inwestycje",
+    "settings": "Ustawienia"
+  },
+  "gettingStarted": {
+    "takeTour": "Zobacz przewodnik",
+    "retakeTour": "Powtórz przewodnik"
+  },
+  "settings": {
+    "title": "Przewodniki po aplikacji",
+    "description": "Poznaj funkcje aplikacji krok po kroku.",
+    "backLink": "Powrót do Ustawień",
+    "pageTitle": "Przewodniki po aplikacji",
+    "pageSubtitle": "Wszystkie przewodniki, które oferuje Monize, w jednym miejscu. Uruchom dowolny w każdej chwili — przewodnik możesz przerwać klawiszem Escape i wrócić do niego stąd.",
+    "meta": "{steps} · {status}",
+    "metaWithRelease": "{steps} · {release} · {status}",
+    "stepCount": "{count, plural, one {# krok} few {# kroki} many {# kroków} other {# kroku}}",
+    "releaseLabel": "Nowość w {version}",
+    "requirementsLoading": "Sprawdzanie, czy możesz przejść ten przewodnik…",
+    "requires": {
+      "transactionEntry": "Najpierw dodaj konto — ten przewodnik pokazuje, jak zapisać transakcję.",
+      "securitiesExist": "Najpierw dodaj papier wartościowy — ten przewodnik otwiera jeden z Twojej listy.",
+      "ownerView": "Najpierw wróć do własnych danych. Ten przewodnik opisuje funkcje niedostępne podczas działania w imieniu innej osoby."
+    },
+    "start": "Rozpocznij",
+    "restart": "Powtórz",
+    "statusNotViewed": "Nieobejrzany",
+    "statusDismissed": "Zakończony przedwcześnie",
+    "resetHeading": "Zacznij od nowa",
+    "resetDescription": "Wyczyść wszystkie zapisane przewodniki, aby były znów proponowane na pulpicie i po aktualizacji.",
+    "reset": "Zresetuj postęp przewodnika",
+    "resetSuccess": "Postęp przewodnika został zresetowany.",
+    "resetError": "Nie udało się zresetować postępu przewodnika. Spróbuj ponownie."
+  },
+  "intro": {
+    "basics": {
+      "title": "Wprowadzenie do Monize",
+      "steps": {
+        "welcome": {
+          "title": "Witamy w Monize",
+          "body": "Ten krótki przewodnik pokaże Ci najważniejsze elementy aplikacji. Możesz go opuścić w dowolnym momencie, naciskając **Escape** lub wybierając **Zakończ przewodnik**."
+        },
+        "dashboard": {
+          "title": "Twój pulpit",
+          "body": "To jest Twój pulpit. Użyj przycisku **Dostosuj** w prawym górnym rogu, aby zmienić układ lub ukryć widżety, tak aby najważniejsze dla Ciebie podsumowania znalazły się na samej górze."
+        },
+        "tools": {
+          "title": "Menu Narzędzia",
+          "body": "W menu **Narzędzia** zarządzasz podstawowymi elementami swoich finansów — odbiorcami, kategoriami, walutami, tagami i innymi."
+        },
+        "accounts": {
+          "title": "Twoje konta",
+          "body": "Dodaj tutaj swoje konta bankowe, karty kredytowe, pożyczki i konta inwestycyjne za pomocą wyróżnionego przycisku. Każde saldo i każda transakcja należą do jakiegoś konta."
+        },
+        "openAccountDetail": {
+          "title": "Otwórz szczegółowy widok konta",
+          "body": "Każde konto ma stronę dopasowaną do swojego rodzaju. Wybierz **Szczegóły** — ikonę oka w wierszu konta — aby ją otworzyć. Na telefonie przytrzymaj konto i wybierz **Szczegóły**."
+        },
+        "accountDetailView": {
+          "title": "Widok stworzony dla tego konta",
+          "body": "Ta strona zmienia się wraz z rodzajem konta, więc konto bankowe, karta kredytowa, pożyczka, konto inwestycyjne czy składnik majątku pokazują liczby i narzędzia najbardziej dla nich przydatne. Wróć tu kiedy zechcesz przez **Szczegóły** na liście kont."
+        },
+        "transactions": {
+          "title": "Transakcje",
+          "body": "To jest Twój rejestr transakcji — znajdziesz tu każdą płatność i wpłatę na swoich kontach, gotową do wyszukiwania i filtrowania."
+        },
+        "createTransaction": {
+          "title": "Zapisz transakcję",
+          "body": "Dodaj przychód lub wydatek za pomocą przycisku **Nowa transakcja**. Otwórz teraz formularz."
+        },
+        "fields": {
+          "title": "Odbiorca i kategoria",
+          "body": "Dla każdej transakcji wybierasz odbiorcę i przypisujesz kategorię. To kategorie napędzają Twoje budżety i raporty; kwota będzie w następnym kroku."
+        },
+        "splits": {
+          "title": "Podziel transakcję",
+          "body": "Jeden zakup obejmujący kilka kategorii? Użyj opcji **Podziel transakcję**, aby rozdzielić pojedynczą transakcję na kilka kategorii — na przykład zakupy spożywcze i artykuły gospodarstwa domowego z jednego sklepu."
+        },
+        "currencyField": {
+          "title": "Kwota i waluta",
+          "body": "Tutaj wpisujesz kwotę transakcji. Płaciłeś w innej walucie? Ustaw walutę obok kwoty i wpisz ją zgodnie z obciążeniem — Monize przeliczy ją na walutę konta za Ciebie."
+        },
+        "closeForm": {
+          "title": "Zamknij formularz, aby kontynuować",
+          "body": "Zamknij formularz transakcji przyciskiem **Anuluj** lub zapisz ją drugim przyciskiem, a przewodnik przejdzie dalej."
+        },
+        "bills": {
+          "title": "Rachunki i wpłaty",
+          "body": "Zaplanuj cykliczne rachunki i wpłaty, aby nadchodzące płatności były prognozowane i nic Ci nie umknęło."
+        },
+        "investments": {
+          "title": "Inwestycje",
+          "body": "Śledź swoje aktywa, ceny i stopy zwrotu na kontach inwestycyjnych."
+        },
+        "budgets": {
+          "title": "Planuj z budżetami",
+          "body": "Budżety pozwalają ustalać miesięczne cele dla poszczególnych kategorii i śledzić, jak sobie z nimi radzisz."
+        },
+        "reports": {
+          "title": "Zrozum swoje finanse",
+          "body": "Raporty zamieniają Twoje transakcje w wykresy — wydatki według kategorii, wartość netto w czasie i wiele więcej."
+        },
+        "finish": {
+          "title": "Wszystko gotowe",
+          "body": "To już koniec przewodnika. Możesz go powtórzyć w dowolnym momencie w sekcji **Przewodniki po aplikacji** w **Ustawieniach**."
+        }
+      }
+    }
+  },
+  "release": {
+    "v1_13_0": {
+      "foreignCurrency": {
+        "title": "Transakcje w obcej walucie",
+        "steps": {
+          "welcome": {
+            "title": "Śledź wydatki w innych walutach",
+            "body": "Kupiłeś coś za granicą? Ten przewodnik ustawia opłatę za transakcje w obcej walucie dla konta, rejestruje zakup w walucie, którą obciążono Twoje konto, i pokazuje, gdzie te koszty się pojawiają. Możesz wyjść w każdej chwili klawiszem **Esc** lub przyciskiem **Zakończ przewodnik**."
+          },
+          "openAccountEdit": {
+            "title": "Zacznij od konta",
+            "body": "Opłaty za transakcje w obcej walucie należą do konta. Wybierz konto, którym płacisz za granicą — kartę kredytową, debetową albo to, z którego płacisz telefonem — i kliknij **Edytuj** wśród akcji w jego wierszu, a na telefonie przytrzymaj wiersz, aby otworzyć jego ustawienia."
+          },
+          "fxFeePercent": {
+            "title": "Ustaw opłatę za przewalutowanie",
+            "body": "Wpisz tutaj opłatę tego konta za transakcje w obcej walucie jako procent — na przykład 2,5. Monize wlicza ją w przeliczoną kwotę każdego zagranicznego zakupu, więc opłata jest rejestrowana za Ciebie."
+          },
+          "closeAccountForm": {
+            "title": "Zapisz i zamknij",
+            "body": "Użyj tych przycisków, aby zakończyć: **Zaktualizuj konto** zapisuje opłatę, **Anuluj** zamyka bez zapisywania. Tak czy inaczej przewodnik trwa dalej."
+          },
+          "newTransaction": {
+            "title": "Zapisz zagraniczny zakup",
+            "body": "Teraz zapisz zakup zrobiony z tego konta w innej walucie. Otwórz **Nowa transakcja** i wskaż to konto."
+          },
+          "chooseAccount": {
+            "title": "Sprawdź konto i datę",
+            "body": "Opłata za przewalutowanie należy do konta, więc upewnij się, że w polu **Konto** jest to konto, dla którego właśnie ją ustawiłeś — jeśli nie, zmień to tutaj. Ustaw też **Datę** na dzień zakupu: kurs wymiany jest pobierany dla tej daty."
+          },
+          "enterDetails": {
+            "title": "Wprowadź szczegóły",
+            "body": "Uzupełnij odbiorcę i kategorię tak jak w każdej innej transakcji. Część walutowa będzie za chwilę."
+          },
+          "entryCurrency": {
+            "title": "Wybierz walutę, w której zapłaciłeś",
+            "body": "Otwórz to i wybierz walutę, którą Cię obciążono. Na liście jest tylko Twoja własna waluta? Wybierz na dole **Dodaj walutę...**, aby dodać nową — zostanie od razu wybrana."
+          },
+          "enterAmount": {
+            "title": "Wpisz kwotę, którą Cię obciążono",
+            "body": "Wpisz sumę dokładnie tak, jak widnieje na wyciągu. Monize pobiera **kurs wymiany** na dzień transakcji, pokazuje obok przeliczoną sumę i wlicza **opłatę za transakcje w obcej walucie** ustawioną na koncie — podpis poniżej wymienia oba. Bank zaokrąglił inaczej? Zmień kurs lub przeliczoną sumę, aby zgadzało się co do grosza."
+          },
+          "closeTransactionForm": {
+            "title": "Zamknij formularz",
+            "body": "Tutaj tak samo: zapisz transakcję przyciskiem zatwierdzenia albo zamknij ją przyciskiem **Anuluj**, a przewodnik pójdzie dalej."
+          },
+          "openAccountDetail": {
+            "title": "Wróć do konta",
+            "body": "Otwórz stronę szczegółów tego konta — wybierz **Szczegóły** wśród akcji w jej wierszu — aby zobaczyć, jak podsumowywana jest aktywność walutowa."
+          },
+          "fxSection": {
+            "title": "Twoja sekcja walutowa",
+            "body": "Konta z aktywnością w obcej walucie zyskują tę sekcję: opłaty zapłacone w podziale na waluty, wykres w czasie i pasujące transakcje, z eksportem do CSV i PNG. Pojawia się, gdy konto ma zagraniczny zakup.",
+            "fallbackBody": "To konto nie ma jeszcze żadnej aktywności w obcej walucie, więc sekcji nie ma na jego stronie. Zapisz na nim zakup w innej walucie i sekcja się pojawi: opłaty w podziale na waluty, wykres w czasie oraz eksport do CSV i PNG."
+          },
+          "report": {
+            "title": "Raport Opłaty za transakcje w obcej walucie",
+            "body": "Ten raport zbiera w jednym miejscu zagraniczne zakupy ze wszystkich Twoich kont i walut, więc widzisz, ile naprawdę kosztują karty \"bez opłat zagranicznych\". Otwórz go kiedy chcesz z sekcji **Raporty**.",
+            "fallbackBody": "Raport **Opłaty za waluty obce** zbiera zagraniczne zakupy ze wszystkich kont i walut w jednym miejscu. Teraz go tu nie widać — może go ukrywać wyszukiwanie albo filtr kategorii — ale znajdziesz go w **Raportach**."
+          },
+          "finish": {
+            "title": "To tyle o walutach obcych w Monize",
+            "body": "Ustaw opłatę raz, wprowadzaj zakupy tak, jak Cię obciążono, a opłaty policzą się same. Ten przewodnik możesz powtórzyć kiedy chcesz w sekcji **Przewodniki po aplikacji** w **Ustawieniach**."
+          }
+        }
+      },
+      "settings": {
+        "title": "Podsumowanie Co nowego",
+        "steps": {
+          "whatsNewToggle": {
+            "title": "Najważniejsze zmiany",
+            "body": "Ten przełącznik decyduje o tym, czy podsumowanie Co nowego pojawia się automatycznie po aktualizacji."
+          },
+          "appVersion": {
+            "title": "Przeczytaj notatki ponownie",
+            "body": "Kliknij oznaczenie wersji na dole **Ustawień** w dowolnym momencie, aby ponownie otworzyć informacje o wydaniu."
+          },
+          "done": {
+            "title": "To wszystko",
+            "body": "Możesz wrócić do tych najważniejszych zmian, kiedy tylko zechcesz, tutaj, w Ustawieniach."
+          }
+        }
+      }
+    },
+    "v1_14_0": {
+      "securityDetail": {
+        "title": "Strona detali papieru wartościowego",
+        "steps": {
+          "welcome": {
+            "title": "Każdy papier na jednej stronie",
+            "body": "Papiery wartościowe były wcześniej trzema osobnymi okienkami. Teraz każdy ma własną stronę, która zbiera wszystko: co trzymasz, jak się zachowywał i wszystko, co Monize o nim wie. Oto skrócona wersja."
+          },
+          "openDetail": {
+            "title": "Otwórz papier",
+            "body": "Kliknij dowolny papier na liście: cały wiersz otwiera jego stronę. Długie przytrzymanie albo prawy przycisk pokazują za to pozostałe akcje wiersza."
+          },
+          "summary": {
+            "title": "Twoja pozycja na pierwszy rzut oka",
+            "body": "Wartość rynkowa, koszt nabycia, niezrealizowany zysk, liczba jednostek i konta, na których leżą. Kwoty są w walucie samego papieru — tej, w której podawana jest jego cena — a przy wartości rynkowej widać, z którego zamknięcia pochodzi.",
+            "fallbackBody": "Ten rząd zwykle pokazuje Twoją pozycję. Tego papieru już nie trzymasz, więc strona pokazuje zamiast tego, co na nim zrealizowałeś. Otwórz papier, który wciąż masz, żeby zobaczyć te liczby."
+          },
+          "chart": {
+            "title": "Trzy sposoby czytania historii",
+            "body": "Przełączaj między **ceną**, **wartością Twojej pozycji** i **zwrotem** w oknie. Kupna i sprzedaże są zaznaczone na każdej serii. Przyciski po prawej ustawiają, jak daleko wstecz sięga wykres, a **strzałki** obok nich przesuwają to okno po wcześniejszej historii w tym samym przybliżeniu — wybierz 1R i cofaj się rok po roku, zamiast przełączać na 5L."
+          },
+          "keyInfo": {
+            "title": "Czym jest ten instrument",
+            "body": "Obok wykresu: typ papieru, giełda, waluta, dostawca notowań, którego używa Monize, i ostatnia zapisana cena. Pod tym karta **Struktura** pokazuje, z czego składa się fundusz — przełączaj między podziałem na sektory, kraje i klasy aktywów."
+          },
+          "tabs": {
+            "title": "Szczegóły pod spodem",
+            "body": "**Przegląd** zawiera opis, zwroty samego papieru, Twój zwrot całkowity na pozycji i stany na poszczególnych kontach. **Transakcje** i **Historia cen** to te same tabele, które trzymały dawne okienka. **Dokumenty** to miejsce na kartę funduszu albo raport roczny, a **Wiadomości** przynoszą najnowsze nagłówki wspominające ten symbol."
+          },
+          "finish": {
+            "title": "To cały przewodnik",
+            "body": "Każdy link, który wskazywał dawne okienka, prowadzi teraz tutaj — widżety cen na pulpicie otwierają tę stronę na karcie Historia cen. To zwykła strona, więc możesz dodać ją do zakładek i do niej wracać."
+          }
+        }
+      },
+      "gemStrategy": {
+        "title": "GEM: reguły wybierają jeden instrument na okres",
+        "steps": {
+          "welcome": {
+            "title": "Poznaj strategię GEM",
+            "body": "Raz w miesiącu lub raz na kwartał GEM porównuje, jak zmieniły się trzy rynki akcji i jedno aktywo bezpieczne, a potem wskazuje jeden instrument do utrzymania do następnej oceny. Gdy akcje radzą sobie zbyt słabo, wskazuje zamiast nich aktywo bezpieczne."
+          },
+          "findReport": {
+            "title": "Znajdź GEM w Raportach",
+            "body": "Otwórz tutaj raport **Strategia GEM**. Znajdziesz go w kategorii **Inwestycja**. Raport jest dostępny również wtedy, gdy nie masz jeszcze w Monize żadnych instrumentów inwestycyjnych ani zapisanych pozycji maklerskich.",
+            "fallbackBody": "Karta raportu nie jest teraz widoczna, zwykle z powodu filtra. Wybierz **Dalej**, a przewodnik otworzy raport GEM bezpośrednio. Później znajdziesz go w **Raportach**, w kategorii **Inwestycja**."
+          },
+          "page": {
+            "title": "Jeden raport, cztery odpowiedzi",
+            "body": "Widoczny u góry **scenariusz** to zapisany zestaw ustawień GEM, a nie zlecenie, transakcja ani konto maklerskie. Raport odpowiada na cztery pytania: co strategia wybiera teraz, dlaczego, czy portfel na wybranych kontach pasuje do celu oraz co należałoby zmienić. GEM zwykle wskazuje jeden instrument aż do następnej oceny miesięcznej lub kwartalnej."
+          },
+          "summary": {
+            "title": "Cztery karty w skrócie",
+            "body": "**Bieżący sygnał** to instrument wskazany przez reguły. **Twój portfel** porównuje ten cel z pozycjami zapisanymi na kontach strategii. **Do przeniesienia** szacuje wartość ewentualnej zmiany. **Aktywa strategii** pokazują, jaki instrument pełni każdą rolę. Brak danych jest pokazywany jako brak danych, a nie jako zero."
+          },
+          "action": {
+            "title": "Wskazówka, nie automatyczne zlecenie",
+            "body": "Wykres porównuje przypisane instrumenty. Karta **Co powinienem zrobić?** przekłada sygnał na możliwą operację sprzedaży i zakupu oraz, gdy wystarcza danych, szacuje podatek i prowizję. Monize nigdy nie wysyła zlecenia do brokera. Po wykonaniu prawdziwych transakcji u brokera zapisz je w Monize, a następnie użyj **Oznacz jako wykonane** wyłącznie jako notatki, że sygnał został zrealizowany."
+          },
+          "reasoning": {
+            "title": "Dlaczego GEM wybrał ten instrument?",
+            "body": "„Momentum” oznacza tutaj po prostu zmianę cen w wybranym okresie z przeszłości. GEM najpierw sprawdza, czy instrument dla akcji amerykańskich wypadł lepiej niż benchmark wolny od ryzyka używany jako punkt odniesienia. Jeśli tak, wybiera najlepszy z trzech rynków: USA, rynków rozwiniętych poza USA i rynków wschodzących. Jeśli nie, wybiera aktywo bezpieczne. Karta **Dlaczego taki sygnał?** i historia sygnałów pokazują całą decyzję, a nie tylko końcowy symbol."
+          },
+          "tabs": {
+            "title": "Wróć do Przeglądu, aby zobaczyć wynik",
+            "body": "Wybierz **Przegląd**, aby zobaczyć, co daje ta konfiguracja. Warto znać też pozostałe karty: **Sygnały** pokazują wcześniejsze decyzje, **Mój portfel** wyjaśnia, co zapisano na wybranych kontach, a **Backtest** pokazuje, jak reguły zachowałyby się na dostępnych cenach historycznych; to model, a nie prognoza ani obietnica wyniku."
+          },
+          "openSettings": {
+            "title": "Otwórz ustawienia scenariusza",
+            "body": "Wybierz **Edytuj ustawienia** — najpierw skonfigurujemy strategię, a dopiero potem będziemy z niej cokolwiek odczytywać. Pusta konfiguracja daje pusty raport, więc to tutaj warto zacząć. Nic na tym ekranie nie kupuje instrumentu ani nie zmienia czegokolwiek na koncie u brokera."
+          },
+          "accounts": {
+            "title": "Wybierz konta do porównania",
+            "body": "**Konta strategii** to konta inwestycyjne należące do tego scenariusza GEM. Do porównania portfela i oszacowania wartości do przeniesienia liczą się tylko instrumenty oraz gotówka zapisane na tych kontach. Nie masz jeszcze konta inwestycyjnego? Zostaw listę pustą. GEM nadal może wyliczyć sygnał, ale nie porówna go z Twoim rzeczywistym portfelem."
+          },
+          "timingAndCosts": {
+            "title": "Wybierz, jak daleko GEM patrzy wstecz",
+            "body": "**Częstotliwość oceny** określa, czy GEM podejmuje nową decyzję co miesiąc, czy co kwartał. **Okno momentum (miesiące)** to po prostu liczba poprzednich miesięcy, z których porównywane są ceny; wartość domyślna wynosi 12. **Stawka podatku (%)** i **Prowizja za transakcję** są opcjonalne i wpływają tylko na szacunki kosztów; nie zmieniają sygnału. Zostaw je puste, jeśli ich nie znasz."
+          },
+          "addInstruments": {
+            "title": "Nie masz jeszcze instrumentów? Zacznij tutaj",
+            "body": "GEM potrzebuje instrumentu w każdej roli, żeby móc cokolwiek zdecydować. Gdy rola jest pusta, karta **Role i instrumenty** proponuje skrót dodający przykładowe funduszy ETF. Najpierw w polu **Notowania do dodania** wybierz rynek, na którym rzeczywiście działa Twój broker: **Ameryka** albo **Europa (UCITS)**. Przycisk dodawania od razu tworzy wpisy instrumentów w Monize, jeszcze przed zapisaniem konfiguracji GEM; niczego nie kupuje. Uzupełniane są tylko puste role, a pasujący instrument z Twojej listy może zostać użyty ponownie. Sprawdź każdy symbol, giełdę i walutę. Te przykłady nie są rekomendacją. Jeśli skrótu nie ma, role są już uzupełnione i możesz je przejrzeć poniżej.",
+            "fallbackBody": "Formularz ustawień nie został wczytany, dlatego przewodnik nie może wskazać karty z rolami. Żadne ustawienie nie zostało zmienione. Użyj opcji ponowienia na stronie albo uruchom przewodnik później w sekcji **Przewodniki po aplikacji** w **Ustawieniach**."
+          },
+          "roles": {
+            "title": "Pięć ról, jeden cel",
+            "body": "Te pięć pól to właśnie to, co uzupełnił skrót — i to, co w innym razie ustawiasz ręcznie. Trzy role akcyjne oznaczają USA (**S&P 500**), **Rynki rozwinięte poza USA** i **Rynki wschodzące**. **Aktywo bezpieczne** ma być trzymane, gdy akcje nie przejdą testu bezpieczeństwa. **Benchmark wolny od ryzyka** jest tylko punktem odniesienia dla tego testu i można zostawić go pustego; wtedy aktywo bezpieczne pełni obie funkcje. To pięć zadań w obliczeniu, a nie pięć inwestycji, które GEM każe posiadać naraz. Celem strategii jest jeden instrument na raz."
+          },
+          "save": {
+            "title": "Sprawdź wszystko przed zapisaniem",
+            "body": "Sprawdź listę kont, każde notowanie i waluty, a potem **Zapisz konfigurację**, aby przechować scenariusz i ponownie obliczyć raport z dostępnej historii cen. To zapis sprawia, że kolejne kroki mają co pokazać. Nadal nie składa żadnych zleceń i nie musisz zapisywać, aby ukończyć ten przewodnik. Jeśli cen brakuje albo są zbyt stare, Monize pokaże brak dostępnego sygnału zamiast zgadywać."
+          },
+          "finish": {
+            "title": "Wróć przy następnej ocenie",
+            "body": "GEM podejmuje jedną decyzję na okres, a datę najbliższej widzisz u góry raportu. Do tego dnia nie musisz nic robić. Gdy nadejdzie, sprawdź, czy sygnał się zmienił; jeśli tak, wykonaj transakcje u brokera i zapisz je w Monize, żeby porównanie portfela dalej się zgadzało. Przewodnik uruchomisz ponownie w sekcji **Przewodniki po aplikacji** w **Ustawieniach**."
+          }
+        }
+      }
+    },
+    "v1_16_0": {
+      "notifications": {
+        "title": "Powiadomienia",
+        "steps": {
+          "welcome": {
+            "title": "Monize może teraz dawać znać",
+            "body": "Rachunek z terminem płatności, przekroczony budżet, saldo przechodzące przez ustawioną przez Ciebie granicę, nieudana kopia zapasowa. Ten przewodnik pokazuje, gdzie to trafia i jak decydujesz, co dotrze do Ciebie e-mailem albo na telefon."
+          },
+          "bell": {
+            "title": "Dzwonek jest zapisem",
+            "body": "Każde powiadomienie, które Monize tworzy, trafia tutaj — niezależnie od tego, co włączysz lub wyłączysz gdzie indziej. E-mail i push to kopie wysyłane dalej; ta lista jest oryginałem, a liczba przy dzwonku pokazuje, ilu jeszcze nie przeczytałeś."
+          },
+          "panel": {
+            "title": "Co niesie ze sobą powiadomienie",
+            "body": "Każde mówi, co się stało, i prowadzi do strony, która to pokazuje: rachunku, budżetu, konta. **Oznacz wszystkie jako przeczytane** zeruje licznik, niczego nie usuwając. Jeśli chcesz, aby Ci o czymś przypomniano, każde powiadomienie ma **Przypomnij mi**: jeszcze raz po chwili albo cyklicznie, dopóki tego nie zatrzymasz — a zatrzymać możesz je także z samego powiadomienia na telefonie."
+          },
+          "filters": {
+            "title": "Najpierw zawęź listę, potem działaj",
+            "body": "Górny rząd filtruje według wagi, dolny oddziela **Finansowe** od **Systemowych** — kopie zapasowe, dostarczanie poczty i wszystko, z czym poradzi sobie tylko administrator. **Usuń wszystkie** trzyma się ustawionego filtra i obejmuje wszystkie pasujące wpisy, nie tylko te na ekranie, więc możesz uprzątnąć serię rozwiązanych alertów systemowych i zostawić resztę."
+          },
+          "settings": {
+            "title": "Gdzie zapada decyzja o dostarczaniu",
+            "body": "**Ustawienia → Powiadomienia** zawierają resztę tego przewodnika. Na górze karty jest przełącznik e-maili i cotygodniowe podsumowanie budżetów; niżej siatka decydująca o całej reszcie, a potem Twoje urządzenia push."
+          },
+          "matrix": {
+            "title": "Jeden wiersz na rodzaj, jedna kolumna na kanał",
+            "body": "Dla każdego rodzaju powiadomienia wybierz, czy wychodzi jako **E-mail (raport)**, **E-mail (alert)**, **Push**, czy przez **UnifiedPush** do dystrybutora, który sam prowadzisz. Nie ma kolumny dla dzwonka, bo dzwonek zawsze dostaje wiersz. **Odstęp** to ostatnia kolumna: pomija e-mail i push, gdy coś z tej samej grupy wyszło już w tym oknie czasowym — wpis w dzwonku i tak powstaje. Każdy przełącznik zapisuje się od razu."
+          },
+          "push": {
+            "title": "Twoje urządzenia",
+            "body": "Zarejestruj tutaj przeglądarkę, a Monize dosięgnie jej także przy zamkniętej aplikacji. Sam podpisuje swoje wiadomości, więc po drodze nie ma żadnego konta Google ani Apple. Każde urządzenie da się osobno przetestować i usunąć, a urządzenie, które przestało być osiągalne, podaje powód. Na iPhonie działa to po dodaniu Monize do ekranu początkowego; jeśli administrator nie włączył push w tej instancji, znajdziesz tu informację o tym."
+          },
+          "portfolio": {
+            "title": "Zmiana wartości inwestycji",
+            "body": "Raz dziennie, gdy Twoje konta inwestycyjne zmienią się o więcej niż ustawiona tutaj kwota. Mierzone są ruchy rynku i dywidendy — wpłaty i wypłaty nie są zmianą."
+          },
+          "finish": {
+            "title": "Jeszcze jedno miejsce",
+            "body": "Progi salda są przy samym koncie: otwórz konto do edycji i ustaw **Powiadom poniżej** albo **Powiadom powyżej**. Uruchamiają się, gdy saldo *przekroczy* granicę, więc usłyszysz o tym raz, a nie po każdej kolejnej płatności. Ten przewodnik możesz powtórzyć w każdej chwili w Ustawieniach."
+          }
+        }
+      },
+      "reportTagBreakdown": {
+        "title": "Podział raportu według tagu",
+        "steps": {
+          "welcome": {
+            "title": "Zobacz raporty według tagu, nie tylko kategorii",
+            "body": "Przychody a wydatki oraz rachunek przepływów pieniężnych można teraz podzielić według wartości wybranego tagu — na przykład wydatki domowe kontra dodatkowa działalność — i pokazać przelewy między nimi, nigdy nie licząc przelewu jako przychodu."
+          },
+          "breakdown": {
+            "title": "Podziel według klucza tagu",
+            "body": "Wybierz tutaj klucz tagu, na przykład **scope**, a raport podzieli się na sekcję dla każdej użytej z nim wartości, plus sekcję **Bez tagu** dla reszty.",
+            "fallbackBody": "Ta kontrolka pojawia się, gdy oznaczysz transakcję tagiem **klucz:wartość**, na przykład **scope:household**. Dodaj taki tag, a Podziel według klucza tagu pojawi się tutaj."
+          },
+          "buckets": {
+            "title": "Sumy według wartości, przelewy pokazane osobno",
+            "body": "Wybór klucza otwiera zakładkę dla każdej wartości oraz zakładkę **Bez tagu**, każda z własnymi przychodami i wydatkami. Pieniądze przenoszone między kontami pokazywane są jako **Wpływy z tagiem** i **Wypływy z tagiem** — widoczne, ale nigdy nie liczone jako przychód."
+          },
+          "finish": {
+            "title": "Tak wygląda podział według tagu",
+            "body": "Oznaczaj transakcje parą klucz:wartość, na przykład scope:household, wszędzie tam, gdzie chcesz ten widok, i wracaj do tej wycieczki w dowolnym momencie z Ustawień."
+          }
+        }
+      }
+    },
+    "v1_17_0": {
+      "transactionRules": {
+        "title": "Reguły transakcji",
+        "steps": {
+          "welcome": {
+            "title": "Reguły porządkują transakcje za Ciebie",
+            "body": "Gdy transakcja zostaje utworzona lub zaimportowana i pasuje do ustawionych przez Ciebie warunków, reguła może ustawić jej kategorię lub odbiorcę, dodać tagi, przepisać opis albo poprosić AI o przegląd. Reguła nigdy nie zmienia kwoty, konta ani daty."
+          },
+          "tools": {
+            "title": "Reguły są w menu Narzędzia",
+            "body": "Otwórz **Narzędzia**, aby znaleźć **Reguły**. Następny krok pokazuje to menu."
+          },
+          "rulesLink": {
+            "title": "Otwórz Reguły",
+            "body": "Wybierz **Reguły**. Zobaczysz tam wszystkie swoje reguły i stamtąd utworzysz nową."
+          },
+          "list": {
+            "title": "Twoje reguły, po kolei",
+            "body": "Każdy wiersz to jedna reguła z przełącznikiem włączania i wyłączania oraz akcjami: przesuń, uruchom, powiel lub usuń. Reguły są sprawdzane od góry do dołu, więc kolejność ma znaczenie, gdy dwie z nich zmieniają to samo. Gdy nie masz jeszcze żadnej reguły, ta karta wyjaśnia, czym jest reguła."
+          },
+          "create": {
+            "title": "Utwórz regułę",
+            "body": "**Utwórz regułę** otwiera edytor z pustą regułą. Nic nie zostanie zapisane, dopóki nie wybierzesz **Zapisz regułę**."
+          },
+          "when": {
+            "title": "Kiedy: na które transakcje patrzy",
+            "body": "Wybierz, czy reguła ma sprawdzać transakcję, gdy zostaje **utworzona**, gdy zostaje **zaimportowana**, czy w obu przypadkach. **Zatrzymaj przetwarzanie kolejnych reguł** pomija reguły znajdujące się niżej dla każdej transakcji, do której ta reguła pasuje."
+          },
+          "if": {
+            "title": "Jeśli: które transakcje pasują",
+            "body": "Ułóż warunki z pól takich jak odbiorca, opis, kwota i kategoria. Przełącznik **Wizualny** i **Wyrażenie** pokazuje te same warunki jako karty albo jako jedną linię tekstu. We wzorcu * oznacza dowolny tekst, a '{name}' zachowuje tekst z tego miejsca, aby akcja mogła go użyć."
+          },
+          "then": {
+            "title": "Wtedy: co zmienia",
+            "body": "Akcje działają w podanej kolejności. Reguła może ustawić kategorię lub odbiorcę, dodać albo usunąć tagi, ustawić opis albo poprosić AI o przegląd transakcji. Nie ma akcji zmieniającej kwotę, konto ani datę."
+          },
+          "test": {
+            "title": "Testuj, uruchamiaj i cofaj",
+            "body": "**Przetestuj regułę** sprawdza szkic na Twoich istniejących transakcjach i pokazuje, co by zmienił. Nic nie zostaje zmienione. Gdy reguła jest zapisana, **Uruchom na istniejących transakcjach** pokazuje podgląd i stosuje ją do tego, co już masz, a takie uruchomienie możesz cofnąć w historii akcji."
+          },
+          "reviews": {
+            "title": "Skrzynka przeglądów AI",
+            "body": "Reguła z akcją **Poproś o przegląd AI** nie zmienia transakcji, tylko przekazuje ją tutaj. Asystent proponuje zmianę i nic nie zostaje zapisane, dopóki jej nie zatwierdzisz. Możesz też odrzucić zgłoszenie. Skrzynkę znajdziesz w menu **AI** jako **Skrzynka przeglądów AI**."
+          }
+        }
+      }
+    },
+    "v1_20_0": {
+      "warranties": {
+        "title": "Gwarancje",
+        "steps": {
+          "welcome": {
+            "title": "Miej oko na swoje gwarancje",
+            "body": "Gwarancja zapisuje, co kupiłeś, kiedy kończy się ochrona i kto to sprzedał, razem z paragonem, instrukcją i ewentualnymi zgłoszeniami. Można ją powiązać z zakupem w rejestrze transakcji. Gwarancja nigdy nie zmienia salda, raportu ani sumy. Ten przewodnik pokazuje, jak ją dodać i gdzie potem się pojawia."
+          },
+          "warrantiesLink": {
+            "title": "Gwarancje są w menu Narzędzia",
+            "body": "Otwórz **Narzędzia** i wybierz **Gwarancje**, aby zobaczyć wszystkie swoje gwarancje."
+          },
+          "overview": {
+            "title": "Ochrona w skrócie",
+            "body": "Te karty liczą Twoje gwarancje w grupach **Wkrótce wygasają**, **Aktywne**, **Wygasłe** i **Dożywotnie**. Wybierz kartę, aby przefiltrować listę poniżej. Możesz też wyszukiwać, sortować i pokazywać zarchiwizowane gwarancje. Wybierz gwarancję z listy, aby otworzyć jej stronę z dokumentami, zgłoszeniami i powiązanym zakupem."
+          },
+          "addWarranty": {
+            "title": "Metoda 1: dodaj tutaj",
+            "body": "**Dodaj gwarancję** otwiera pusty formularz. Wpisz produkt, sprzedawcę i datę zakupu, a potem wybierz, kiedy kończy się ochrona: **W wybranym dniu**, **Po upływie okresu** albo **Nigdy** dla gwarancji dożywotniej. Przed zapisaniem możesz dołączyć paragon lub instrukcję."
+          },
+          "importCsv": {
+            "title": "Metoda 2: zaimportuj plik CSV",
+            "body": "**Importuj CSV** wczytuje plik w układzie kolumn Warracker, na przykład eksport z aplikacji Warracker lub z tej strony. Zanim cokolwiek zostanie zapisane, zobaczysz każdy wiersz i ewentualne problemy."
+          },
+          "inRegister": {
+            "title": "Gwarancje w rejestrze transakcji",
+            "body": "Transakcja z gwarancją ma w rejestrze ikonę tarczy. Wyszukaj **has:warranty**, aby znaleźć wszystkie takie transakcje."
+          },
+          "newTransaction": {
+            "title": "Metoda 3: podczas zapisywania zakupu",
+            "body": "Wybierz **+ Nowa transakcja**, aby otworzyć formularz."
+          },
+          "warrantiesLine": {
+            "title": "Wiersz Gwarancje",
+            "body": "**Dodaj gwarancję** w tym miejscu najpierw zapisuje nową transakcję, a potem otwiera formularz gwarancji wypełniony jej danymi. Gdy później edytujesz transakcję, ten wiersz pokazuje jej gwarancje, a każda z nich otwiera swoją stronę.",
+            "fallbackBody": "Wiersz Gwarancje nie jest widoczny dla konta wspólnego, ponieważ gwarancja należy tylko do Ciebie. Wybierz jedno ze swoich kont, a formularz pokaże wiersz **Gwarancje** nad przyciskami. **Dodaj gwarancję** w tym wierszu najpierw zapisuje nową transakcję, a potem otwiera formularz gwarancji wypełniony jej danymi. Gdy później edytujesz transakcję, wiersz pokazuje jej gwarancje."
+          },
+          "closeForm": {
+            "title": "Zamknij formularz",
+            "body": "Wybierz **Anuluj**, aby zamknąć go bez zapisywania, albo zapisz transakcję, jeśli jest prawdziwa."
+          },
+          "dashboardWidget": {
+            "title": "Sprawdź na pulpicie, co wygasa",
+            "body": "Wybierz **Dostosuj** i włącz **Gwarancje wkrótce wygasające**. Widżet pokazuje gwarancje, które wygasną najwcześniej, a jego tytuł otwiera stronę Gwarancje."
+          },
+          "reminders": {
+            "title": "Przypomnienia przed końcem ochrony",
+            "body": "Monize przypomina 30 dni i 7 dni przed wygaśnięciem gwarancji oraz w dniu jej wygaśnięcia. Przypomnienia trafiają tutaj, a każde z nich możesz odłożyć na później albo otworzyć z niego gwarancję. Sposób ich dostarczania wybierzesz w **Ustawienia**, w sekcji **Powiadomienia**, jako **Przypomnienia o gwarancjach**."
+          }
+        }
+      },
+      "payrollDeductions": {
+        "title": "Potrącenia z wynagrodzenia",
+        "steps": {
+          "welcome": {
+            "title": "Zatrzymaj potrącenia na rocznym limicie",
+            "body": "Niektóre potrącenia z wynagrodzenia, np. na emeryturę lub ubezpieczenie od bezrobocia, ustają po osiągnięciu rocznego limitu i zaczynają się od nowa w kolejnym roku. Reguła potrącenia podaje Monize ten limit, aby wypłata przestała pobierać potrącenie, gdy zostanie osiągnięty. **Zanim zaczniesz, potrzebujesz zaplanowanego rachunku wynagrodzenia:** swojej wypłaty ustawionej jako zaplanowana wpłata, z potrąceniami jako osobnymi pozycjami."
+          },
+          "payrollBill": {
+            "title": "Najpierw ustaw swoją wypłatę",
+            "body": "Jeśli jeszcze tego nie zrobiłeś, wybierz **+ Nowy harmonogram** i utwórz wypłatę jako wpłatę. Podziel ją na pozycję z wynagrodzeniem brutto i po jednej ujemnej pozycji na każde potrącenie, każdą z własną kategorią. Jeśli potrącenie nie jest teraz pobierane, bo tegoroczny limit został już osiągnięty, i tak dodaj dla niego pozycję podziału jako wydatek o wartości zero, aby reguła mogła je ograniczyć i aby zaczęło się od nowa po resecie. Reguły może mieć tylko aktywna wpłata, która wpłaca więcej, niż potrąca, i tylko jej pozycje potrąceń można ograniczyć."
+          },
+          "taxesLink": {
+            "title": "Potrącenia z wynagrodzenia są w Podatkach",
+            "body": "Otwórz **Narzędzia** i wybierz **Podatki**, aby znaleźć narzędzia podatkowe."
+          },
+          "taxesCard": {
+            "title": "Otwórz Potrącenia z wynagrodzenia",
+            "body": "Wybierz tę kartę, aby otworzyć reguły potrąceń z wynagrodzenia."
+          },
+          "newRule": {
+            "title": "Utwórz reguły dla wypłaty",
+            "body": "**+ Nowa reguła** otwiera formularz. Wybierz zaplanowany rachunek wynagrodzenia, a potem roczny limit dla każdej kategorii potrącenia, którą chcesz ograniczyć. Dodaj datę resetu, zwykle 1 stycznia. Jeśli rachunek nie ma pozycji potrąceń, formularz poprosi, aby najpierw dodać je do rachunku."
+          },
+          "rulesList": {
+            "title": "Twoje reguły",
+            "body": "Każda reguła pokazuje rachunek, kategorię, roczny limit, datę resetu i kwotę potrącaną z każdej wypłaty. Edytuj regułę, aby zmienić limit, albo usuń ją, aby wypłata znów pobierała pełną pozycję. Usunięcie reguły nigdy nie zmienia zaksięgowanej transakcji."
+          },
+          "periodTables": {
+            "title": "Co już zostało pobrane",
+            "body": "Gdy masz regułę, **Pokaż narastająco w roku** pokazuje, ile każda kategoria pobrała w tym okresie i ile zostało do limitu. **Pokaż poprzednie okresy** pokazuje, ile pobrała w poprzednich latach."
+          },
+          "forecast": {
+            "title": "Stosowane przy księgowaniu wypłaty",
+            "body": "Gdy wypłata zostaje zaksięgowana, każda ograniczona pozycja jest zmniejszana do kwoty pozostałej do limitu, aż do zera, i zaczyna się od nowa po dacie resetu. Prognoza przepływów pieniężnych tutaj i na pulpicie pokazuje to samo z wyprzedzeniem, więc widzisz, jak rośnie wypłata netto po osiągnięciu limitu."
+          },
+          "reminders": {
+            "title": "Przypomnienie przed każdym resetem",
+            "body": "Dwa miesiące przed resetem reguły Monize prosi tutaj o potwierdzenie limitu na kolejny rok. Jeśli nic nie zrobisz, reguła zachowa limit i zresetuje się w swoim terminie. Sposób dostarczania przypomnień wybierzesz w **Ustawienia**, w sekcji **Powiadomienia**, jako **Rachunki i zaplanowane**."
+          }
+        }
+      },
+      "sharedExpenses": {
+        "title": "Rozliczenia",
+        "steps": {
+          "welcome": {
+            "title": "Wspólny wyjazd, przejrzyste rozliczenia",
+            "body": "Zobacz, jak zapisywać zakupy dla grupy i zwroty pieniędzy. Ten przewodnik nie tworzy za Ciebie żadnych wpisów."
+          },
+          "tools": {
+            "title": "Otwórz rozliczenia",
+            "body": "**Rozliczenia** znajdziesz w menu **Narzędzia**. Na telefonie skorzystaj z menu nawigacji."
+          },
+          "newGroup": {
+            "title": "Zacznij od swojej grupy",
+            "body": "W oknie **Nowa grupa** podajesz nazwę wyjazdu, uczestników i walutę rozliczenia. Uczestnicy nie muszą mieć kont w Monize. Każdy zakup może dotyczyć innych osób z grupy."
+          },
+          "chooseGroup": {
+            "title": "Zajrzyj do grupy",
+            "body": "Otwórz grupę, aby kontynuować. Jeśli jeszcze jej nie masz, wybierz **Pomiń ten krok** i utwórz ją po zakończeniu przewodnika."
+          },
+          "expenses": {
+            "title": "Kto zapłacił i dla kogo?",
+            "body": "Jeśli masz uprawnienia do edycji, wybierz **Dodaj wydatek** i wskaż płacącego oraz osoby, których dotyczy zakup. W **Podziel między** możesz podzielić koszt po równo, podać dokładne kwoty, procenty lub udział zerowy."
+          },
+          "balances": {
+            "title": "Sprawdź bilans i rozlicz się",
+            "body": "Karta **Kto komu** pokazuje, kto jest komu winien pieniądze, i proponuje spłaty. Zapisz spłatę dopiero po przekazaniu pieniędzy. W **Pliki** i **Historia zmian** znajdziesz dokumenty i historię grupy."
+          },
+          "done": {
+            "title": "Gotowe na kolejny wyjazd",
+            "body": "Wpisy grupy pozostają oddzielone od prywatnych transakcji. Ten przewodnik możesz powtórzyć w dowolnej chwili: **Ustawienia**, następnie **Przewodniki po aplikacji**."
+          }
+        }
+      }
+    }
+  },
+  "emailReceipts": {
+    "basics": {
+      "title": "Paragony z e-maili",
+      "steps": {
+        "welcome": {
+          "title": "Po co czytać paragony z e-maili",
+          "body": "Transakcja bankowa pokazuje, ile zapłacono i kiedy. Nie pokazuje, co kupiono. Pokazuje to e-mail z potwierdzeniem zamówienia. Monize czyta te e-maile, znajduje transakcję, którą opłacono, i proponuje opis, odbiorcę oraz podział na pozycje z kategorią dla każdej pozycji. Każdą propozycję zatwierdzasz, zanim zmieni ona transakcję."
+        },
+        "aiRequired": {
+          "title": "W praktyce potrzebny jest dostawca AI",
+          "body": "Monize czyta e-mail za pomocą **profilu**. Profil to zestaw wzorców dla jednej domeny nadawcy, na przykład jednego sklepu. Profil można napisać ręcznie, ale każdy wzorzec musi pasować do dokładnych wierszy e-maili tego sklepu. Dlatego w praktyce profil pisze AI. AI pisze profil jeden raz, na podstawie kilku przykładowych e-maili. Po zatwierdzeniu profil czyta każdy nowy e-mail z tego sklepu bez udziału AI."
+        },
+        "aiProviders": {
+          "title": "Najpierw skonfiguruj dostawcę AI",
+          "body": "Dodaj tutaj dostawcę i sprawdź połączenie. Bez dostawcy kreator nie napisze profilu, a e-maile ze sklepu bez profilu pozostaną nieodczytane."
+        },
+        "tabs": {
+          "title": "Cztery karty w kolejności użycia",
+          "body": "**Przegląd** pokazuje, co Monize odczytało. W karcie **Skrzynka pocztowa** podłącz skrzynkę, w której są tylko potwierdzenia zamówień. Monize tylko czyta tę skrzynkę: nigdy nie przenosi, nie oznacza i nie usuwa wiadomości. **Profile** zawierają jeden profil dla każdego sklepu. **Wiadomości** pokazują każdy e-mail i jego stan."
+        },
+        "uncovered": {
+          "title": "Sklepy bez profilu",
+          "body": "Ta ramka pokazuje domeny nadawców, których e-maili żaden profil jeszcze nie czyta. Wybierz domenę, aby uruchomić kreator. Zaznacz do pięciu e-maili i do każdego przypisz transakcję bankową, którą opłacono. AI pisze profil i testuje go na tych parach. Potem widzisz podgląd dla wszystkich e-maili z tego sklepu. Akceptujesz profil albo prosisz o zmianę krótką notatką.",
+          "fallbackBody": "Nie masz jeszcze e-maili ze sklepu bez profilu. Po podłączeniu skrzynki każda domena nadawcy pojawi się tutaj jako etykieta, na przykład **sklep.example (12)**: domena i liczba jej e-maili. Wybierz etykietę, aby uruchomić kreator. Zaznacz do pięciu e-maili i do każdego przypisz transakcję bankową, którą opłacono. AI pisze profil i testuje go na tych parach. Potem widzisz podgląd dla wszystkich e-maili z tego sklepu. Akceptujesz profil albo prosisz o zmianę krótką notatką."
+        },
+        "profiles": {
+          "title": "Twoje profile",
+          "body": "Każdy wiersz to jeden profil, zatwierdzony lub roboczy. **Utwórz nowy profil ręcznie** otwiera edytor profilu pisanego ręcznie. Użyj go, aby poprawić drobny szczegół w wersji roboczej od AI. Po zatwierdzeniu profilu Monize od razu czyta e-maile z jego domeny.",
+          "fallbackBody": "Nie masz jeszcze profili. Każdy zaakceptowany profil pojawi się tutaj jako jeden wiersz, na przykład **Sklep Example**, domena **sklep.example**, stan **Zatwierdzony**. **Utwórz nowy profil ręcznie** otwiera edytor profilu pisanego ręcznie. Używaj go tylko do poprawienia drobnego szczegółu w wersji roboczej od AI. Po zatwierdzeniu profilu Monize od razu czyta e-maile z jego domeny."
+        },
+        "reviews": {
+          "title": "Zatwierdź propozycje",
+          "body": "Każdy e-mail, który pasuje do transakcji, staje się propozycją w **Skrzynce przeglądów AI** w menu **AI**. Propozycja pokazuje na przykład pozycje zamówienia z kategorią dla każdej pozycji. Nic nie zmienia się w transakcjach, dopóki tam nie zatwierdzisz propozycji."
+        }
+      }
+    }
+  }
+}

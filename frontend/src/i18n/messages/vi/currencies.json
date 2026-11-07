@@ -1,0 +1,193 @@
+{
+  "page": {
+    "title": "Tiền tệ",
+    "subtitle": "Quản lý các tiền tệ được sử dụng trong tài khoản và chứng khoán của bạn",
+    "refreshRates": "Làm mới tỷ giá",
+    "refreshing": "Đang làm mới...",
+    "statusFilterLabel": "Trạng thái",
+    "newCurrency": "+ Tiền tệ mới",
+    "searchPlaceholder": "Tìm kiếm theo mã hoặc tên...",
+    "statusAll": "Tất cả ({count})",
+    "statusActive": "Đang hoạt động ({count})",
+    "statusInactive": "Không hoạt động ({count})",
+    "modalTitleEdit": "Chỉnh sửa tiền tệ",
+    "modalTitleNew": "Tiền tệ mới",
+    "loading": "Đang tải tiền tệ...",
+    "count": "{count, plural, one {# tiền tệ} other {# tiền tệ}}",
+    "providers": {
+      "line": "Tỷ giá từ {providers}",
+      "separator": ", sau đó ",
+      "names": {
+        "frankfurter": "Frankfurter (tỷ giá tham chiếu ECB)",
+        "yahoo": "Yahoo Finance",
+        "crypto": "Cặp tiền mã hóa (Yahoo)"
+      }
+    },
+    "toasts": {
+      "loadFailed": "Không thể tải tiền tệ",
+      "updated": "Cập nhật tiền tệ thành công",
+      "created": "Tạo tiền tệ thành công",
+      "updateFailed": "Không thể cập nhật tiền tệ",
+      "createFailed": "Không thể tạo tiền tệ",
+      "deactivated": "Đã vô hiệu hóa tiền tệ",
+      "activated": "Đã kích hoạt tiền tệ",
+      "statusFailed": "Không thể cập nhật trạng thái tiền tệ",
+      "ratesRefreshed": "Đã làm mới tỷ giá hối đoái: cập nhật {updated} cặp",
+      "ratesRefreshedWithFailed": "Đã làm mới tỷ giá hối đoái: cập nhật {updated}, thất bại {failed}",
+      "ratesAllFailed": "Không thể lấy được tỷ giá nào; nhà cung cấp không phản hồi",
+      "ratesFailed": "Không thể làm mới tỷ giá hối đoái"
+    },
+    "summary": {
+      "totalCurrencies": "Tổng số tiền tệ",
+      "active": "Đang hoạt động",
+      "inactive": "Không hoạt động"
+    }
+  },
+  "list": {
+    "columns": {
+      "code": "Mã",
+      "name": "Tên",
+      "symbol": "Ký hiệu",
+      "decimals": "Số thập phân",
+      "usage": "Sử dụng",
+      "rate": "Tỷ giá ({currency})",
+      "status": "Trạng thái",
+      "actions": "Hành động"
+    },
+    "defaultBadge": "Mặc định",
+    "cryptoBadge": "Tiền mã hóa",
+    "noPriceSymbol": "Không có ký hiệu giá",
+    "statusBadge": {
+      "active": "Đang hoạt động",
+      "activeShort": "HĐ",
+      "inactive": "Không hoạt động",
+      "inactiveShort": "KHĐ"
+    },
+    "actions": {
+      "edit": "Chỉnh sửa",
+      "deactivate": "Vô hiệu hóa",
+      "activate": "Kích hoạt"
+    },
+    "contextMenu": {
+      "editCurrency": "Chỉnh sửa tiền tệ",
+      "deactivate": "Vô hiệu hóa",
+      "activate": "Kích hoạt",
+      "deleteCurrency": "Xóa tiền tệ"
+    },
+    "usageAccounts": "{count, plural, other {# tài khoản}}",
+    "usageSecurities": "{count, plural, other {# chứng khoán}}",
+    "rateHelp": "Giá trị của một đơn vị mỗi loại tiền tính bằng {currency}.",
+    "empty": {
+      "title": "Không có tiền tệ",
+      "subtitle": "Hãy bắt đầu bằng cách thêm một tiền tệ."
+    },
+    "deleteConfirm": {
+      "title": "Xóa \"{code}\"?",
+      "message": "Tiền tệ này sẽ bị xóa vĩnh viễn. Chỉ hoạt động khi tiền tệ không được sử dụng bởi bất kỳ tài khoản hay chứng khoán nào.",
+      "confirmLabel": "Xóa",
+      "cancelLabel": "Hủy"
+    },
+    "toasts": {
+      "deleted": "Xóa tiền tệ thành công",
+      "deleteFailed": "Không thể xóa tiền tệ. Nó có thể đang được sử dụng."
+    }
+  },
+  "form": {
+    "codeLabel": "Mã tiền tệ",
+    "codePlaceholder": "Ví dụ: USD, EUR, GBP",
+    "nameLabel": "Tên",
+    "namePlaceholderCreate": "Ví dụ: Canadian Dollar, Malaysia, Ringgit (cũng dùng để tra cứu)",
+    "namePlaceholderEdit": "Ví dụ: Canadian Dollar",
+    "symbolLabel": "Ký hiệu",
+    "symbolPlaceholder": "Ví dụ: $, €, £, ¥",
+    "decimalPlacesLabel": "Số thập phân",
+    "kindLabel": "Loại",
+    "kindOptions": {
+      "fiat": "Tiền pháp định",
+      "crypto": "Tiền mã hóa"
+    },
+    "kindLocked": "{code} đang được sử dụng nên không thể đổi loại.",
+    "quoteSymbolLabel": "Ký hiệu giá (tùy chọn)",
+    "quoteSymbolPlaceholder": "vd. BTC-EUR",
+    "quoteSymbolHelp": "Ký hiệu Yahoo Finance dùng để lấy giá của đồng coin: mã giao dịch, dấu gạch ngang và loại tiền tệ niêm yết, chẳng hạn BTC-EUR. Tỷ giá của đồng coin được lấy thông qua ký hiệu này.",
+    "verifyButton": "Xác minh",
+    "quoteSymbolPricedIn": "Niêm yết bằng {currency}",
+    "quoteSymbolMissing": "Không có ký hiệu giá thì loại tiền tệ này không có tỷ giá.",
+    "quoteSymbolNotCrypto": "{symbol} không phải là tiền mã hóa. Hãy nhập cặp của một đồng coin, chẳng hạn BTC-EUR.",
+    "quoteSymbolNotFound": "Không tìm thấy tiền mã hóa cho {symbol}",
+    "lookupButton": "Tra cứu",
+    "lookingUp": "Đang tra cứu...",
+    "clearButton": "Xóa",
+    "clearTitle": "Xóa tất cả các trường",
+    "submitCreate": "Tạo tiền tệ",
+    "submitUpdate": "Cập nhật tiền tệ",
+    "toasts": {
+      "lookupTooShort": "Nhập mã hoặc tên tiền tệ (ít nhất 2 ký tự) để tra cứu",
+      "found": "Đã tìm thấy: {details}",
+      "notFound": "Không tìm thấy tiền tệ cho \"{query}\"",
+      "lookupFailed": "Tra cứu thất bại - vui lòng thử lại",
+      "reactivateFailed": "Không thể kích hoạt lại tiền tệ",
+      "verifyEmpty": "Nhập ký hiệu giá như BTC-EUR để xác minh",
+      "verifyFailed": "Không thể xác minh ký hiệu giá"
+    },
+    "inactiveNotice": "{code} đã có trong danh sách của bạn nhưng đang không hoạt động.",
+    "nonIsoNotice": "{code} không phải là mã tiền tệ tiêu chuẩn. Nếu đây là tiền mã hóa, hãy đặt loại của nó thành Tiền mã hóa. <guide>Đọc về tiền mã hóa trong hướng dẫn sử dụng</guide>.",
+    "switchToCrypto": "Dùng Tiền mã hóa",
+    "cryptoPrecisionNotice": "Số tiền bằng tiền mã hóa được giữ tối đa tám chữ số thập phân, đúng độ chính xác khi lưu trữ, nên không thể nhập khoản phí nhỏ hơn {smallest}. <guide>Xem cách ghi nhận phí ví</guide>.",
+    "reactivateButton": "Kích hoạt lại {code}",
+    "reactivating": "Đang kích hoạt lại..."
+  },
+  "validation": {
+    "codeLength": "Mã tiền tệ phải chính xác 3 ký tự",
+    "nameRequired": "Tên là bắt buộc",
+    "nameMax": "Tên phải từ 100 ký tự trở xuống",
+    "symbolRequired": "Ký hiệu là bắt buộc",
+    "symbolMax": "Ký hiệu phải từ 10 ký tự trở xuống",
+    "quoteSymbolMax": "Ký hiệu giá phải từ 20 ký tự trở xuống",
+    "quoteSymbolRequiresCrypto": "Chỉ tiền mã hóa mới có ký hiệu giá",
+    "quoteSymbolNotAPair": "Nhập một cặp như BTC-EUR: đồng coin, dấu gạch ngang và mã tiền tệ gồm ba chữ cái"
+  },
+  "rateHistory": {
+    "title": "Lịch sử tỷ giá",
+    "stored": "Lịch sử đã lưu: {start} đến {end} ({count} quan sát)",
+    "none": "Không có lịch sử đã lưu cho {pair}",
+    "loading": "Đang kiểm tra lịch sử tỷ giá đã lưu...",
+    "loadFailed": "Không thể đọc lịch sử tỷ giá đã lưu",
+    "fillGaps": "Lấp chỗ trống trong lịch sử tỷ giá",
+    "filling": "Đang tải các tỷ giá còn thiếu...",
+    "fillGapsTitle": "Tải các tỷ giá hằng ngày mà báo cáo của bạn còn thiếu, từ ngày đầu tiên dữ liệu của bạn dùng {code} đến hôm nay.",
+    "hint": "Báo cáo có ngày trước tỷ giá đã lưu đầu tiên không thể quy đổi {pair}.",
+    "list": {
+      "heading": "Tỷ giá đã lưu",
+      "direction": "Hiển thị theo {to} cho 1 {from}.",
+      "loading": "Đang tải các tỷ giá đã lưu...",
+      "loadFailed": "Không đọc được các tỷ giá đã lưu",
+      "empty": "Không có tỷ giá đã lưu để liệt kê",
+      "truncated": "Đang hiển thị {count} tỷ giá đã lưu mới nhất; các tỷ giá cũ hơn không được liệt kê.",
+      "inverted": "nghịch đảo",
+      "unknownRate": "Không rõ",
+      "columns": {
+        "date": "Ngày",
+        "rate": "Tỷ giá",
+        "source": "Nguồn"
+      },
+      "sources": {
+        "yahooFinance": "Yahoo Finance",
+        "frankfurter": "Frankfurter (ECB)",
+        "mnyImport": "Nhập từ Money",
+        "yahooCrypto": "Cặp tiền mã hóa (Yahoo)",
+        "unknown": "Không rõ"
+      }
+    },
+    "toasts": {
+      "filled": "Đã thêm {count} tỷ giá; lịch sử giờ bắt đầu từ {start}",
+      "partial": "Đã lưu {count} tỷ giá; lịch sử nay bắt đầu từ {start}. Còn {windows} chỗ trống cần tải, nhấn lại để tiếp tục.",
+      "moreToFetch": "Lần này không có tỷ giá nào được lưu; còn {windows} chỗ trống cần tải, nhấn lại để tiếp tục.",
+      "noGaps": "{pair} đã có tỷ giá hằng ngày cho mọi ngày mà báo cáo của bạn cần",
+      "noNewRates": "Không có tỷ giá mới nào được lưu cho {pair}",
+      "unused": "Không tài khoản, khoản nắm giữ hay giao dịch nào của bạn dùng {code}, nên không có tỷ giá để tải",
+      "providerFloor": "Nhà cung cấp không có tỷ giá {pair} trước ngày {date}",
+      "failed": "Không lấp được lịch sử tỷ giá"
+    }
+  }
+}

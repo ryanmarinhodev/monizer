@@ -1,0 +1,149 @@
+'use client';
+
+import type { ComponentType, ReactNode, SVGProps } from 'react';
+import Link from 'next/link';
+import {
+  ArrowPathIcon,
+  ArrowsRightLeftIcon,
+  ArrowTrendingUpIcon,
+  ArrowsUpDownIcon,
+  BanknotesIcon,
+  BookmarkIcon,
+  BriefcaseIcon,
+  BuildingLibraryIcon,
+  BuildingOffice2Icon,
+  CalendarDaysIcon,
+  CalendarIcon,
+  ChartBarSquareIcon,
+  ChartBarIcon,
+  ChartPieIcon,
+  ClipboardDocumentCheckIcon,
+  CreditCardIcon,
+  GlobeAltIcon,
+  LightBulbIcon,
+  PresentationChartLineIcon,
+  RectangleGroupIcon,
+  ScaleIcon,
+  ShieldCheckIcon,
+  StarIcon,
+  UsersIcon,
+} from '@heroicons/react/24/outline';
+// Type-only import: erased at compile time, so no runtime cycle with the
+// registry (which imports the widgets, which import WidgetCard, which
+// imports this file).
+import type { DashboardWidgetId } from './widget-registry';
+
+type WidgetIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
+
+/**
+ * Per-widget icon for the dashboard card headers. Distinct per widget on
+ * purpose -- the registry's `iconType` (bar/line/pie/table/list) is about the
+ * visualization kind and repeats five glyphs across 22 widgets, which is no
+ * differentiation at all. `widget-meta.test.tsx` holds "every registered
+ * widget has an icon".
+ */
+export const WIDGET_ICONS: Record<DashboardWidgetId, WidgetIconComponent> = {
+  'favourite-accounts': BuildingLibraryIcon,
+  'upcoming-bills': CalendarDaysIcon,
+  'cash-flow-forecast': ChartBarSquareIcon,
+  'top-movers': ArrowTrendingUpIcon,
+  'favourite-securities': StarIcon,
+  'portfolio-value': PresentationChartLineIcon,
+  'net-worth': ScaleIcon,
+  'assets-liabilities': BanknotesIcon,
+  'expenses-pie': ChartPieIcon,
+  'income-expenses': ArrowsUpDownIcon,
+  'budget-status': ClipboardDocumentCheckIcon,
+  insights: LightBulbIcon,
+  'favourite-reports': BookmarkIcon,
+  'spending-by-payee': UsersIcon,
+  'monthly-spending-trend': ChartBarIcon,
+  'income-by-source': BriefcaseIcon,
+  'credit-utilization-accounts': CreditCardIcon,
+  'credit-utilization-total': CreditCardIcon,
+  'sector-weightings': BuildingOffice2Icon,
+  'security-type-allocation': RectangleGroupIcon,
+  'geographic-allocation': GlobeAltIcon,
+  'recurring-expenses': ArrowPathIcon,
+  'weekend-weekday': CalendarIcon,
+  'cash-flow-sankey': ArrowsRightLeftIcon,
+  'warranties-expiring': ShieldCheckIcon,
+};
+
+/**
+ * The tinted icon puck before a widget title. Blue ramp only, so every
+ * colour theme re-tints it through its own accent.
+ */
+export function WidgetIconPuck({ id }: { id: DashboardWidgetId }) {
+  const Icon = WIDGET_ICONS[id];
+  if (!Icon) return null;
+  return (
+    <span
+      aria-hidden
+      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300"
+    >
+      <Icon className="h-4 w-4" />
+    </span>
+  );
+}
+
+const TITLE_CLASS = 'text-lg font-semibold text-gray-900 dark:text-gray-100';
+
+/**
+ * A widget's heading text, as a link to the fuller view of the same figures
+ * when `href` is given and a plain heading when it is not.
+ *
+ * One mechanism for every widget: `WidgetHeading` (the core widgets, which draw
+ * their own card header) and `WidgetCard` (the report-derived ones) both render
+ * the title through this, so the target is named as a route in the widget and
+ * the affordance is written once.
+ */
+export function WidgetTitle({
+  href,
+  className = '',
+  children,
+}: {
+  /** Route the title navigates to. Omit for a widget with no fuller view. */
+  href?: string;
+  /** Extra classes on the heading element. */
+  className?: string;
+  children: ReactNode;
+}) {
+  const headingClass = `${TITLE_CLASS} truncate ${className}`.trimEnd();
+  if (!href) return <h3 className={headingClass}>{children}</h3>;
+  return (
+    <h3 className={headingClass}>
+      <Link
+        href={href}
+        className="rounded-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        {children}
+      </Link>
+    </h3>
+  );
+}
+
+/**
+ * Icon puck + title for the widgets that draw their own card header (the
+ * core widgets predating `WidgetCard`). With `href` the title links to the
+ * fuller view; without, it is a plain heading.
+ */
+export function WidgetHeading({
+  id,
+  href,
+  className = '',
+  children,
+}: {
+  id: DashboardWidgetId;
+  href?: string;
+  /** Extra classes on the wrapper (e.g. `mb-4` where the heading stands alone). */
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`flex min-w-0 items-center gap-2.5 ${className}`}>
+      <WidgetIconPuck id={id} />
+      <WidgetTitle href={href}>{children}</WidgetTitle>
+    </div>
+  );
+}

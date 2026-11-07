@@ -1,0 +1,678 @@
+# -- Global settings
+global:
+  # -- Namespace for all resources
+  namespace: monize
+  # -- Application domain name
+  domain: yourdomain.com
+  # -- Full application hostname (defaults to monize.<domain>)
+  hostname: ""
+  # -- Timezone for all containers
+  timezone: ""
+
+# -- Namespace configuration
+namespace:
+  # -- Create the namespace
+  create: true
+  # -- Pod Security Standards enforcement level (privileged, baseline, restricted)
+  podSecurityEnforce: restricted
+
+# -- Backend configuration
+backend:
+  # -- Image settings
+  image:
+    registry: ghcr.io
+    repository: kenlasko/monize-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  # -- Number of replicas
+  #
+  # More than one requires cluster.mode=multi below: at CLUSTER_MODE=single the
+  # backend keeps rate-limit counters and cross-replica wake-ups in its own
+  # process, which a second replica would neither share nor see. Attachment and backup
+  # storage must be cluster-safe too, which the backend refuses to boot
+  # without: see cluster.mode.
+  replicas: 1
+
+  # -- Voluntary-disruption budget (node drains, cluster upgrades)
+  #
+  # Off by default on purpose: at replicas: 1 a budget of minAvailable: 1 makes
+  # a node drain block indefinitely rather than interrupt the service briefly,
+  # which is the worse surprise. Turn it on with the replica count.
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget
+    enabled: false
+    # -- Minimum pods that must stay available (ignored when maxUnavailable is set)
+    #
+    # Must be below the replica count (below autoscaling.minReplicas when the
+    # autoscaler owns it). A budget equal to it admits no eviction at all, so a
+    # node drain or cluster upgrade blocks indefinitely rather than interrupting
+    # the service briefly; the chart refuses to render one.
+    minAvailable: 1
+    # -- Maximum pods that may be unavailable; takes precedence over minAvailable
+    #
+    # Read exactly, so 0 is not mistaken for unset -- and then refused for the
+    # same reason as minAvailable above: it permits no eviction either.
+    maxUnavailable: ""
+
+  # -- Scheduler spread, so replicas do not all land on one node
+  #
+  # Empty by default: it is only meaningful above one replica, and a constraint
+  # a single-node cluster cannot satisfy is a pod that will not schedule.
+  # DoNotSchedule is the strict form; use ScheduleAnyway where capacity is tight.
+  #
+  # The labelSelector must match the labels these pods actually carry --
+  # `app: monize-backend`, which is also the Deployment's own selector. A selector
+  # that matches nothing is not a weaker constraint but no constraint at all:
+  # it is satisfied by every placement, including all replicas on one node, and
+  # neither Kubernetes nor `helm template` reports anything. The chart refuses
+  # to render a matchLabels entry this pod template does not carry.
+  topologySpreadConstraints: []
+  #   - maxSkew: 1
+  #     topologyKey: kubernetes.io/hostname
+  #     whenUnsatisfiable: ScheduleAnyway
+  #     labelSelector:
+  #       matchLabels:
+  #         app: monize-backend
+
+  # -- Horizontal pod autoscaling (CPU only)
+  #
+  # When enabled the Deployment omits its own replica count, so the chart and
+  # the autoscaler do not fight on every upgrade. Needs metrics-server.
+  #
+  # targetCPUUtilizationPercentage is a percentage of the CPU *request* below,
+  # not of a core and not of the limit. With no request set the ratio is
+  # undefined, the HPA reports <unknown>/75% and never scales -- so a chart that
+  # looks autoscaled sits at minReplicas through every load it was installed to
+  # survive. Raising or lowering resources.requests.cpu silently re-tunes every
+  # threshold here; the two are one setting in two places. The request above is
+  # deliberately small so the pod schedules anywhere, which makes 75% of it a
+  # very low bar -- anything past idle scales out to maxReplicas and stays
+  # there. Enabling autoscaling means sizing resources.requests.cpu to what the
+  # process actually uses first.
+  autoscaling:
+    # -- Create a HorizontalPodAutoscaler
+    enabled: false
+    # -- Lower bound on replicas
+    minReplicas: 2
+    # -- Upper bound on replicas
+    maxReplicas: 4
+    # -- Target average CPU utilization, as a percentage of the request
+    targetCPUUtilizationPercentage: 75
+
+  # -- Extra labels to add to the Deployment and pod template
+  extraLabels: {}
+  # -- Extra annotations to add to the Deployment
+  extraAnnotations: {}
+
+  # -- Service port
+  service:
+    port: 3001
+    type: ClusterIP
+
+  # -- Resource requests and limits
+  # NOTE: these suit ordinary use. Importing a Microsoft Money (.mny) file does
+  # not: the upload is buffered in memory and decrypted in place, so peak usage
+  # is roughly twice the file size on top of the baseline. A 150Mi limit will
+  # OOM-kill the pod partway through any real Money file, which the wizard then
+  # reports as a stalled job. See backend.mnyImport below for the sizing rule.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 140Mi
+    limits:
+      memory: 400Mi
+
+  # -- Memory ceilings for the backup paths that cannot stream
+  #
+  # The encrypted, automatic and support exports hold a whole payload in memory
+  # (AES-GCM needs the entire plaintext for its auth tag; the support export needs
+  # every table at once to reconcile scaled balances), and a restore has to
+  # decompress and parse one. Each of those holds several copies of the data at
+  # peak, so a ceiling has to be a fraction of resources.limits.memory above --
+  # not close to it, and certainly not larger, or the pod is OOM-killed before the
+  # request can be refused with a readable error.
+  #
+  # Leave these unset and the backend derives them from the container's cgroup
+  # memory limit, which tracks whatever you set above. exportBuffer derives to
+  # about a quarter of it.
+  #
+  # The two restore ceilings are derived differently, and from a measurement. A
+  # restore holds the envelope, the decrypted plaintext, the decompressed payload,
+  # the UTF-8 string, the parsed object graph and the remapped copy of it -- about
+  # 6.1x the expanded payload PLUS a fixed ~78Mi, measured (issue #1073), where the
+  # model used to assume three times the payload and nothing fixed. So
+  # restoreExpanded is solved out of the capacity instead of taken as a share of
+  # it: the memory left after the ordinary process is reserved, less a margin, less
+  # that fixed cost, divided by 6.1. On this chart's default 400Mi backend that is
+  # about 23 MiB, and restoreUpload follows it -- gzip output is never smaller than
+  # what it expands to, so a larger upload is one the deployment could not
+  # decompress anyway.
+  #
+  # On a container too small for any restore it derives to zero and restores are
+  # refused with a 503 naming the lever, rather than flooring into a number the pod
+  # cannot survive. The backend warns at startup when the derived value is small.
+  #
+  # The compressed limit does not bound decompressed memory: a small gzip expands
+  # to the restoreExpanded ceiling regardless of its wire size. Concurrent restore
+  # *processing* is therefore capped separately (usually to one at a time on the
+  # default pod); that cap is automatic and not configured here.
+  #
+  # Set them when you have measured your own deployment; the backend logs a
+  # warning at startup if a value cannot protect the process it is running in.
+  #
+  # Raising resources.limits.memory without raising these gains nothing, and
+  # raising these without raising the memory limit is how a backup request
+  # restarts the pod.
+  #
+  # Note that a backup artifact now carries attachment bytes for every storage
+  # provider, not only the database one, so artifacts are larger than they were.
+  # A deployment whose users keep many receipts in local or S3 storage wants both
+  # a larger memory limit and a larger restoreUpload.
+  #
+  # exportBuffer applies to the automatic backup (which writes a file) and the
+  # support export (which reconciles every table at once). Both HTTP downloads
+  # stream and are not bounded by it, the encrypted one included: it writes a
+  # framed AES-GCM container rather than one message over the whole artifact, so
+  # a large encrypted export is no longer refused for want of memory.
+  backupLimits:
+    # -- Artifact a buffered export may accumulate (e.g. "96mb")
+    exportBuffer: ""
+    # -- Decompressed size a restore payload may reach (e.g. "23mb")
+    restoreExpanded: ""
+    # -- Compressed upload the restore endpoint accepts (e.g. "23mb")
+    restoreUpload: ""
+
+  # -- How many restores may WAIT for a processing slot, and for how long
+  #
+  # Restore processing is capped separately from the upload: a small gzip expands
+  # to the expanded ceiling regardless of its wire size, so the compressed budget
+  # cannot bound decompressed memory. On the default pod that cap is one, and a
+  # second restore waits rather than decompressing beside the first.
+  #
+  # Waiting rather than being refused outright is deliberate -- the caller has
+  # already uploaded the artifact, and a 503 makes them upload it again -- but a
+  # wait that is neither bounded nor deadlined holds a socket and the upload's
+  # memory reservation for as long as the client keeps them. A request arriving at
+  # a full queue, or one whose wait runs out, is refused with 503 and a
+  # Retry-After; a caller who disconnects while queued is dropped and its restore
+  # never runs.
+  restoreQueue:
+    # -- Restores that may wait for a processing slot before a 503 (e.g. "4")
+    limit: ""
+    # -- Milliseconds a restore may wait for a processing slot (e.g. "120000")
+    waitMs: ""
+
+  # -- Microsoft Money (.mny) import
+  mnyImport:
+    # -- Largest .mny file the wizard accepts, in megabytes. A Money Plus Sunset
+    # file with three decades of history runs to a couple of hundred MB.
+    # Set backend.resources.limits.memory to at least 2x this plus headroom --
+    # so 300 (the default) wants 1Gi, and lowering this is the cheaper way to
+    # bound memory if the files being imported are small. See helm/README.md.
+    MNY_IMPORT_LIMIT_MB: "300"
+
+  # -- Writable durable storage for the data the backend keeps outside Postgres.
+  #
+  # The backend container runs with readOnlyRootFilesystem: true and, until this
+  # existed, the backend workload rendered no volumes at all. So two features that are
+  # exposed in the UI could not work in the canonical chart, and both failed at
+  # the point of use rather than at install time:
+  #
+  #   * Automatic backups write to BACKUP_CONTAINER_DIR (/data/backups). Directory
+  #     creation failed with EROFS, and the user saw a schedule that reported
+  #     errors forever while looking configured.
+  #   * ATTACHMENT_STORAGE_PROVIDER=local writes to ATTACHMENT_CONTAINER_DIR
+  #     (/data/attachments) -- the same failure, for receipts and documents.
+  #
+  # Left disabled by default: enabling it creates a PersistentVolumeClaim, and on
+  # a cluster with no default StorageClass that leaves the pod Pending. Turning it
+  # on is a deliberate act, and the chart refuses to render if you turn it on
+  # without saying where the storage comes from.
+  #
+  # These are plain PVCs mounted as volumes, deliberately not
+  # volumeClaimTemplates: those are a StatefulSet feature and are immutable, so
+  # adding one to an existing release could not be done by an upgrade. Keeping
+  # them as ordinary claims is also what made converting these workloads to
+  # Deployments a rename rather than a data migration.
+  persistence:
+    # -- Storage for automatic backups (/data/backups).
+    backups:
+      enabled: false
+      # -- Mount an existing claim instead of creating one. Set this OR size.
+      existingClaim: ""
+      # -- Size of the claim the chart creates. Automatic backups keep 7 daily,
+      # 4 weekly and 6 monthly artifacts per user by default, and each is a
+      # gzipped dump of that user's whole dataset -- so size this against the
+      # number of users, not the number of files.
+      size: 5Gi
+      # -- StorageClass for the created claim. Empty uses the cluster default.
+      storageClass: ""
+      accessMode: ReadWriteOnce
+    # -- Storage for locally stored attachment bytes (/data/attachments). Only
+    # needed with ATTACHMENT_STORAGE_PROVIDER=local; the default "database"
+    # provider keeps bytes in Postgres and s3 keeps them in a bucket. Keep it
+    # enabled for as long as any attachment still lives here: after a switch
+    # away from "local" the relocation reads each remaining attachment from this
+    # claim (see backend.attachmentContainerDir).
+    attachments:
+      enabled: false
+      existingClaim: ""
+      size: 10Gi
+      storageClass: ""
+      accessMode: ReadWriteOnce
+
+  # -- Security context for the backend container
+  securityContext:
+    allowPrivilegeEscalation: false
+    # With this on, the container can only write where a volume is mounted. See
+    # backend.persistence above, and note that /tmp is always given an emptyDir
+    # because Node and the .mny import both need somewhere to spill.
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 100
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
+
+  # -- Liveness probe configuration
+  livenessProbe:
+    httpGet:
+      path: /api/v1/health/live
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 60
+    timeoutSeconds: 5
+
+  # -- Readiness probe configuration
+  readinessProbe:
+    httpGet:
+      path: /api/v1/health/ready
+      port: http
+    initialDelaySeconds: 3
+    periodSeconds: 5
+    timeoutSeconds: 3
+
+  # -- General application settings
+  # NOTE: JWT_SECRET and ENCRYPTION_KEY must be provided via a Secret.
+  # Use extraEnvFrom with a secretRef, or extraEnv with valueFrom.secretKeyRef.
+  # Both are required: the backend refuses to start (and the pod crash-loops)
+  # without a JWT_SECRET and an ENCRYPTION_KEY of at least 32 characters each.
+  # ENCRYPTION_KEY (`openssl rand -hex 32`) encrypts AI provider keys,
+  # emergency-access credentials and the automatic-backup data keys. Keep it
+  # stable once set: rotating it re-encrypts nothing, it makes what is stored
+  # unreadable. AI_ENCRYPTION_KEY is the former name and is still accepted, so
+  # an existing release that set it needs no change; a release that set
+  # neither must add ENCRYPTION_KEY before upgrading (nothing was encrypted
+  # without one, so adding it is safe).
+  # JWT_SECRET (`openssl rand -base64 32`): a known placeholder or predictable
+  # value starts but raises a log warning, an admin alert and a banner. Keep it
+  # stable: changing it makes stored authenticator (TOTP) secrets unreadable,
+  # so 2FA users must sign in with a backup code or have an admin reset their
+  # 2FA. See docs/backend/modules-and-runtime.md, "Changing JWT_SECRET".
+  app:
+    NODE_ENV: production
+    # -- PUBLIC_APP_URL (defaults to https://<hostname>)
+    PUBLIC_APP_URL: ""
+
+  # -- Database connection settings
+  # NOTE: DATABASE_USER and DATABASE_PASSWORD must be provided via a Secret.
+  # Use extraEnvFrom with a secretRef, or extraEnv with valueFrom.secretKeyRef.
+  database:
+    DATABASE_HOST: ""
+    DATABASE_NAME: ""
+
+  # -- Row-Level Security (defense-in-depth). Off by default -- leave as-is for
+  # the standard single-role setup. See docs/specs/row-level-security.md
+  # and the runbook before changing RLS_MODE.
+  # RLS_MODE and DATABASE_APP_USER are rendered into the backend ConfigMap.
+  # NOTE: DATABASE_APP_PASSWORD is a secret -- supply it alongside
+  # DATABASE_PASSWORD via extraEnvFrom (secretRef) or extraEnv
+  # (valueFrom.secretKeyRef), never here.
+  # On CNPG the owner (DATABASE_USER) has no CREATEROLE, so the monize_app role
+  # cannot be created by the app at startup -- provision it with the CNPG
+  # DatabaseRole CRD (CloudNativePG 1.30+; see helm/README.md), or the older
+  # Cluster `spec.managed.roles` stanza on pre-1.30. Startup then only applies
+  # the role's grants.
+  rls:
+    # off | shadow | enforce
+    RLS_MODE: "off"
+    # Name of the unprivileged runtime role (must match the CNPG managed role /
+    # DATABASE_APP_PASSWORD secret). Defaults to monize_app when blank.
+    DATABASE_APP_USER: "monize_app"
+
+  # -- Authentication settings
+  auth:
+    LOCAL_AUTH_ENABLED: "true"
+    REGISTRATION_ENABLED: "true"
+
+  # -- OIDC settings (only included in ConfigMap when explicitly set)
+  # NOTE: OIDC_CLIENT_ID and OIDC_CLIENT_SECRET must be provided via a Secret.
+  # Use extraEnvFrom with a secretRef, or extraEnv with valueFrom.secretKeyRef.
+  oidc:
+    OIDC_ISSUER_URL: ""
+    OIDC_CALLBACK_URL: ""
+
+  # -- SMTP / email settings
+  # NOTE: SMTP_USER and SMTP_PASSWORD must be provided via a Secret.
+  # Use extraEnvFrom with a secretRef, or extraEnv with valueFrom.secretKeyRef.
+  smtp:
+    SMTP_HOST: ""
+    SMTP_PORT: "587"
+    SMTP_SECURE: "false"
+    EMAIL_FROM: ""
+
+  # -- Additional environment variables for the backend container
+  extraEnv: []
+  #   - name: MY_VAR
+  #     value: "my-value"
+  #   - name: MY_SECRET
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: my-secret
+  #         key: password
+
+  # -- Additional envFrom references (secretRef, configMapRef) for the backend container
+  extraEnvFrom: []
+  #   - secretRef:
+  #       name: my-backend-secrets
+  #   - configMapRef:
+  #       name: my-backend-config
+
+  # -- Where automatic backups are written inside the container. Must match
+  # BACKUP_CONTAINER_DIR if you override that through extraEnv; the mount for
+  # backend.persistence.backups follows this value.
+  #
+  # Read only by the "local" backup store, which is the default. Set
+  # BACKUP_STORAGE_PROVIDER=s3 in extraEnv to keep the artifacts in a bucket
+  # instead, in which case this directory and the claim below are unused.
+  # Switching is forward-only: the previous recovery points stay where they
+  # were, so keep the old claim until the new store has a full retention window.
+  backupContainerDir: /data/backups
+
+  # -- Where locally stored attachment bytes are written inside the container.
+  # Must match ATTACHMENT_CONTAINER_DIR if you override that through extraEnv.
+  #
+  # Changing ATTACHMENT_STORAGE_PROVIDER relocates the attachments already
+  # stored: the backend copies each one into the new backend, verifies the copy
+  # and deletes the original, starting on boot and retrying hourly at :50 until
+  # none are left. Unlike the backup store above, this is not
+  # forward-only -- but it does mean **the backend being moved away from has to
+  # stay configured and mounted until it finishes**, because each attachment is
+  # read through the backend its own row names. Leaving `local` for `s3` is
+  # therefore: set the new variables, keep the claim below, watch for
+  # "Attachment storage relocation" in the backend log, and only then disable
+  # persistence.attachments. Set ATTACHMENT_STORAGE_MIGRATE_ON_SWITCH=false in
+  # extraEnv to leave everything where it is instead; attachments stay readable
+  # either way, from whichever backend holds them.
+  attachmentContainerDir: /data/attachments
+
+  # -- Additional volumes for the backend pod (beyond /tmp and the persistence
+  # block above)
+  extraVolumes: []
+  #   - name: extra-backups
+  #     persistentVolumeClaim:
+  #       claimName: nas-monize-backups
+
+  # -- Additional volume mounts for the backend container
+  extraVolumeMounts: []
+  #   - name: extra-backups
+  #     mountPath: /mnt/nas/monize
+
+# -- Frontend configuration
+frontend:
+  # -- Image settings
+  image:
+    registry: ghcr.io
+    repository: kenlasko/monize-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  # -- Number of replicas
+  #
+  # More than one requires cluster.mode=multi below: at CLUSTER_MODE=single the
+  # backend keeps rate-limit counters and cross-replica wake-ups in its own
+  # process, which a second replica would neither share nor see.
+  #
+  # The frontend is stateless, so its replica count is independent of the
+  # backend's; cluster.mode is about the backend. Large uploads (.mny import,
+  # restore, attachments, AI queries) are streamed through, not buffered, so a
+  # replica's memory does not need to cover the .mny import limit.
+  replicas: 1
+
+  # -- Voluntary-disruption budget (node drains, cluster upgrades)
+  #
+  # Off by default on purpose: at replicas: 1 a budget of minAvailable: 1 makes
+  # a node drain block indefinitely rather than interrupt the service briefly,
+  # which is the worse surprise. Turn it on with the replica count.
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget
+    enabled: false
+    # -- Minimum pods that must stay available (ignored when maxUnavailable is set)
+    #
+    # Must be below the replica count (below autoscaling.minReplicas when the
+    # autoscaler owns it). A budget equal to it admits no eviction at all, so a
+    # node drain or cluster upgrade blocks indefinitely rather than interrupting
+    # the service briefly; the chart refuses to render one.
+    minAvailable: 1
+    # -- Maximum pods that may be unavailable; takes precedence over minAvailable
+    #
+    # Read exactly, so 0 is not mistaken for unset -- and then refused for the
+    # same reason as minAvailable above: it permits no eviction either.
+    maxUnavailable: ""
+
+  # -- Scheduler spread, so replicas do not all land on one node
+  #
+  # Empty by default: it is only meaningful above one replica, and a constraint
+  # a single-node cluster cannot satisfy is a pod that will not schedule.
+  # DoNotSchedule is the strict form; use ScheduleAnyway where capacity is tight.
+  #
+  # The labelSelector must match the labels these pods actually carry --
+  # `app: monize-frontend`, which is also the Deployment's own selector. A selector
+  # that matches nothing is not a weaker constraint but no constraint at all:
+  # it is satisfied by every placement, including all replicas on one node, and
+  # neither Kubernetes nor `helm template` reports anything. The chart refuses
+  # to render a matchLabels entry this pod template does not carry.
+  topologySpreadConstraints: []
+  #   - maxSkew: 1
+  #     topologyKey: kubernetes.io/hostname
+  #     whenUnsatisfiable: ScheduleAnyway
+  #     labelSelector:
+  #       matchLabels:
+  #         app: monize-frontend
+
+  # -- Horizontal pod autoscaling (CPU only)
+  #
+  # When enabled the Deployment omits its own replica count, so the chart and
+  # the autoscaler do not fight on every upgrade. Needs metrics-server.
+  #
+  # targetCPUUtilizationPercentage is a percentage of the CPU *request* below,
+  # not of a core and not of the limit. With no request set the ratio is
+  # undefined, the HPA reports <unknown>/75% and never scales -- so a chart that
+  # looks autoscaled sits at minReplicas through every load it was installed to
+  # survive. Raising or lowering resources.requests.cpu silently re-tunes every
+  # threshold here; the two are one setting in two places. The request above is
+  # deliberately small so the pod schedules anywhere, which makes 75% of it a
+  # very low bar -- anything past idle scales out to maxReplicas and stays
+  # there. Enabling autoscaling means sizing resources.requests.cpu to what the
+  # process actually uses first.
+  autoscaling:
+    # -- Create a HorizontalPodAutoscaler
+    enabled: false
+    # -- Lower bound on replicas
+    minReplicas: 2
+    # -- Upper bound on replicas
+    maxReplicas: 4
+    # -- Target average CPU utilization, as a percentage of the request
+    targetCPUUtilizationPercentage: 75
+
+  # -- Extra labels to add to the Deployment and pod template
+  extraLabels: {}
+  # -- Extra annotations to add to the Deployment
+  extraAnnotations: {}
+
+  # -- Service port
+  service:
+    port: 3000
+    type: ClusterIP
+
+  # -- Resource requests and limits
+  # The proxy buffers ordinary request bodies up to 11MB and refuses anything
+  # larger; the large-upload routes (.mny import, restore, attachments, AI
+  # queries) stream to the backend instead, so the default limit covers them.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 80Mi
+    limits:
+      memory: 300Mi
+
+  # -- Microsoft Money (.mny) import
+  mnyImport:
+    # -- Must match backend.mnyImport.MNY_IMPORT_LIMIT_MB. The frontend reads it
+    # to bound the streamed .mny import and restore uploads it forwards; a body
+    # past it is refused with 413.
+    MNY_IMPORT_LIMIT_MB: "300"
+
+  # -- Security context for the frontend container
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 100
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
+
+  # -- Liveness probe configuration
+  livenessProbe:
+    httpGet:
+      path: /api/v1/health/live
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 60
+    timeoutSeconds: 5
+
+  # -- Readiness probe configuration
+  readinessProbe:
+    httpGet:
+      path: /api/v1/health/ready
+      port: http
+    initialDelaySeconds: 2
+    periodSeconds: 5
+    timeoutSeconds: 3
+
+  # -- General application settings
+  app:
+    NODE_ENV: production
+    # -- INTERNAL_API_URL (defaults to http://monize-backend-service:<backend.service.port>)
+    INTERNAL_API_URL: ""
+    # -- PUBLIC_APP_URL (defaults to https://<hostname>)
+    PUBLIC_APP_URL: ""
+
+  # -- Additional environment variables for the frontend container
+  extraEnv: []
+  #   - name: MY_VAR
+  #     value: "my-value"
+
+  # -- Additional envFrom references (secretRef, configMapRef) for the frontend container
+  extraEnvFrom: []
+  #   - secretRef:
+  #       name: my-frontend-secrets
+  #   - configMapRef:
+  #       name: my-frontend-config
+
+# -- MCP (Model Context Protocol) endpoint routing
+#
+# The endpoint serves two protocol revisions. The 2026-07-28 one is stateless per
+# request and needs nothing here. The 2025-era one -- still what Claude Desktop's
+# connector, `claude mcp add` and Codex negotiate -- opens a session that lives in
+# ONE backend process: the SDK gives a session id no way back in, and the live
+# state of an exchange is the open stream and the pending confirmation held by
+# the replica that answered `initialize`. A request that lands elsewhere is
+# answered 404 and the client has to start over.
+#
+# So with backend.replicas > 1, a deployment serving 2025-era clients needs this
+# on. It routes the MCP path straight to the backend Service (bypassing the
+# frontend proxy, which would otherwise spread each request across replicas) and
+# asks the edge for cookie-based session affinity.
+#
+# Affinity is only as good as the client's cookie jar: a client that does not
+# keep cookies is not pinned by this, and for those the working configurations
+# are one backend replica or a 2026-07-28 client. See helm/README.md.
+mcp:
+  stickySessions:
+    # -- Pin 2025-era MCP sessions to one backend replica
+    enabled: false
+    # -- Path prefix routed straight to the backend. Must match the URL clients
+    # are given; the app's own connect instructions hand out /api/v1/mcp.
+    path: /api/v1/mcp
+    # -- Name of the affinity cookie the edge sets
+    cookieName: monize-mcp-affinity
+
+# -- Horizontal scaling
+#
+# What the backend needs before a second replica of it is correct. Everything
+# shared lives in PostgreSQL, so this adds no dependency -- see
+# docs/specs/horizontal-scaling.md.
+cluster:
+  # -- CLUSTER_MODE: single (one backend replica) or multi (several)
+  #
+  # In multi the backend enforces rate limits and single-use claims on rows
+  # rather than in process memory, and replicas wake each other over
+  # LISTEN/NOTIFY. Two things it then requires, both refused at boot if absent:
+  # backend.database.DATABASE_HOST must reach a PostgreSQL session rather than a
+  # transaction-mode pooler (each replica holds one LISTEN), and the storage
+  # assertions below must be true.
+  mode: single
+  # -- Assert that every replica mounts backend.attachmentContainerDir
+  #
+  # Only read when mode=multi with ATTACHMENT_STORAGE_PROVIDER=local, where the
+  # boot refuses without it. The chart's own claim defaults to ReadWriteOnce,
+  # which a second pod on another node cannot attach, so this means switching
+  # backend.persistence.attachments.accessMode to ReadWriteMany as well. The
+  # database and s3 providers need nothing here.
+  attachmentSharedVolume: false
+  # -- Assert that every replica mounts backend.backupContainerDir
+  #
+  # Only read when mode=multi with the "local" backup store, which is the
+  # default: automatic backups are switched on per user rather than by a chart
+  # value, so no setting says whether any exist, and the hourly job writes to
+  # whichever replica runs it. Same ReadWriteMany requirement as above.
+  #
+  # The other way out is BACKUP_STORAGE_PROVIDER=s3 with the BACKUP_STORE_S3_*
+  # variables in backend.extraEnv, which puts the artifacts in a bucket every
+  # replica reaches by construction. Keep that bucket separate from the
+  # off-machine destination's BACKUP_S3_BUCKET: the backend refuses to start
+  # when the two are one location (INV-BACKUP-007).
+  backupSharedVolume: false
+
+# -- Ingress configuration (traditional Kubernetes Ingress)
+ingress:
+  # -- Enable Ingress resource creation
+  enabled: false
+  # -- Ingress class name (e.g., nginx, traefik)
+  className: ""
+  # -- Ingress annotations
+  annotations: {}
+  # -- TLS configuration
+  tls: []
+  #   - secretName: monize-tls
+  #     hosts:
+  #       - monize.yourdomain.com
+
+# -- HTTPRoute configuration (Gateway API)
+httpRoute:
+  # -- Enable HTTPRoute resource creation
+  enabled: true
+  # -- Gateway parent reference
+  parentRefs:
+    - name: tls
+      namespace: cilium
+      sectionName: https

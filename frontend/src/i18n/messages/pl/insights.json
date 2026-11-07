@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "Analiza wydatków",
+    "subtitle": "Analiza wzorców wydatków i anomalii oparta na AI"
+  },
+  "list": {
+    "refreshButton": "Odśwież analizę",
+    "refreshAge": "({time})",
+    "summary": {
+      "active": "Aktywne analizy",
+      "alerts": "Alerty",
+      "warnings": "Ostrzeżenia"
+    },
+    "allTypes": "Wszystkie typy",
+    "typeFilterLabel": "Typ",
+    "severityFilterLabel": "Ważność",
+    "severityFilter": {
+      "all": "Wszystkie ({count})",
+      "alert": "Alerty ({count})",
+      "warning": "Ostrzeżenia ({count})",
+      "info": "Informacje ({count})"
+    },
+    "showDismissed": "Pokaż odrzucone",
+    "emptyNoInsights": "Nie wygenerowano jeszcze żadnej analizy. Kliknij \"Odśwież analizę\", aby przeanalizować wzorce wydatków.",
+    "emptyFiltered": "Żadna analiza nie pasuje do bieżących filtrów.",
+    "generateButton": "Wygeneruj analizę",
+    "errorLoadFailed": "Nie udało się wczytać analizy. Spróbuj ponownie.",
+    "errorGenerateFailed": "Nie udało się wygenerować analizy. Upewnij się, że dostawca AI jest skonfigurowany.",
+    "errorDismissFailed": "Nie udało się zamknąć analizy. Spróbuj ponownie.",
+    "errorTimeout": "Generowanie analizy trwa dłużej niż zwykle. Poczekaj lub odśwież stronę."
+  },
+  "card": {
+    "dismiss": "Zamknij",
+    "dismissing": "Odrzucanie..."
+  },
+  "notConfigured": {
+    "heading": "AI nie jest skonfigurowane",
+    "message": "Nie skonfigurowano żadnego dostawcy AI. Aby korzystać z Analiz wydatków, {link} w ustawieniach."
+  },
+  "insightTypes": {
+    "anomaly": "Anomalia",
+    "trend": "Trend",
+    "subscription": "Subskrypcja",
+    "budget_pace": "Tempo budżetu",
+    "seasonal": "Sezonowość",
+    "new_recurring": "Nowy cykliczny"
+  },
+  "insightSeverities": {
+    "info": "Informacja",
+    "warning": "Ostrzeżenie",
+    "alert": "Alert"
+  }
+}

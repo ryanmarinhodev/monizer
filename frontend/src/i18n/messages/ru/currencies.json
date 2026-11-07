@@ -1,0 +1,193 @@
+{
+  "page": {
+    "title": "Валюты",
+    "subtitle": "Управление валютами, используемыми в счетах и ценных бумагах",
+    "refreshRates": "Обновить курсы",
+    "refreshing": "Обновление...",
+    "statusFilterLabel": "Статус",
+    "newCurrency": "+ Новая валюта",
+    "searchPlaceholder": "Поиск по коду или названию...",
+    "statusAll": "Все ({count})",
+    "statusActive": "Активные ({count})",
+    "statusInactive": "Неактивные ({count})",
+    "modalTitleEdit": "Редактировать валюту",
+    "modalTitleNew": "Новая валюта",
+    "loading": "Загрузка валют...",
+    "count": "{count, plural, one {# валюта} other {# валют}}",
+    "providers": {
+      "line": "Курсы от {providers}",
+      "separator": ", затем ",
+      "names": {
+        "frankfurter": "Frankfurter (справочные курсы ЕЦБ)",
+        "yahoo": "Yahoo Finance",
+        "crypto": "Криптопары (Yahoo)"
+      }
+    },
+    "toasts": {
+      "loadFailed": "Не удалось загрузить валюты",
+      "updated": "Валюта успешно обновлена",
+      "created": "Валюта успешно создана",
+      "updateFailed": "Не удалось обновить валюту",
+      "createFailed": "Не удалось создать валюту",
+      "deactivated": "Валюта деактивирована",
+      "activated": "Валюта активирована",
+      "statusFailed": "Не удалось обновить статус валюты",
+      "ratesRefreshed": "Курсы обновлены: обновлено {updated} пар",
+      "ratesRefreshedWithFailed": "Курсы обновлены: обновлено {updated}, ошибок {failed}",
+      "ratesAllFailed": "Не удалось получить ни одного курса валют; поставщик не ответил",
+      "ratesFailed": "Не удалось обновить курсы валют"
+    },
+    "summary": {
+      "totalCurrencies": "Всего валют",
+      "active": "Активные",
+      "inactive": "Неактивные"
+    }
+  },
+  "list": {
+    "columns": {
+      "code": "Код",
+      "name": "Название",
+      "symbol": "Символ",
+      "decimals": "Знаки после запятой",
+      "usage": "Использование",
+      "rate": "Курс ({currency})",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "defaultBadge": "По умолчанию",
+    "cryptoBadge": "Крипто",
+    "noPriceSymbol": "Нет символа цены",
+    "statusBadge": {
+      "active": "Активная",
+      "activeShort": "Акт",
+      "inactive": "Неактивная",
+      "inactiveShort": "Неакт"
+    },
+    "actions": {
+      "edit": "Изменить",
+      "deactivate": "Деактивировать",
+      "activate": "Активировать"
+    },
+    "contextMenu": {
+      "editCurrency": "Редактировать валюту",
+      "deactivate": "Деактивировать",
+      "activate": "Активировать",
+      "deleteCurrency": "Удалить валюту"
+    },
+    "usageAccounts": "{count, plural, one {# счёт} few {# счёта} many {# счетов} other {# счёта}}",
+    "usageSecurities": "{count, plural, other {# бум.}}",
+    "rateHelp": "Сколько стоит одна единица каждой валюты в {currency}.",
+    "empty": {
+      "title": "Нет валют",
+      "subtitle": "Начните с добавления валюты."
+    },
+    "deleteConfirm": {
+      "title": "Удалить «{code}»?",
+      "message": "Эта валюта будет окончательно удалена. Удаление возможно только если валюта не используется ни в одном счёте или ценной бумаге.",
+      "confirmLabel": "Удалить",
+      "cancelLabel": "Отмена"
+    },
+    "toasts": {
+      "deleted": "Валюта успешно удалена",
+      "deleteFailed": "Не удалось удалить валюту. Возможно, она используется."
+    }
+  },
+  "form": {
+    "codeLabel": "Код валюты",
+    "codePlaceholder": "например, USD, EUR, GBP",
+    "nameLabel": "Название",
+    "namePlaceholderCreate": "например, Канадский доллар, Малайзия, Ринггит (используется также для поиска)",
+    "namePlaceholderEdit": "например, Канадский доллар",
+    "symbolLabel": "Символ",
+    "symbolPlaceholder": "например, $, €, £, ¥",
+    "decimalPlacesLabel": "Знаки после запятой",
+    "kindLabel": "Тип",
+    "kindOptions": {
+      "fiat": "Фиатная валюта",
+      "crypto": "Криптовалюта"
+    },
+    "kindLocked": "{code} используется, поэтому её тип изменить нельзя.",
+    "quoteSymbolLabel": "Символ цены (необязательно)",
+    "quoteSymbolPlaceholder": "например, BTC-EUR",
+    "quoteSymbolHelp": "Символ Yahoo Finance, по которому берётся цена монеты: её тикер, дефис и валюта котировки, например BTC-EUR. Обменные курсы монеты загружаются через него.",
+    "verifyButton": "Проверить",
+    "quoteSymbolPricedIn": "Цена в {currency}",
+    "quoteSymbolMissing": "Без символа цены у валюты нет обменного курса.",
+    "quoteSymbolNotCrypto": "{symbol} не является криптовалютой. Введите пару монеты, например BTC-EUR.",
+    "quoteSymbolNotFound": "Криптовалюта для {symbol} не найдена",
+    "lookupButton": "Найти",
+    "lookingUp": "Поиск...",
+    "clearButton": "Очистить",
+    "clearTitle": "Очистить все поля",
+    "submitCreate": "Создать валюту",
+    "submitUpdate": "Обновить валюту",
+    "toasts": {
+      "lookupTooShort": "Введите код или название валюты (не менее 2 символов) для поиска",
+      "found": "Найдено: {details}",
+      "notFound": "Валюта не найдена для «{query}»",
+      "lookupFailed": "Поиск не удался — попробуйте снова",
+      "reactivateFailed": "Не удалось повторно активировать валюту",
+      "verifyEmpty": "Введите символ цены, например BTC-EUR, для проверки",
+      "verifyFailed": "Не удалось проверить символ цены"
+    },
+    "inactiveNotice": "{code} уже есть в вашем списке, но неактивна.",
+    "nonIsoNotice": "{code} не является стандартным кодом валюты. Если это криптовалюта, задайте тип «Криптовалюта». <guide>О криптовалютах читайте в руководстве пользователя</guide>.",
+    "switchToCrypto": "Использовать криптовалюту",
+    "cryptoPrecisionNotice": "Суммы в криптовалюте хранятся не более чем с восемью знаками после запятой, то есть с точностью хранения, поэтому комиссию меньше {smallest} ввести нельзя. <guide>Как записывать комиссии кошелька</guide>.",
+    "reactivateButton": "Активировать {code}",
+    "reactivating": "Активация..."
+  },
+  "validation": {
+    "codeLength": "Код валюты должен состоять ровно из 3 символов",
+    "nameRequired": "Название обязательно",
+    "nameMax": "Название должно быть не длиннее 100 символов",
+    "symbolRequired": "Символ обязателен",
+    "symbolMax": "Символ должен быть не длиннее 10 символов",
+    "quoteSymbolMax": "Символ цены должен быть не длиннее 20 символов",
+    "quoteSymbolRequiresCrypto": "Символ цены есть только у криптовалюты",
+    "quoteSymbolNotAPair": "Введите пару, например BTC-EUR: монета, дефис и трёхбуквенный код валюты"
+  },
+  "rateHistory": {
+    "title": "История курса",
+    "stored": "Сохранённая история: с {start} по {end} ({count} наблюдений)",
+    "none": "Нет сохранённой истории для {pair}",
+    "loading": "Проверка сохранённой истории курса...",
+    "loadFailed": "Не удалось прочитать сохранённую историю курса",
+    "fillGaps": "Заполнить пробелы в истории курса",
+    "filling": "Загружаются недостающие курсы...",
+    "fillGapsTitle": "Загружает дневные курсы, которых не хватает вашим отчётам: с первой даты, когда ваши данные используют {code}, по сегодня.",
+    "hint": "Отчёты за период до первого сохранённого курса не могут конвертировать {pair}.",
+    "list": {
+      "heading": "Сохранённые курсы",
+      "direction": "Показано как {to} за 1 {from}.",
+      "loading": "Загрузка сохранённых курсов...",
+      "loadFailed": "Не удалось прочитать сохранённые курсы",
+      "empty": "Нет сохранённых курсов для показа",
+      "truncated": "Показаны {count} последних сохранённых курсов; более старые не перечислены.",
+      "inverted": "обратный",
+      "unknownRate": "Неизвестно",
+      "columns": {
+        "date": "Дата",
+        "rate": "Курс",
+        "source": "Источник"
+      },
+      "sources": {
+        "yahooFinance": "Yahoo Finance",
+        "frankfurter": "Frankfurter (ЕЦБ)",
+        "mnyImport": "Импорт из Money",
+        "yahooCrypto": "Криптопары (Yahoo)",
+        "unknown": "Неизвестно"
+      }
+    },
+    "toasts": {
+      "filled": "Добавлено курсов: {count}; история теперь начинается с {start}",
+      "partial": "Сохранено {count} курсов; история теперь начинается {start}. Осталось {windows} пробелов, нажмите ещё раз, чтобы продолжить.",
+      "moreToFetch": "В этот раз курсы не сохранены; осталось {windows} пробелов, нажмите ещё раз, чтобы продолжить.",
+      "noGaps": "Для {pair} уже есть ежедневный курс на каждую дату, которая нужна вашим отчётам",
+      "noNewRates": "Новых курсов для {pair} не сохранено",
+      "unused": "Ни один ваш счёт, актив или операция не использует {code}, поэтому загружать нечего",
+      "providerFloor": "У поставщика нет курсов {pair} раньше {date}",
+      "failed": "Не удалось заполнить историю курса"
+    }
+  }
+}

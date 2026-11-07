@@ -1,0 +1,4357 @@
+import { Test, TestingModule } from "@nestjs/testing";
+import { DataSource } from "typeorm";
+import { ConfigService } from "@nestjs/config";
+import {
+  BadRequestException,
+  ConflictException,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
+import {
+  promises as fs,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+} from "fs";
+import { join } from "path";
+import { tmpdir } from "os";
+import { createHash } from "crypto";
+import {
+  AutoBackupService,
+  DEFAULT_BACKUP_CONTAINER_DIR,
+  MONTHLY_DAY,
+  WEEKLY_DAYS,
+} from "./auto-backup.service";
+import { LocalBackupStorageTarget } from "./storage/local-backup-storage.target";
+import {
+  BACKUP_STORAGE_TARGET,
+  BackupStorageTarget,
+} from "./storage/backup-storage.interface";
+import { BackupService } from "./backup.service";
+import { BackupEncryptionService } from "./backup-encryption.service";
+import { AutoBackupSettings } from "./entities/auto-backup-settings.entity";
+import { AutoBackupPolicyRow } from "./entities/auto-backup-policy.entity";
+import { User } from "../users/entities/user.entity";
+import { DemoModeService } from "../common/demo-mode.service";
+import { SystemAlertService } from "../system-alerts/system-alert.service";
+import { BackupOffsiteDispatchService } from "./offsite/backup-offsite-dispatch.service";
+import { offsiteObjectKey } from "./offsite/backup-offsite-keys";
+import {
+  BackupOffsiteDestination,
+  BackupOffsiteUpload,
+  BackupOffsiteUploadStatus,
+} from "./offsite/entities/backup-offsite-upload.entity";
+import { INTENTIONALLY_EXCLUDED_TABLES } from "./export-table-queries";
+import { createScopedDbMocks } from "../test-helpers/scoped-db-testing";
+import {
+  createUserMaintenanceMock,
+  userMaintenanceProvider,
+  type UserMaintenanceMock,
+} from "../test-helpers/job-claim-testing";
+import {
+  columnProblem,
+  parseSchemaColumns,
+  statementClaims,
+} from "../common/db/raw-sql-columns";
+
+jest.mock("../common/db/scoped-db", () =>
+  jest.requireActual("../test-helpers/scoped-db-testing").scopedDbMockModule(),
+);
+
+jest.mock("stream/promises", () => ({
+  pipeline: jest.fn().mockResolvedValue(undefined),
+}));
+
+/**
+ * These specs run against a real temporary directory rather than a mocked `fs`.
+ *
+ * The behaviour under test is filesystem behaviour: whether a final filename can
+ * ever name a partial file, whether a symlink inside a permitted directory can
+ * redirect a write out of it, whether two users on one root can reach each
+ * other's artifacts. A mocked `rename` demonstrates none of that -- it records
+ * that the code called rename, which was never the question. The mocked version
+ * of this suite passed throughout the period when the daily write truncated its
+ * own final filename and every user shared one namespace.
+ *
+ * The clock, unlike the filesystem, is pinned. `copyToWeeklyIfNeeded` and
+ * `copyToMonthlyIfNeeded` read `new Date()`, so on the 1st, 7th, 14th, 21st and
+ * 28th a single backup leaves *two* files in the folder -- and every assertion
+ * here that counts artifacts or compares the folder listing exactly was
+ * therefore green on 24 days a month and red on the other five. That is not a
+ * flake to retry: it is the suite reporting the date rather than the code. Ten
+ * tests failed this way on 2026-08-07 with no change to the module behind them.
+ *
+ * So `beforeEach` fixes the system time to an ordinary day, and the tests that
+ * are *about* promotion set their own date, as they always did. Faking the
+ * clock does not weaken the filesystem claims above: the directory, the writes
+ * and the renames stay real.
+ */
+
+/**
+ * An ordinary day: late enough to be newer than every seeded fixture, and in
+ * neither promotion list. Guarded by a test below rather than by this comment.
+ */
+const SUITE_CLOCK = new Date("2026-04-15T10:00:00Z");
+
+describe("AutoBackupService", () => {
+  let service: AutoBackupService;
+  let mockSettingsRepo: Record<string, jest.Mock>;
+  /** The deployment policy singleton (`auto_backup_policy`). */
+  let mockPolicyRepo: Record<string, jest.Mock>;
+  let mockUsersRepo: Record<string, jest.Mock>;
+  let mockOffsiteUploadRepo: Record<string, jest.Mock>;
+  let mockBackupService: Record<string, jest.Mock>;
+  let mockBackupEncryption: Record<string, jest.Mock>;
+  let updateBuilder: Record<string, jest.Mock>;
+  let scoped: ReturnType<typeof createScopedDbMocks>;
+  let maintenance: UserMaintenanceMock;
+  let mockSystemAlerts: {
+    raiseAdminAlert: jest.Mock;
+    raiseUserAlert: jest.Mock;
+  };
+  /**
+   * The off-machine copy, typed to the real method so a call this suite accepts
+   * is one `BackupOffsiteDispatchService` could serve. It is a collaborator of
+   * ours, not a driver's, so `docs/backend/testing.md` asks for the type.
+   */
+  let mockOffsiteDispatch: {
+    dispatchAfterBackup: jest.MockedFunction<
+      BackupOffsiteDispatchService["dispatchAfterBackup"]
+    >;
+  };
+
+  /** A real directory, standing in for the operator's mounted backup volume. */
+  let root: string;
+
+  const userId = "55555555-5555-5555-5555-555555555555";
+  const otherUserId = "66666666-6666-6666-6666-666666666666";
+
+  /**
+   * Where this user's artifacts land: a server-computed, sharded subdirectory
+   * of `root` -- `<root>/<ab>/<cd>/<id>`, the same fan-out attachment bytes use.
+   */
+  const folderFor = (id: string = userId) =>
+    join(root, id.slice(0, 2), id.slice(2, 4), id);
+
+  /**
+   * The artifact the account that pressed "Run Backup Now" got.
+   *
+   * A manual run is a fan-out across every account now, so `filename` is
+   * optional on its result -- present only when the caller's own backup was
+   * written. These specs drive one account, so an absent one is the failure and
+   * is asserted here rather than papered over with a non-null assertion.
+   */
+  function ownArtifact(result: { filename?: string }): string {
+    expect(result.filename).toBeDefined();
+    return result.filename as string;
+  }
+
+  async function listBackups(directory: string): Promise<string[]> {
+    try {
+      return (await fs.readdir(directory)).sort();
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Runs `fn` with the clock moved to `date`, then puts it back.
+   *
+   * The one way to change the date in this file. Fake timers are installed once
+   * in `beforeEach` with a deliberately narrow `doNotFake` list, so a test that
+   * reinstalls them with a bare `useFakeTimers()` silently takes the default
+   * instead -- which fakes `nextTick` and `queueMicrotask` underneath the real
+   * `fs.promises` calls these specs depend on. Move the date; do not reinstall
+   * the timers.
+   */
+  async function withClockAt(
+    date: string,
+    fn: () => Promise<void>,
+  ): Promise<void> {
+    jest.setSystemTime(new Date(date));
+    try {
+      await fn();
+    } finally {
+      jest.setSystemTime(SUITE_CLOCK);
+    }
+  }
+  let isDemo: boolean;
+
+  function createSettings(
+    overrides: Partial<AutoBackupSettings> = {},
+  ): AutoBackupSettings {
+    const s = new AutoBackupSettings();
+    s.userId = userId;
+    s.enabled = false;
+    s.folderPath = "";
+    s.frequency = "daily";
+    s.backupTime = "02:00";
+    s.timezone = "UTC";
+    s.retentionDaily = 7;
+    s.retentionWeekly = 4;
+    s.retentionMonthly = 6;
+    s.lastBackupAt = null;
+    s.lastBackupStatus = null;
+    s.lastBackupError = null;
+    s.nextBackupAt = null;
+    Object.assign(s, overrides);
+    return s;
+  }
+
+  /**
+   * The policy `updateSettings` upserted, read back off the raw statement it
+   * issues.
+   *
+   * The write is one `INSERT ... ON CONFLICT (id) DO UPDATE` rather than an
+   * entity save, because the row may not exist yet and two administrators
+   * pressing Save together must leave one policy rather than race a read. The
+   * parameter order is the statement's; asserting on it here is what keeps the
+   * two in step.
+   */
+  function writtenPolicy(): {
+    enabled: boolean;
+    folderPath: string;
+    frequency: string;
+    backupTime: string;
+    timezone: string;
+    retentionDaily: number;
+    retentionWeekly: number;
+    retentionMonthly: number;
+  } | null {
+    const call = [...scoped.manager.query.mock.calls]
+      .reverse()
+      .find(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("INSERT INTO auto_backup_policy") &&
+          sql.includes("DO UPDATE"),
+      );
+    if (!call) return null;
+    const [
+      enabled,
+      folderPath,
+      frequency,
+      backupTime,
+      timezone,
+      retentionDaily,
+      retentionWeekly,
+      retentionMonthly,
+    ] = call[1] as [
+      boolean,
+      string,
+      string,
+      string,
+      string,
+      number,
+      number,
+      number,
+    ];
+    return {
+      enabled,
+      folderPath,
+      frequency,
+      backupTime,
+      timezone,
+      retentionDaily,
+      retentionWeekly,
+      retentionMonthly,
+    };
+  }
+
+  /**
+   * The account row the reconcile wrote -- where `next_backup_at` is derived.
+   *
+   * The policy holds no schedule of its own, so an assertion about *when* the
+   * next backup lands is an assertion about the row the reconcile enrolled.
+   */
+  function reconciledRow(): AutoBackupSettings {
+    const calls = mockSettingsRepo.save.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    return calls[calls.length - 1][0] as AutoBackupSettings;
+  }
+
+  /**
+   * The stored deployment policy, as `auto_backup_policy` holds it. Absent by
+   * default, which is the fresh-deployment case.
+   */
+  function storePolicy(overrides: Partial<AutoBackupPolicyRow> = {}): void {
+    const row = new AutoBackupPolicyRow();
+    row.id = true;
+    row.enabled = true;
+    row.folderPath = "";
+    row.frequency = "daily";
+    row.backupTime = "02:00";
+    row.timezone = "UTC";
+    row.retentionDaily = 7;
+    row.retentionWeekly = 4;
+    row.retentionMonthly = 6;
+    row.manualRunClaimedAt = null;
+    Object.assign(row, overrides);
+    mockPolicyRepo.findOne.mockResolvedValue(row);
+  }
+
+  async function createService(
+    env: Record<string, string> = {},
+  ): Promise<AutoBackupService> {
+    scoped = createScopedDbMocks([
+      [AutoBackupSettings, mockSettingsRepo as never],
+      [AutoBackupPolicyRow, mockPolicyRepo as never],
+      [User, mockUsersRepo as never],
+      [BackupOffsiteUpload, mockOffsiteUploadRepo as never],
+    ]);
+    // The cron claims each due window with a guarded
+    // `UPDATE ... RETURNING`, which the pg driver answers as
+    // `[rows, rowCount]`. Winning by default preserves the behaviour every test
+    // written before the claim existed expects; the loser path is asserted
+    // explicitly below. The returned row carries `user_id` because that is what
+    // the statement returns and what the table has -- a fixture keyed `id`
+    // described a column `auto_backup_settings` does not define, which is the
+    // shape the outage was in.
+    scoped.manager.query.mockResolvedValue([[{ user_id: userId }], 1]);
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: DataSource,
+          useValue: scoped.dataSource,
+        },
+        AutoBackupService,
+        {
+          provide: BackupService,
+          useValue: mockBackupService,
+        },
+        userMaintenanceProvider(maintenance),
+        {
+          provide: BackupEncryptionService,
+          useValue: mockBackupEncryption,
+        },
+        {
+          provide: DemoModeService,
+          useValue: {
+            get isDemo() {
+              return isDemo;
+            },
+          },
+        },
+        {
+          provide: SystemAlertService,
+          useValue: mockSystemAlerts,
+        },
+        {
+          provide: BackupOffsiteDispatchService,
+          useValue: mockOffsiteDispatch,
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) =>
+              key in env ? env[key] : defaultEnv[key],
+            ),
+          },
+        },
+        // The real `local` target over the real temp directory this suite
+        // creates, not a stub. The extraction of the storage seam claims it
+        // changed nothing, and the only thing that can prove that is this suite
+        // exercising the same filesystem behaviour it always has.
+        LocalBackupStorageTarget,
+        {
+          provide: BACKUP_STORAGE_TARGET,
+          useExisting: LocalBackupStorageTarget,
+        },
+      ],
+    }).compile();
+
+    return module.get<AutoBackupService>(AutoBackupService);
+  }
+
+  /** Env every service gets unless a test overrides it. */
+  let defaultEnv: Record<string, string>;
+
+  beforeEach(async () => {
+    // Only `Date` is faked. The timer APIs stay real because the writes below
+    // are real filesystem I/O, and a suite that fakes the event loop under
+    // `fs.promises` deadlocks rather than failing.
+    jest.useFakeTimers({
+      doNotFake: [
+        "setTimeout",
+        "clearTimeout",
+        "setInterval",
+        "clearInterval",
+        "setImmediate",
+        "clearImmediate",
+        "nextTick",
+        "queueMicrotask",
+        "performance",
+      ],
+    });
+    jest.setSystemTime(SUITE_CLOCK);
+
+    root = mkdtempSync(join(tmpdir(), "monize-backup-spec-"));
+    defaultEnv = { BACKUP_CONTAINER_DIR: root };
+
+    isDemo = false;
+    mockSettingsRepo = {
+      findOne: jest.fn(),
+      find: jest.fn().mockResolvedValue([]),
+      create: jest.fn().mockImplementation((data) => {
+        const s = new AutoBackupSettings();
+        Object.assign(s, data);
+        return s;
+      }),
+      save: jest.fn().mockImplementation((entity) => Promise.resolve(entity)),
+      createQueryBuilder: jest.fn(() => updateBuilder),
+    };
+
+    // Nothing saved by default: `loadPolicy` falls back to `defaultPolicy()`,
+    // which is enabled -- a deployment that has never opened the screen still
+    // backs every account up.
+    mockPolicyRepo = {
+      findOne: jest.fn().mockResolvedValue(null),
+      save: jest.fn().mockImplementation((entity) => Promise.resolve(entity)),
+    };
+
+    updateBuilder = {
+      update: jest.fn(() => updateBuilder),
+      set: jest.fn(() => updateBuilder),
+      where: jest.fn(() => updateBuilder),
+      execute: jest.fn().mockResolvedValue({ affected: 1 }),
+    };
+
+    mockUsersRepo = {
+      findOne: jest.fn().mockImplementation(({ where }) =>
+        Promise.resolve({
+          id: where.id,
+          backupEncryptionEnabled: false,
+          backupPasswordEnc: null,
+        }),
+      ),
+      // Policy reconciliation sweeps every active account; none by default, so
+      // the cron tests below exercise only the due-backup path.
+      find: jest.fn().mockResolvedValue([]),
+      // The admin surface reports how many accounts the policy governs.
+      count: jest.fn().mockResolvedValue(0),
+    };
+
+    // The off-site ledger the stored-backups listing reads to attach each
+    // artifact's copy status. Empty by default, so listings that are not about
+    // off-site status carry no `offsite` field.
+    mockOffsiteUploadRepo = {
+      find: jest.fn().mockResolvedValue([]),
+    };
+
+    maintenance = createUserMaintenanceMock();
+
+    mockBackupService = {
+      // The service now returns the buffer alongside a completeness report; the
+      // default double reports a complete backup so promotion and retention run
+      // exactly as before. The "partial backup" describe overrides it.
+      exportToBuffer: jest.fn().mockResolvedValue({
+        buffer: Buffer.from("gzipped-export"),
+        report: {
+          complete: true,
+          expectedAttachments: 0,
+          includedAttachments: 0,
+          missingAttachments: 0,
+          inconsistentAttachments: 0,
+        },
+      }),
+    };
+
+    mockBackupEncryption = {
+      // Nothing stored by default: an ordinary unencrypted backup.
+      resolveBackupKey: jest.fn().mockResolvedValue({ status: "none" }),
+    };
+
+    mockSystemAlerts = {
+      // The real service never throws; the double keeps that contract.
+      raiseAdminAlert: jest.fn().mockResolvedValue({ created: 1, emailed: 0 }),
+      raiseUserAlert: jest.fn().mockResolvedValue({ created: true }),
+    };
+
+    mockOffsiteDispatch = {
+      // As the real one: it resolves whatever happened off-machine, because a
+      // copy's failure is never the backup's (INV-BACKUP-003).
+      dispatchAfterBackup: jest.fn().mockResolvedValue(undefined) as never,
+    };
+
+    service = await createService();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.clearAllMocks();
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  /**
+   * The guard for the defect this pinning exists to stop coming back.
+   *
+   * A comment saying "15 is an ordinary day" is true until somebody adds 15 to
+   * `WEEKLY_DAYS`, at which point ten unrelated assertions start counting an
+   * extra file and the failure points at retention or sharding rather than at
+   * the calendar. Deriving the check from the service's own constants means
+   * that change fails here, once, with a message that names the cause.
+   */
+  describe("the suite's own clock", () => {
+    const pinnedDay = SUITE_CLOCK.getUTCDate();
+
+    it("is pinned to a day that promotes neither weekly nor monthly", () => {
+      expect(WEEKLY_DAYS).not.toContain(pinnedDay);
+      expect(pinnedDay).not.toBe(MONTHLY_DAY);
+    });
+
+    it("actually reaches the code under test", () => {
+      // `useFakeTimers` with a `doNotFake` list is easy to over-populate --
+      // adding "Date" to it would leave every assertion below back on the wall
+      // clock, silently, with the pinning still apparently in place.
+      expect(new Date().toISOString()).toBe(SUITE_CLOCK.toISOString());
+    });
+
+    it("is installed in exactly one place", () => {
+      // A second installation is how the narrow `doNotFake` list gets lost: a
+      // new test writes the bare call it finds in every other Jest suite, gets
+      // faked microtasks under real `fs.promises`, and hangs -- or reinstates
+      // the wall clock for whatever runs after it. Use `withClockAt` to move
+      // the date instead.
+      const source = readFileSync(__filename, "utf8");
+      const installs = source.match(/jest\.useFakeTimers\(/g) ?? [];
+      expect(installs).toHaveLength(1);
+    });
+  });
+
+  describe("getSettings", () => {
+    it("returns the stored deployment policy", async () => {
+      storePolicy({ enabled: true, folderPath: root, frequency: "weekly" });
+
+      const result = await service.getSettings(userId);
+
+      expect(result).toStrictEqual({
+        enabled: true,
+        folderPath: root,
+        frequency: "weekly",
+        backupTime: "02:00",
+        timezone: "UTC",
+        retentionDaily: 7,
+        retentionWeekly: 4,
+        retentionMonthly: 6,
+        resolvedFolderPath: folderFor(),
+        // Coverage travels with the policy: a schedule alone cannot say
+        // whether it reaches anybody.
+        accountCount: 0,
+        scheduledAccountCount: 0,
+        lastBackupAt: null,
+        lastBackupStatus: null,
+        lastBackupError: null,
+        nextBackupAt: null,
+      });
+      expect(mockPolicyRepo.findOne).toHaveBeenCalledWith({
+        where: { id: true },
+      });
+    });
+
+    it("reads the one policy row whichever administrator is signed in", async () => {
+      // Two administrators must edit one policy. Reading "whoever is signed in"
+      // gave a deployment two answers to one question, the second of which
+      // reverted on the next hourly reconcile. No account's own row is read
+      // here at all.
+      storePolicy({ enabled: true, folderPath: root, frequency: "weekly" });
+      mockSettingsRepo.findOne.mockClear();
+
+      const result = await service.getSettings(otherUserId);
+
+      expect(result.frequency).toBe("weekly");
+      expect(mockSettingsRepo.findOne).not.toHaveBeenCalled();
+    });
+
+    it("reports the deployment's own last and next run, not one account's", async () => {
+      // A policy screen reporting one row's `lastBackupAt` says "Last backup:
+      // today" on an instance where eleven of twelve accounts have never been
+      // backed up at all.
+      storePolicy({ enabled: true, folderPath: root });
+      mockUsersRepo.count.mockResolvedValue(3);
+      const mine = createSettings({
+        enabled: true,
+        lastBackupAt: new Date("2026-04-10T02:00:00Z"),
+        lastBackupStatus: "success",
+        nextBackupAt: new Date("2026-04-16T02:00:00Z"),
+      });
+      const theirs = createSettings({
+        enabled: true,
+        lastBackupAt: new Date("2026-04-14T02:00:00Z"),
+        lastBackupStatus: "partial",
+        lastBackupError: "attachments",
+        nextBackupAt: new Date("2026-04-15T23:00:00Z"),
+      });
+      theirs.userId = otherUserId;
+      mockSettingsRepo.find.mockResolvedValue([mine, theirs]);
+
+      const result = await service.getSettings(userId);
+
+      expect(result.accountCount).toBe(3);
+      // Two armed rows, three accounts: the gap is the point, and a single
+      // number could only have been the three.
+      expect(result.scheduledAccountCount).toBe(2);
+      expect(result.lastBackupAt).toEqual(theirs.lastBackupAt);
+      expect(result.lastBackupStatus).toBe("partial");
+      expect(result.lastBackupError).toBe("attachments");
+      expect(result.nextBackupAt).toEqual(theirs.nextBackupAt);
+    });
+
+    it("reports the per-user folder the files actually land in", async () => {
+      storePolicy({ enabled: true, folderPath: root });
+
+      const result = await service.getSettings(userId);
+
+      // Sharded by user id, so one deployment folder holds every user's
+      // backups without their filenames -- which carry only a tier and a date
+      // -- ever colliding.
+      expect(result.resolvedFolderPath).toBe(folderFor());
+    });
+
+    it("should return defaults when no policy has been saved", async () => {
+      mockPolicyRepo.findOne.mockResolvedValue(null);
+
+      const result = await service.getSettings(userId);
+
+      // Enabled, because that is what the deployment is actually doing: an
+      // instance whose policy has never been saved still backs every account up
+      // on the default schedule, and this screen used to say otherwise.
+      expect(result.enabled).toBe(true);
+      expect(result.folderPath).toBe(root);
+      expect(result.frequency).toBe("daily");
+      expect(result.backupTime).toBe("02:00");
+      expect(result.retentionDaily).toBe(7);
+      expect(result.retentionWeekly).toBe(4);
+      expect(result.retentionMonthly).toBe(6);
+    });
+
+    it("should report the default folder for a stored policy without one", async () => {
+      storePolicy({ enabled: true, folderPath: "" });
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: "" }),
+      );
+
+      const result = await service.getSettings(userId);
+
+      expect(result.folderPath).toBe(root);
+      expect(result.enabled).toBe(true);
+    });
+
+    it("should default the folder path to BACKUP_CONTAINER_DIR when configured", async () => {
+      service = await createService({
+        BACKUP_CONTAINER_DIR: "/mnt/monize-backups",
+      });
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      const result = await service.getSettings(userId);
+
+      expect(result.folderPath).toBe("/mnt/monize-backups");
+    });
+
+    it("should trim a configured BACKUP_CONTAINER_DIR", async () => {
+      service = await createService({
+        BACKUP_CONTAINER_DIR: "  /mnt/backups/  ",
+      });
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      const result = await service.getSettings(userId);
+
+      expect(result.folderPath).toBe("/mnt/backups");
+    });
+
+    it("should use the built-in default when BACKUP_CONTAINER_DIR is unset", async () => {
+      service = await createService({ BACKUP_CONTAINER_DIR: "" });
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      const result = await service.getSettings(userId);
+
+      expect(result.folderPath).toBe(DEFAULT_BACKUP_CONTAINER_DIR);
+    });
+
+    it("should fall back to the built-in default for an invalid BACKUP_CONTAINER_DIR", async () => {
+      service = await createService({
+        BACKUP_CONTAINER_DIR: "relative/backups",
+      });
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      const result = await service.getSettings(userId);
+
+      expect(result.folderPath).toBe(DEFAULT_BACKUP_CONTAINER_DIR);
+    });
+  });
+
+  describe("updateSettings", () => {
+    it("writes the one policy row whoever is signed in", async () => {
+      // One deployment policy needs one row. Writing `req.user.id` gave a
+      // second administrator a second policy that reverted on the next hourly
+      // reconcile, and put a deployment-wide setting where deactivating,
+      // demoting or restoring that account would rewrite it.
+      await service.updateSettings(otherUserId, { frequency: "weekly" });
+
+      expect(writtenPolicy()).toMatchObject({ frequency: "weekly" });
+    });
+
+    it("pushes the saved policy onto every other account before answering", async () => {
+      // The whole point of the method: a policy that only took effect at the
+      // top of the next hour leaves "Save" looking like it did nothing, and a
+      // policy that only ever governs the row it is stored on is the defect.
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+      mockUsersRepo.find.mockResolvedValue([
+        { id: userId },
+        { id: otherUserId },
+      ]);
+      mockSettingsRepo.find.mockResolvedValue([]);
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        folderPath: root,
+        frequency: "every12hours",
+        retentionDaily: 21,
+      });
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: otherUserId,
+          enabled: true,
+          frequency: "every12hours",
+          retentionDaily: 21,
+          nextBackupAt: expect.any(Date),
+        }),
+      );
+    });
+
+    it("still reports the policy as saved when one account fails to reconcile", async () => {
+      // A saved policy that answers 500 because somebody else's row would not
+      // write reads as "not saved", and the operator saves it again.
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      mockSettingsRepo.find.mockResolvedValue([]);
+      mockSettingsRepo.save
+        .mockImplementationOnce((entity) => Promise.resolve(entity))
+        .mockImplementationOnce(() => Promise.reject(new Error("db down")));
+
+      await expect(
+        service.updateSettings(userId, { frequency: "weekly" }),
+      ).resolves.toEqual(expect.objectContaining({ frequency: "weekly" }));
+    });
+
+    it("should create new settings if none exist", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      await service.updateSettings(userId, {
+        folderPath: root,
+        frequency: "weekly",
+      });
+
+      // Upserted onto the singleton: a deployment that has never saved has no
+      // row, and the same statement covers both cases.
+      expect(writtenPolicy()).toMatchObject({
+        folderPath: root,
+        frequency: "weekly",
+      });
+    });
+
+    it("should update existing settings", async () => {
+      const existing = createSettings({ folderPath: "/old" });
+      mockSettingsRepo.findOne.mockResolvedValue(existing);
+
+      await service.updateSettings(userId, {
+        folderPath: "/new-backups",
+        retentionDaily: 14,
+      });
+
+      expect(writtenPolicy()).toMatchObject({
+        folderPath: "/new-backups",
+        retentionDaily: 14,
+      });
+    });
+
+    it("should fall back to BACKUP_CONTAINER_DIR when enabling without a folder path", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      await service.updateSettings(userId, { enabled: true });
+
+      expect(writtenPolicy()).toMatchObject({
+        enabled: true,
+        folderPath: root,
+      });
+    });
+
+    it("should validate folder is writable when enabling", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: root }),
+      );
+
+      mockUsersRepo.find.mockResolvedValue([{ id: userId }]);
+      mockSettingsRepo.find.mockResolvedValue([]);
+
+      await service.updateSettings(userId, { enabled: true });
+
+      expect(writtenPolicy()).toMatchObject({ enabled: true });
+      // The schedule itself lands on the account row the reconcile enrols.
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          enabled: true,
+          nextBackupAt: expect.any(Date),
+        }),
+      );
+      // The per-user directory is what has to be writable, and enabling creates
+      // it -- the root alone being writable says nothing about where the file
+      // actually goes.
+      expect((await fs.stat(folderFor())).isDirectory()).toBe(true);
+    });
+
+    it("refuses to enable a folder outside the permitted roots", async () => {
+      const outside = mkdtempSync(join(tmpdir(), "monize-elsewhere-"));
+      try {
+        storePolicy({ folderPath: outside });
+
+        await expect(
+          service.updateSettings(userId, { enabled: true }),
+        ).rejects.toThrow(/outside the permitted roots/);
+        // A rejected command must not have written: the policy stays off.
+        expect(writtenPolicy()).toBeNull();
+        expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+      } finally {
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it("should clear nextBackupAt when disabling", async () => {
+      const existing = createSettings({
+        enabled: true,
+        folderPath: root,
+        nextBackupAt: new Date(),
+      });
+      mockSettingsRepo.findOne.mockResolvedValue(existing);
+
+      await service.updateSettings(userId, { enabled: false });
+
+      // The policy carries no schedule of its own; disarming every account's
+      // own `next_backup_at` is the reconcile's job.
+      expect(writtenPolicy()).toMatchObject({ enabled: false });
+    });
+
+    it("should reject non-absolute paths", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.updateSettings(userId, { folderPath: "relative/path" }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it("should reject paths with '..'", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.updateSettings(userId, { folderPath: "/backups/../etc" }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it("should update retention values", async () => {
+      const existing = createSettings();
+      mockSettingsRepo.findOne.mockResolvedValue(existing);
+
+      await service.updateSettings(userId, {
+        retentionDaily: 30,
+        retentionWeekly: 12,
+        retentionMonthly: 24,
+      });
+
+      expect(writtenPolicy()).toMatchObject({
+        retentionDaily: 30,
+        retentionWeekly: 12,
+        retentionMonthly: 24,
+      });
+    });
+
+    it("should update backupTime", async () => {
+      const existing = createSettings();
+      mockSettingsRepo.findOne.mockResolvedValue(existing);
+
+      await service.updateSettings(userId, { backupTime: "14:30" });
+
+      expect(writtenPolicy()).toMatchObject({ backupTime: "14:30" });
+    });
+  });
+
+  describe("validateFolder", () => {
+    it("should return valid for a writable directory", async () => {
+      const result = await service.validateFolder(root);
+
+      expect(result).toEqual({ valid: true });
+    });
+
+    /**
+     * `validateFolder` probes the *shared* root, so every user validating the
+     * same folder writes a test file into one directory -- and the cron probes a
+     * per-user folder that every replica fires for. The probe name was
+     * `.monize-write-test-${Date.now()}`, which two calls in the same millisecond
+     * pick identically: both writes succeed, the first unlink removes the file,
+     * and the second gets ENOENT and reports the folder as not writable.
+     *
+     * The consequence is a user told to "check container permissions" for a
+     * folder that is writable, and -- on the cron path -- an aborted backup.
+     */
+    it("stays valid when several probes run against one directory at once", async () => {
+      const results = await Promise.all(
+        Array.from({ length: 12 }, () => service.validateFolder(root)),
+      );
+
+      expect(results).toEqual(
+        Array.from({ length: 12 }, () => ({ valid: true })),
+      );
+    });
+
+    it("leaves no probe file behind", async () => {
+      await service.validateFolder(root);
+      const left = readdirSync(root).filter((name) =>
+        name.startsWith(".monize-write-test-"),
+      );
+      expect(left).toEqual([]);
+    });
+
+    it("should return invalid for non-existent directory", async () => {
+      const result = await service.validateFolder(join(root, "no-such-dir"));
+
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("does not exist");
+    });
+
+    it("should return invalid for non-directory path", async () => {
+      const file = join(root, "file.txt");
+      await fs.writeFile(file, "");
+
+      const result = await service.validateFolder(file);
+
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("not a directory");
+    });
+
+    // chmod cannot demonstrate a permission denial to uid 0, and CI images
+    // commonly run as root. Skipped rather than weakened into an assertion that
+    // passes for the wrong reason.
+    const itUnlessRoot = process.getuid?.() === 0 ? it.skip : it;
+
+    itUnlessRoot(
+      "should return invalid for non-writable directory",
+      async () => {
+        const readOnly = join(root, "read-only");
+        await fs.mkdir(readOnly);
+        await fs.chmod(readOnly, 0o500);
+        service = await createService({ BACKUP_ALLOWED_ROOTS: root });
+
+        try {
+          const result = await service.validateFolder(readOnly);
+
+          expect(result.valid).toBe(false);
+          expect(result.error).toContain("not writable");
+        } finally {
+          await fs.chmod(readOnly, 0o700);
+        }
+      },
+    );
+
+    it("should return invalid for relative paths", async () => {
+      const result = await service.validateFolder("relative/path");
+
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("absolute path");
+    });
+
+    it("should return invalid for paths with '..'", async () => {
+      const result = await service.validateFolder(`${root}/../etc`);
+
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("..");
+    });
+  });
+
+  /**
+   * The destination used to be any absolute writable path, chosen through an
+   * endpoint that requires authentication and no role. These are the paths that
+   * must now be refused, and the one that must not.
+   */
+  /**
+   * The default deployment has `readOnlyRootFilesystem: true` and, unless the
+   * operator enables a claim, no mount at `/data/backups`. Enabling a schedule
+   * there already fails -- `resolveUserFolder` creates the directory and
+   * `assertFolderWritable` probes it -- so a follow-up review's claim that the
+   * settings "can be stored" was wrong. What was right is what the user is told:
+   * the message named a Docker volume, which is one of the two mechanisms and the
+   * wrong one on Kubernetes, and read as a mistyped path rather than as a
+   * deployment with nowhere to write.
+   */
+  describe("a deployment with no writable backup storage", () => {
+    /**
+     * A default root that cannot be created.
+     *
+     * EROFS is a property of the mount, not of the code, and this suite runs as
+     * root -- so chmod cannot produce it and neither can any real directory here.
+     * Only `mkdir` is substituted; the directory, the probe and the containment
+     * checks stay real, which is the same trade the short-write tests in
+     * `atomic-file.spec.ts` make.
+     */
+    async function serviceWithUncreatableRoot(): Promise<{
+      service: AutoBackupService;
+      root: string;
+    }> {
+      const unusable = join(root, "read-only-mount", "backups");
+      const svc = await createService({
+        BACKUP_CONTAINER_DIR: unusable,
+        BACKUP_ALLOWED_ROOTS: unusable,
+      });
+      jest.spyOn(fs, "mkdir").mockRejectedValue(
+        Object.assign(new Error("EROFS: read-only file system"), {
+          code: "EROFS",
+        }),
+      );
+      return { service: svc, root: unusable };
+    }
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("still refuses to store an enabled schedule", async () => {
+      const { service: svc } = await serviceWithUncreatableRoot();
+      storePolicy();
+
+      await expect(
+        svc.updateSettings(userId, { enabled: true }),
+      ).rejects.toThrow(BadRequestException);
+      // The point: nothing was written. A schedule that cannot run must not be
+      // stored as though it will.
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+
+    it("says the deployment has no backup storage, not that a path is missing", async () => {
+      const { service: svc, root: unusable } =
+        await serviceWithUncreatableRoot();
+      storePolicy();
+
+      const error: Error = await svc
+        .updateSettings(userId, { enabled: true })
+        .then(
+          () => new Error("expected a rejection"),
+          (e: Error) => e,
+        );
+
+      expect(error.message).toContain("no writable backup storage");
+      expect(error.message).toContain(unusable);
+      // Both mechanisms, because the code cannot tell which platform it is on --
+      // and the Kubernetes one was the half that used to be missing.
+      expect(error.message).toMatch(/Docker/);
+      expect(error.message).toMatch(/backend\.persistence\.backups/);
+    });
+
+    it("reports the capability as unavailable, with a reason", async () => {
+      const { service: svc, root: unusable } =
+        await serviceWithUncreatableRoot();
+
+      // So a surface can say this before the user configures a frequency, a
+      // time and a retention policy and presses save.
+      const capability = await svc.describeCapability(userId);
+      expect(capability.available).toBe(false);
+      expect(capability.folderPath).toBe(unusable);
+      expect(capability.reason).toBeTruthy();
+    });
+
+    it("reports the capability as available on a writable root", async () => {
+      await expect(service.describeCapability(userId)).resolves.toEqual({
+        available: true,
+        folderPath: root,
+        // A container directory is a location an operator may choose, so the
+        // settings screen keeps its folder picker.
+        locationSelectable: true,
+        // Nothing stored for this user yet. The count is what makes a store
+        // that has just been switched over visibly empty rather than silently
+        // so (`docs/specs/backup-storage-targets.md` section 11, decision 2).
+        artifactCount: 0,
+        // Which store is bound, so the screen names it instead of inferring
+        // "S3" from the absence of a folder picker.
+        storageProvider: "local",
+      });
+    });
+
+    it("counts the artifacts the current store already holds", async () => {
+      await fs.mkdir(folderFor(), { recursive: true });
+      await fs.writeFile(
+        join(folderFor(), "monize-backup-daily-2026-04-15.json.gz"),
+        "artifact",
+      );
+      await fs.writeFile(
+        join(folderFor(), "monize-backup-weekly-2026-04-14.mzbe"),
+        "artifact",
+      );
+
+      await expect(service.describeCapability(userId)).resolves.toMatchObject({
+        available: true,
+        artifactCount: 2,
+      });
+    });
+
+    it("probes the configured root, not only the deployment default (F3RB-003)", async () => {
+      // BACKUP_ALLOWED_ROOTS exists so an operator can mount somewhere other
+      // than /data/backups. Probing only the default reported "no storage" for
+      // a working configured root, and the banner then refused to re-arm a
+      // schedule that would have saved and run.
+      const other = mkdtempSync(join(tmpdir(), "monize-backup-other-"));
+      try {
+        const svc = await createService({
+          BACKUP_CONTAINER_DIR: join(root, "does-not-exist", "nested"),
+          BACKUP_ALLOWED_ROOTS: other,
+        });
+        storePolicy({ folderPath: other });
+
+        await expect(svc.describeCapability(userId)).resolves.toMatchObject({
+          available: true,
+          folderPath: other,
+        });
+      } finally {
+        rmSync(other, { recursive: true, force: true });
+      }
+    });
+
+    it("refuses a stored root outside the permitted roots, and probes nothing there (F3RB-R1-001)", async () => {
+      // `updateSettings` only checks a stored folder's syntax unless the same
+      // call enables the schedule, and a deployment upgraded from before
+      // confinement can already hold an arbitrary path. Capability must apply
+      // the same containment the write does -- before touching the filesystem,
+      // or it leaves a probe file outside the approved volume and then reports a
+      // configuration available that `resolveUserFolder` refuses.
+      const outside = mkdtempSync(join(tmpdir(), "monize-capability-outside-"));
+      // Observe the real `writeFile` rather than replacing it: an empty
+      // directory afterwards is also what a probe that cleaned up after itself
+      // would leave, so the directory listing alone cannot tell "never wrote"
+      // from "wrote and unlinked". The spy can.
+      const writeFile = jest.spyOn(fs, "writeFile");
+      try {
+        storePolicy({ folderPath: outside });
+
+        const capability = await service.describeCapability(userId);
+
+        expect(capability.available).toBe(false);
+        expect(capability.reason).toContain("outside the permitted roots");
+        expect(
+          writeFile.mock.calls.filter(([target]) =>
+            String(target).startsWith(outside),
+          ),
+        ).toEqual([]);
+        expect(readdirSync(outside)).toEqual([]);
+      } finally {
+        writeFile.mockRestore();
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it("refuses a stored root symlinked out of the permitted roots (F3RB-R1-001)", async () => {
+      const outside = mkdtempSync(join(tmpdir(), "monize-capability-target-"));
+      const link = join(root, "stored-escape");
+      try {
+        await fs.symlink(outside, link);
+        storePolicy({ folderPath: link });
+
+        const capability = await service.describeCapability(userId);
+
+        expect(capability.available).toBe(false);
+        expect(readdirSync(outside)).toEqual([]);
+      } finally {
+        rmSync(link, { recursive: true, force: true });
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it("still reports an enabled-but-out-of-policy row as unavailable rather than throwing", async () => {
+      // The admin has to be able to load the page and switch such a schedule
+      // off; capability answering "no" is what the banner needs, not an error.
+      const outside = mkdtempSync(join(tmpdir(), "monize-capability-enabled-"));
+      try {
+        storePolicy({ enabled: true, folderPath: outside });
+
+        await expect(service.describeCapability(userId)).resolves.toMatchObject(
+          { available: false },
+        );
+      } finally {
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it("leaves no probe file behind when reporting the capability", async () => {
+      await service.describeCapability(userId);
+      expect(
+        readdirSync(root).filter((n) => n.startsWith(".monize-write-test-")),
+      ).toEqual([]);
+    });
+  });
+
+  /**
+   * A path that cannot be a directory at all -- a component that is a file, a
+   * symlink cycle, an untraversable parent. `realpathOfExistingAncestor` treats
+   * only ENOENT as "not created yet" and used to rethrow everything else raw, so
+   * these reached the client as a 500 carrying the resolved filesystem path
+   * instead of a 400 saying what was wrong.
+   */
+  describe("a path that cannot be a directory", () => {
+    it("answers with a bad request, not a server error", async () => {
+      const blocker = join(root, "notes.txt");
+      await fs.writeFile(blocker, "not a directory");
+
+      const result = await service.validateFolder(join(blocker, "backups"));
+
+      expect(result.valid).toBe(false);
+      expect(result.error).toMatch(/cannot be used as a directory/);
+      // The raw errno message and the resolved path do not belong in a response.
+      expect(result.error).not.toMatch(/realpath/);
+    });
+
+    it("refuses to store a schedule pointing at one", async () => {
+      const blocker = join(root, "ledger.csv");
+      await fs.writeFile(blocker, "");
+      mockSettingsRepo.findOne.mockResolvedValue(createSettings());
+
+      await expect(
+        service.updateSettings(userId, {
+          enabled: true,
+          folderPath: join(blocker, "backups"),
+        }),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("permitted roots", () => {
+    it("refuses a writable directory outside every permitted root", async () => {
+      const outside = mkdtempSync(join(tmpdir(), "monize-elsewhere-"));
+      try {
+        const result = await service.validateFolder(outside);
+
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain("outside the permitted roots");
+        // The message has to name the way out, or an operator with a legitimate
+        // second volume has no idea why their configuration stopped working.
+        expect(result.error).toContain("BACKUP_ALLOWED_ROOTS");
+      } finally {
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it("refuses the filesystem root, which the folder picker used to offer", async () => {
+      await expect(service.browseFolders("/")).rejects.toThrow(
+        BadRequestException,
+      );
+      expect((await service.validateFolder("/tmp")).valid).toBe(false);
+    });
+
+    it("accepts a directory an operator has permitted", async () => {
+      const second = mkdtempSync(join(tmpdir(), "monize-second-root-"));
+      try {
+        service = await createService({ BACKUP_ALLOWED_ROOTS: second });
+
+        expect(await service.validateFolder(second)).toEqual({ valid: true });
+        // The deployment default stays permitted: excluding it would break the
+        // out-of-the-box configuration.
+        expect(await service.validateFolder(root)).toEqual({ valid: true });
+      } finally {
+        rmSync(second, { recursive: true, force: true });
+      }
+    });
+
+    it("refuses a symlink inside a permitted root that points out of it", async () => {
+      const outside = mkdtempSync(join(tmpdir(), "monize-symlink-target-"));
+      const escape = join(root, "escape");
+      try {
+        await fs.symlink(outside, escape);
+
+        // Lexically `escape` is inside `root`; only canonicalisation sees that
+        // it is not. This is the case the old `safePath` check could not catch,
+        // because it compared strings.
+        const result = await service.validateFolder(escape);
+
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain("outside the permitted roots");
+      } finally {
+        rmSync(escape, { recursive: true, force: true });
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it.each([
+      ["the user directory itself", (f: string) => f],
+      ["the first shard segment", (f: string) => join(f, "..", "..")],
+      ["the second shard segment", (f: string) => join(f, "..")],
+    ])(
+      "refuses a backup when %s is a symlink out of the permitted roots (F3RB-002)",
+      async (_label, pick) => {
+        // The root is canonicalised before the sharded segments are appended, so
+        // a symlink anywhere in `<root>/<ab>/<cd>/<userId>` used to redirect the
+        // write while the base still looked clean. The final path has to be
+        // canonicalised too.
+        const outside = mkdtempSync(join(tmpdir(), "monize-shard-target-"));
+        const linkPath = pick(folderFor());
+        try {
+          await fs.mkdir(join(linkPath, ".."), { recursive: true });
+          await fs.symlink(outside, linkPath);
+          mockSettingsRepo.findOne.mockResolvedValue(
+            createSettings({ folderPath: root }),
+          );
+
+          await expect(service.runManualBackup(userId)).rejects.toThrow(
+            BadRequestException,
+          );
+          // Nothing may reach the symlink's target.
+          expect(await listBackups(outside)).toEqual([]);
+        } finally {
+          rmSync(outside, { recursive: true, force: true });
+        }
+      },
+    );
+
+    it("accepts a symlink that stays inside a permitted root", async () => {
+      const real = join(root, "real");
+      const link = join(root, "link");
+      await fs.mkdir(real);
+      await fs.symlink(real, link);
+
+      // Containment, not a ban on symlinks: an operator mounting a volume
+      // through one has done nothing wrong.
+      expect(await service.validateFolder(link)).toEqual({ valid: true });
+    });
+  });
+
+  describe("default backup folder creation", () => {
+    it("should create the configured default folder when it is missing", async () => {
+      const missing = join(root, "auto-created");
+      service = await createService({ BACKUP_CONTAINER_DIR: missing });
+
+      const result = await service.validateFolder(missing);
+
+      expect(result).toEqual({ valid: true });
+      expect((await fs.stat(missing)).isDirectory()).toBe(true);
+    });
+
+    it("should not create a user-chosen folder that is missing", async () => {
+      const chosen = join(root, "never-created");
+
+      const result = await service.validateFolder(chosen);
+
+      // A typo should surface as an error, not as a new empty directory that
+      // silently becomes the backup destination.
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("does not exist");
+      await expect(fs.stat(chosen)).rejects.toThrow();
+    });
+
+    const itUnlessRootHere = process.getuid?.() === 0 ? it.skip : it;
+
+    itUnlessRootHere(
+      "should report an error when the default folder cannot be created",
+      async () => {
+        const parent = join(root, "read-only-parent");
+        await fs.mkdir(parent);
+        await fs.chmod(parent, 0o500);
+        const missing = join(parent, "child");
+        service = await createService({ BACKUP_CONTAINER_DIR: missing });
+
+        try {
+          const result = await service.validateFolder(missing);
+
+          expect(result.valid).toBe(false);
+          expect(result.error).toContain("does not exist");
+        } finally {
+          await fs.chmod(parent, 0o700);
+        }
+      },
+    );
+  });
+
+  describe("stored backups", () => {
+    /** Write `name` into a user's own sharded folder with a fixed size. */
+    async function seed(
+      name: string,
+      id: string = userId,
+      contents = "artifact",
+    ): Promise<void> {
+      await fs.mkdir(folderFor(id), { recursive: true });
+      await fs.writeFile(join(folderFor(id), name), contents);
+    }
+
+    it("lists this user's artifacts newest first, with size and mtime", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-14.json.gz", userId, "older");
+      await seed("monize-backup-daily-2026-04-15.mzbe", userId, "newer-file");
+      await fs.utimes(
+        join(folderFor(), "monize-backup-daily-2026-04-14.json.gz"),
+        new Date("2026-04-14T02:00:00Z"),
+        new Date("2026-04-14T02:00:00Z"),
+      );
+      await fs.utimes(
+        join(folderFor(), "monize-backup-daily-2026-04-15.mzbe"),
+        new Date("2026-04-15T02:00:00Z"),
+        new Date("2026-04-15T02:00:00Z"),
+      );
+
+      const result = await service.listStoredBackups(userId);
+
+      expect(result.enabled).toBe(true);
+      expect(result.backups).toEqual([
+        {
+          filename: "monize-backup-daily-2026-04-15.mzbe",
+          modifiedAt: "2026-04-15T02:00:00.000Z",
+          size: "newer-file".length,
+          encrypted: true,
+        },
+        {
+          filename: "monize-backup-daily-2026-04-14.json.gz",
+          modifiedAt: "2026-04-14T02:00:00.000Z",
+          size: "older".length,
+          encrypted: false,
+        },
+      ]);
+    });
+
+    it("reports the schedule as off when the user's row is disabled", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: false }),
+      );
+
+      // The settings endpoint that carries this is admin-only, so a
+      // non-administrator has no other way to learn whether anything is backing
+      // their data up -- and the Settings screen hides the section on it.
+      await expect(service.listStoredBackups(userId)).resolves.toEqual({
+        enabled: false,
+        backups: [],
+      });
+    });
+
+    it("returns an empty list when the user has no folder yet", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+
+      // A user enrolled on the deployment defaults has a folder only after
+      // their first run; that is an empty list, not an error.
+      await expect(service.listStoredBackups(userId)).resolves.toEqual({
+        enabled: true,
+        backups: [],
+      });
+    });
+
+    it("never lists another user's artifacts or the legacy flat folder", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz", otherUserId);
+      // Written by a version before per-user folders: the name carries no user
+      // id, so nothing there can be attributed to anybody.
+      await fs.writeFile(
+        join(root, "monize-backup-daily-2026-04-13.json.gz"),
+        "legacy",
+      );
+      await seed("monize-backup-weekly-2026-04-14.json.gz");
+
+      const result = await service.listStoredBackups(userId);
+
+      expect(result.backups.map((b) => b.filename)).toEqual([
+        "monize-backup-weekly-2026-04-14.json.gz",
+      ]);
+    });
+
+    it("skips directory entries that are not artifacts this module wrote", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz");
+      await seed(".monize-backup-daily-2026-04-15.json.gz.tmp-abc");
+      await seed("notes.txt");
+      await fs.mkdir(join(folderFor(), "monize-backup-daily-2026-04-12.mzbe"));
+
+      const result = await service.listStoredBackups(userId);
+
+      expect(result.backups.map((b) => b.filename)).toEqual([
+        "monize-backup-daily-2026-04-15.json.gz",
+      ]);
+    });
+
+    it("summarizes this user's artifacts as a count and a total", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-14.json.gz", userId, "older");
+      await seed("monize-backup-weekly-2026-04-15.mzbe", userId, "newer-file");
+
+      await expect(service.summarizeStoredBackups(userId)).resolves.toEqual({
+        enabled: true,
+        artifacts: 2,
+        bytes: "older".length + "newer-file".length,
+      });
+    });
+
+    it("counts nothing towards the total that the owner-facing listing would not offer", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz", userId, "mine");
+      // Another user's namespace, the pre-namespacing flat folder whose name
+      // carries no owner, and a file this module never wrote: none of the three
+      // is attributable to this user, so none of them may be billed to them.
+      await seed("monize-backup-daily-2026-04-15.json.gz", otherUserId, "hers");
+      await fs.writeFile(
+        join(root, "monize-backup-daily-2026-04-13.json.gz"),
+        "legacy",
+      );
+      await seed("notes.txt", userId, "not-an-artifact");
+
+      await expect(service.summarizeStoredBackups(userId)).resolves.toEqual({
+        enabled: true,
+        artifacts: 1,
+        bytes: "mine".length,
+      });
+    });
+
+    it("reports zero for a user whose namespace is empty", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+
+      // Enrolled but not yet run: a store that enumerates fine and holds
+      // nothing is zero, which is a figure, not a missing answer.
+      await expect(service.summarizeStoredBackups(userId)).resolves.toEqual({
+        enabled: true,
+        artifacts: 0,
+        bytes: 0,
+      });
+    });
+
+    it("reports a store it cannot enumerate as unknown rather than as empty", async () => {
+      const outside = mkdtempSync(join(tmpdir(), "monize-unreadable-"));
+      try {
+        mockSettingsRepo.findOne.mockResolvedValue(
+          createSettings({ enabled: true, folderPath: outside }),
+        );
+
+        // A root outside BACKUP_ALLOWED_ROOTS refuses before anything is
+        // listed. Answering 0 here would put "stores nothing" on the admin
+        // screen for a user whose backups are simply unreachable.
+        await expect(service.summarizeStoredBackups(userId)).resolves.toEqual({
+          enabled: true,
+          artifacts: null,
+          bytes: null,
+        });
+      } finally {
+        rmSync(outside, { recursive: true, force: true });
+      }
+    });
+
+    it("keeps the schedule and the stored bytes as separate answers", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: false }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz", userId, "kept");
+
+      // Switched off last week, still occupying what retention has not aged
+      // out: "off" is not "nothing stored".
+      await expect(service.summarizeStoredBackups(userId)).resolves.toEqual({
+        enabled: false,
+        artifacts: 1,
+        bytes: "kept".length,
+      });
+    });
+
+    it("opens one artifact by name, as a stream of its bytes", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-monthly-26-04.json.gz", userId, "bytes");
+
+      const artifact = await service.openStoredBackup(
+        userId,
+        "monize-backup-monthly-26-04.json.gz",
+      );
+
+      expect(artifact.filename).toBe("monize-backup-monthly-26-04.json.gz");
+      expect(artifact.sizeBytes).toBe("bytes".length);
+      // A path would be no use to a store that has none. The stream is read to
+      // the end here because that is what proves it is the artifact's bytes and
+      // not merely a handle the assertion happened to be handed -- and because
+      // a caller that opens one owes it a close.
+      const chunks: Buffer[] = [];
+      for await (const chunk of artifact.stream) chunks.push(chunk as Buffer);
+      expect(Buffer.concat(chunks).toString()).toBe("bytes");
+    });
+
+    it.each([
+      ["../../../etc/passwd", "a traversal"],
+      [
+        "monize-backup-daily-2026-04-15.json.gz/../../secret",
+        "a nested escape",
+      ],
+      ["notes.txt", "a name this module does not write"],
+      [".monize-backup-daily-2026-04-15.json.gz.tmp-abc", "a partial write"],
+      [
+        "monize-backup-daily-2026-04-16.json.gz",
+        "an artifact that is not there",
+      ],
+    ])("refuses %s (%s)", async (filename) => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz");
+
+      // An unrecognised name and an absent file answer alike on purpose: the
+      // difference tells a caller nothing they may act on.
+      await expect(service.openStoredBackup(userId, filename)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it("opens the directory entry rather than the name the request carried", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz", userId, "bytes");
+      // The listing is what decides: a file on disk that this user's folder
+      // does not enumerate is not served, because the string that reaches the
+      // filesystem is the entry `readdir` returned and not the one the caller
+      // typed. Statting the caller's own string instead would open it.
+      const readdir = jest.spyOn(fs, "readdir").mockResolvedValue([] as never);
+
+      await expect(
+        service.openStoredBackup(
+          userId,
+          "monize-backup-daily-2026-04-15.json.gz",
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(readdir).toHaveBeenCalled();
+      readdir.mockRestore();
+    });
+
+    it("does not reach another user's folder through their own filename", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true }),
+      );
+      await seed("monize-backup-daily-2026-04-15.json.gz", otherUserId);
+
+      // The folder is server-computed from the caller's id; the name decides
+      // nothing about whose directory is opened.
+      await expect(
+        service.openStoredBackup(
+          userId,
+          "monize-backup-daily-2026-04-15.json.gz",
+        ),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    /**
+     * The off-machine copy status the read endpoint attaches to each stored
+     * backup, so the Settings row can show a per-destination icon. The ledger
+     * rows are seeded through the same mocked DataSource the rest of this suite
+     * uses, and each is a real `BackupOffsiteUpload` whose object key is built by
+     * the production helper -- so the filename the listing groups by is the one
+     * the dispatcher would actually have written.
+     */
+    describe("off-site copy status", () => {
+      /** A ledger row a real dispatch could have written for `filename`. */
+      function offsiteRow(opts: {
+        destination: BackupOffsiteDestination;
+        filename: string;
+        digest: string;
+        status: BackupOffsiteUploadStatus;
+      }): BackupOffsiteUpload {
+        const row = new BackupOffsiteUpload();
+        row.userId = userId;
+        row.destination = opts.destination;
+        // S3 addresses the artifact by its sharded, digest-suffixed key; email
+        // by the filename itself. `offsiteArtifactFileName` inverts both, so the
+        // listing recovers `filename` either way.
+        row.objectKey =
+          opts.destination === "s3"
+            ? offsiteObjectKey(userId, opts.filename, opts.digest)
+            : opts.filename;
+        row.tier = "daily";
+        row.digest = opts.digest;
+        row.sizeBytes = 10;
+        row.status = opts.status;
+        row.attempts = 1;
+        row.lastError = null;
+        row.claimedAt = null;
+        row.createdAt = new Date();
+        row.updatedAt = new Date();
+        return row;
+      }
+
+      it("reports each destination's newest status on the artifact it names", async () => {
+        mockSettingsRepo.findOne.mockResolvedValue(
+          createSettings({ enabled: true }),
+        );
+        const filename = "monize-backup-daily-2026-04-15.mzbe";
+        await seed(filename, userId, "bytes");
+        const digest = "a".repeat(64);
+        // Newest first, as `order: { createdAt: "DESC" }` returns them.
+        mockOffsiteUploadRepo.find.mockResolvedValue([
+          offsiteRow({
+            destination: "s3",
+            filename,
+            digest,
+            status: "uploaded",
+          }),
+          offsiteRow({
+            destination: "email",
+            filename,
+            digest,
+            status: "failed",
+          }),
+        ]);
+
+        const result = await service.listStoredBackups(userId);
+
+        expect(result.backups).toHaveLength(1);
+        expect(result.backups[0].offsite).toEqual({
+          s3: "uploaded",
+          email: "failed",
+        });
+      });
+
+      it("leaves offsite undefined for an artifact with no ledger row", async () => {
+        mockSettingsRepo.findOne.mockResolvedValue(
+          createSettings({ enabled: true }),
+        );
+        await seed("monize-backup-daily-2026-04-15.mzbe");
+        mockOffsiteUploadRepo.find.mockResolvedValue([]);
+
+        const result = await service.listStoredBackups(userId);
+
+        expect(result.backups).toHaveLength(1);
+        expect(result.backups[0].offsite).toBeUndefined();
+        // Absent, not present-and-empty: a weekly/monthly/partial or an
+        // un-dispatched file carries no `offsite` at all.
+        expect("offsite" in result.backups[0]).toBe(false);
+      });
+
+      it("keeps the newest row when two exist for one (artifact, destination)", async () => {
+        mockSettingsRepo.findOne.mockResolvedValue(
+          createSettings({ enabled: true }),
+        );
+        const filename = "monize-backup-daily-2026-04-15.mzbe";
+        await seed(filename);
+        // A same-day re-export writes a second S3 row under a new digest -- a
+        // different object key that still round-trips to this same filename. The
+        // read is newest first, so the first row seen is the current status.
+        mockOffsiteUploadRepo.find.mockResolvedValue([
+          offsiteRow({
+            destination: "s3",
+            filename,
+            digest: "b".repeat(64),
+            status: "uploaded",
+          }),
+          offsiteRow({
+            destination: "s3",
+            filename,
+            digest: "a".repeat(64),
+            status: "failed",
+          }),
+        ]);
+
+        const result = await service.listStoredBackups(userId);
+
+        expect(result.backups[0].offsite).toEqual({ s3: "uploaded" });
+      });
+    });
+  });
+
+  describe("browseFolders", () => {
+    it("should list subdirectories", async () => {
+      await fs.mkdir(join(root, "backups"));
+      await fs.mkdir(join(root, "data"));
+      await fs.mkdir(join(root, ".hidden"));
+      await fs.writeFile(join(root, "file.txt"), "");
+
+      const result = await service.browseFolders(root);
+
+      expect(result.current).toBe(await fs.realpath(root));
+      expect(result.directories).toEqual(["backups", "data"]);
+    });
+
+    it("hides the per-user directories", async () => {
+      await fs.mkdir(folderFor(), { recursive: true });
+      await fs.mkdir(folderFor(otherUserId), { recursive: true });
+      await fs.mkdir(join(root, "shared"));
+
+      const result = await service.browseFolders(root);
+
+      // Listing them would turn a folder picker into user enumeration, and
+      // offering one as a destination would nest a second level inside it.
+      expect(result.directories).toEqual(["shared"]);
+    });
+
+    it("should throw for non-existent path", async () => {
+      await expect(
+        service.browseFolders(join(root, "no-such")),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it("should throw for relative paths", async () => {
+      await expect(service.browseFolders("relative")).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe("runManualBackup", () => {
+    // These tests assert the daily-only outcome. The suite-wide clock
+    // (SUITE_CLOCK) is already pinned to a plain day-of-month, so no promotion
+    // to weekly/monthly interferes; the tests that exercise promotion move the
+    // clock with withClockAt.
+    it("should back up under BACKUP_CONTAINER_DIR when no settings exist", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+
+      await service.runManualBackup(userId);
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          folderPath: root,
+          lastBackupStatus: "success",
+        }),
+      );
+      expect(await listBackups(folderFor())).toEqual([
+        expect.stringMatching(/^monize-backup-daily-/),
+      ]);
+    });
+
+    it("should back up under BACKUP_CONTAINER_DIR when no folder path is set", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: "" }),
+      );
+
+      await service.runManualBackup(userId);
+
+      expect(await listBackups(folderFor())).toEqual([
+        expect.stringMatching(
+          /^monize-backup-daily-\d{4}-\d{2}-\d{2}\.json\.gz$/,
+        ),
+      ]);
+    });
+
+    it("writes into the user's own sharded folder, not flat into the base", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: root }),
+      );
+
+      const result = await service.runManualBackup(userId);
+
+      expect(await listBackups(folderFor())).toEqual([result.filename]);
+      // Nothing lands flat in the base: only the shard directory appears there.
+      expect(
+        (await listBackups(root)).filter((name) =>
+          name.startsWith("monize-backup-"),
+        ),
+      ).toEqual([]);
+    });
+
+    it("creates the per-user folder on first use", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: root }),
+      );
+      // The base folder is mounted; the user's own folder is not there yet.
+      await expect(fs.access(folderFor())).rejects.toThrow();
+
+      const result = await service.runManualBackup(userId);
+
+      // Created on demand, the way attachment shard directories are -- only
+      // the base has to be mounted.
+      expect(await listBackups(folderFor())).toEqual([result.filename]);
+    });
+
+    it("still refuses to create a missing base folder the operator chose", async () => {
+      const missing = join(root, "missing-sub");
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: missing }),
+      );
+
+      // A typo in the configured folder must surface, not silently create a
+      // tree of shard directories somewhere nobody mounted.
+      await expect(service.runManualBackup(userId)).rejects.toThrow(
+        /does not exist/,
+      );
+      await expect(fs.access(missing)).rejects.toThrow();
+    });
+
+    it("rejects a user id that is not a safe path segment", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: root }),
+      );
+
+      // Refused before anything is resolved against the store: a user id that
+      // is not a UUID is not a shard segment either, so the ambient-identity
+      // check now names it first. Either refusal is the containment holding --
+      // what must never happen is a write.
+      await expect(service.runManualBackup("../../etc")).rejects.toThrow(
+        /Path traversal|valid UUID/,
+      );
+      // Nothing was written anywhere under the root.
+      expect(await listBackups(root)).toEqual([]);
+    });
+
+    it("backs up every account on the deployment, not the administrator alone", async () => {
+      // "Run Backup Now" sits under a deployment policy, so backing up one row
+      // was the same defect as the policy governing one row: an operator
+      // pressed it to prove backups worked and proved it for themselves only.
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.find.mockResolvedValue([
+        { id: userId },
+        { id: otherUserId },
+      ]);
+
+      const result = await service.runManualBackup(userId);
+
+      expect(result.usersRequested).toBe(2);
+      expect(result.usersBackedUp).toBe(2);
+      expect(await listBackups(folderFor(userId))).toHaveLength(1);
+      expect(await listBackups(folderFor(otherUserId))).toHaveLength(1);
+    });
+
+    it("keeps going, and reports the count, when one account fails", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.find.mockResolvedValue([
+        { id: userId },
+        { id: otherUserId },
+      ]);
+      // The caller's own account runs first, so the second export is the other
+      // account's.
+      mockBackupService.exportToBuffer
+        .mockResolvedValueOnce({
+          buffer: Buffer.from("gzipped-export"),
+          report: {
+            complete: true,
+            expectedAttachments: 0,
+            missingAttachments: 0,
+            inconsistentAttachments: 0,
+          },
+        })
+        .mockRejectedValueOnce(new Error("export blew up"));
+
+      const result = await service.runManualBackup(userId);
+
+      expect(result.usersBackedUp).toBe(1);
+      expect(result.usersFailed).toBe(1);
+      expect(result.message).toMatch(/1 failed/);
+      // The caller's own artifact is still named, because it is the one they
+      // can go and look at.
+      expect(await listBackups(folderFor(userId))).toHaveLength(1);
+    });
+
+    it("skips an account whose data is mid-replacement without failing the run", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.find.mockResolvedValue([
+        { id: userId },
+        { id: otherUserId },
+      ]);
+      maintenance.isUnderMaintenance.mockImplementation((id: string) =>
+        Promise.resolve(id === otherUserId),
+      );
+
+      const result = await service.runManualBackup(userId);
+
+      expect(result.usersBackedUp).toBe(1);
+      expect(result.usersSkipped).toBe(1);
+      expect(result.usersFailed).toBe(0);
+      expect(await listBackups(folderFor(otherUserId))).toEqual([]);
+    });
+
+    it("refuses rather than writing an empty file mid-maintenance", async () => {
+      // The cron defers silently; a manual run has someone watching, so it says
+      // why. Writing the file anyway would produce an empty backup and then
+      // rotate the last good one out to keep the retention count.
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      maintenance.isUnderMaintenance.mockResolvedValue(true);
+
+      await expect(service.runManualBackup(userId)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+      // Nothing reached the disk: the user's folder holds no backup file.
+      expect(await listBackups(folderFor())).toEqual([]);
+    });
+
+    it("should run backup and update status on success", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+
+      const result = await service.runManualBackup(userId);
+
+      // A run covers every account on the deployment, so the message counts
+      // accounts rather than describing the one artifact the caller got.
+      expect(result.message).toBe("Backed up 1 of 1 account(s)");
+      expect(result.usersBackedUp).toBe(1);
+      expect(result.usersFailed).toBe(0);
+      expect(result.filename).toMatch(
+        /^monize-backup-daily-\d{4}-\d{2}-\d{2}\.json\.gz$/,
+      );
+      // Only the outcome columns: a whole-entity save wrote back a
+      // `next_backup_at` read before the export and could revert another
+      // replica's claim.
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastBackupStatus: "success",
+          lastBackupError: null,
+        }),
+      );
+      // The bytes are on disk under the reported name, not merely written.
+      expect(
+        await fs.readFile(join(folderFor(), ownArtifact(result)), "utf-8"),
+      ).toBe("gzipped-export");
+    });
+
+    it("writes an .mzbe file when the user has encryption enabled", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.findOne.mockResolvedValue({
+        id: userId,
+        backupEncryptionEnabled: true,
+        backupPasswordEnc: "enc:secret",
+      });
+      // The stored key, not a password: the cron never holds one.
+      const key = {
+        dataKey: Buffer.alloc(32, 1),
+        wrap: Buffer.alloc(76, 2),
+      };
+      mockBackupEncryption.resolveBackupKey.mockResolvedValue({
+        status: "key",
+        key,
+      });
+
+      const result = await service.runManualBackup(userId);
+
+      expect(mockBackupService.exportToBuffer).toHaveBeenCalledWith(
+        userId,
+        key,
+      );
+      expect(result.filename).toMatch(
+        /^monize-backup-daily-\d{4}-\d{2}-\d{2}\.mzbe$/,
+      );
+      expect(await listBackups(folderFor())).toEqual([
+        expect.stringMatching(/\.mzbe$/),
+      ]);
+    });
+
+    it("warns on every unencrypted backup rather than writing one silently", async () => {
+      // Plaintext is a legitimate outcome, never a silent one. Issue #1269 was a
+      // deployment writing plaintext for months while the docs, the release
+      // notes and the Settings screen all said backups were encrypted by
+      // default; the only evidence was the file extension.
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.findOne.mockResolvedValue({
+        id: userId,
+        authProvider: "local",
+        backupEncryptionEnabled: false,
+        backupPasswordEnc: null,
+      });
+      mockBackupEncryption.resolveBackupKey.mockResolvedValue({
+        status: "none",
+      });
+      const warn = jest
+        .spyOn(Logger.prototype, "warn")
+        .mockImplementation(() => undefined);
+
+      try {
+        const result = await service.runManualBackup(userId);
+
+        expect(result.filename).toMatch(/\.json\.gz$/);
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining("unencrypted"),
+        );
+      } finally {
+        warn.mockRestore();
+      }
+    });
+
+    it("throws when encryption is enabled but the stored password cannot be decrypted", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.findOne.mockResolvedValue({
+        id: userId,
+        backupEncryptionEnabled: true,
+        backupPasswordEnc: "enc:bad",
+      });
+      // Cron has no way to recover the password (e.g. master key rotated).
+      mockBackupEncryption.resolveBackupKey.mockResolvedValue({
+        status: "unrecoverable",
+      });
+
+      await expect(service.runManualBackup(userId)).rejects.toThrow(
+        /Re-enable encryption in Security/,
+      );
+      expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+    });
+
+    it("throws when the user row vanishes mid-flight", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockUsersRepo.findOne.mockResolvedValue(null);
+
+      await expect(service.runManualBackup(userId)).rejects.toThrow(
+        /not found/,
+      );
+    });
+  });
+
+  /**
+   * The egress digest (`docs/specs/backup-off-machine.md` section 3, foundation
+   * of INV-BACKUP-005).
+   *
+   * The write path had no integrity record at all: nothing said what the bytes
+   * under a final filename were supposed to be, which is why an off-machine copy
+   * could not be verified and a truncated artifact could not be recognised. The
+   * digest is computed once over the buffer handed to `writeFileAtomic`, and the
+   * claim these tests make is the one that matters downstream -- it is the
+   * SHA-256 of the bytes a reader actually finds on disk, not merely of
+   * something the service held in memory. So they recompute it from the file.
+   */
+  describe("the egress digest of a written artifact", () => {
+    /** The digest and size the service logged for the artifact it just wrote. */
+    const loggedIdentity = (
+      log: jest.SpyInstance,
+    ): { digest: string; sizeBytes: number } => {
+      const line = log.mock.calls
+        .map((call) => String(call[0]))
+        .find((message) => message.includes("Backup written to"));
+      const match = /\(sha256 ([0-9a-f]{64}), (\d+) bytes\)/.exec(line ?? "");
+      if (!match) {
+        throw new Error(`No artifact identity in the log: ${line ?? "(none)"}`);
+      }
+      return { digest: match[1], sizeBytes: Number(match[2]) };
+    };
+
+    it("is the SHA-256 of the bytes that ended up on disk", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      // Not the default fixture's bytes: a digest test whose payload every
+      // other test shares cannot tell "hashed the artifact" from "hashed a
+      // constant this suite happens to write everywhere".
+      const payload = Buffer.concat([
+        Buffer.from("egress-digest-payload-", "utf8"),
+        // Bytes rather than escapes: a NUL and a high byte written into the
+        // source are what `source-bytes.spec.ts` bans, and the artifact under
+        // test is compressed or encrypted, so it is binary either way.
+        Buffer.from([0x00, 0xff]),
+      ]);
+      mockBackupService.exportToBuffer.mockResolvedValue({
+        buffer: payload,
+        report: {
+          complete: true,
+          expectedAttachments: 0,
+          includedAttachments: 0,
+          missingAttachments: 0,
+          inconsistentAttachments: 0,
+        },
+      });
+      const log = jest
+        .spyOn(Logger.prototype, "log")
+        .mockImplementation(() => undefined);
+
+      try {
+        const result = await service.runManualBackup(userId);
+
+        const onDisk = readFileSync(join(folderFor(), ownArtifact(result)));
+        const recomputed = createHash("sha256").update(onDisk).digest("hex");
+        const identity = loggedIdentity(log);
+        expect(identity.digest).toBe(recomputed);
+        expect(identity.sizeBytes).toBe(onDisk.length);
+        // And it is a digest of these bytes specifically, so a future change
+        // that hashed the filename or an empty buffer fails here.
+        expect(identity.digest).toBe(
+          createHash("sha256").update(payload).digest("hex"),
+        );
+      } finally {
+        log.mockRestore();
+      }
+    });
+
+    it("differs when the bytes differ", async () => {
+      // The anti-constant check: two runs of the same user on the same day
+      // produce the same filename, and the digest is what distinguishes the two
+      // artifacts (it is the key's disambiguator off-machine). A digest that did
+      // not move with the bytes would collapse them into one recovery point.
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      const log = jest
+        .spyOn(Logger.prototype, "log")
+        .mockImplementation(() => undefined);
+
+      try {
+        mockBackupService.exportToBuffer.mockResolvedValue({
+          buffer: Buffer.from("first-export"),
+          report: {
+            complete: true,
+            expectedAttachments: 0,
+            includedAttachments: 0,
+            missingAttachments: 0,
+            inconsistentAttachments: 0,
+          },
+        });
+        await service.runManualBackup(userId);
+        const first = loggedIdentity(log);
+
+        log.mockClear();
+        mockBackupService.exportToBuffer.mockResolvedValue({
+          buffer: Buffer.from("second-export-with-an-attachment"),
+          report: {
+            complete: true,
+            expectedAttachments: 0,
+            includedAttachments: 0,
+            missingAttachments: 0,
+            inconsistentAttachments: 0,
+          },
+        });
+        const second = await service.runManualBackup(userId);
+        const secondIdentity = loggedIdentity(log);
+
+        expect(secondIdentity.digest).not.toBe(first.digest);
+        expect(secondIdentity.sizeBytes).not.toBe(first.sizeBytes);
+        expect(secondIdentity.digest).toBe(
+          createHash("sha256")
+            .update(readFileSync(join(folderFor(), ownArtifact(second))))
+            .digest("hex"),
+        );
+      } finally {
+        log.mockRestore();
+      }
+    });
+  });
+
+  /**
+   * The off-machine copy is dispatched from the tail of a run, and only from a
+   * run that produced a complete artifact (INV-BACKUP-003).
+   *
+   * Both halves matter and they fail in opposite directions. Dispatching a
+   * partial artifact would put a backup that cannot be restored in full where an
+   * operator reaches for it in a crisis; letting the dispatch's failure reach
+   * the run would turn a backup that is on disk into one recorded as failed, so
+   * the next window's retention would count one fewer artifact than exists.
+   */
+  describe("the off-machine copy (INV-BACKUP-003)", () => {
+    const dueSettings = () =>
+      createSettings({
+        enabled: true,
+        folderPath: root,
+        nextBackupAt: new Date(Date.now() - 3600000),
+      });
+
+    it("is dispatched after a complete automatic run, with the artifact's own digest", async () => {
+      mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+
+      await service.handleAutoBackupCron();
+
+      expect(mockOffsiteDispatch.dispatchAfterBackup).toHaveBeenCalledTimes(1);
+      const [dispatched] =
+        mockOffsiteDispatch.dispatchAfterBackup.mock.calls[0];
+      const filename = (await listBackups(folderFor()))[0];
+      const onDisk = readFileSync(join(folderFor(), filename));
+      expect(dispatched).toEqual({
+        userId,
+        // The store handle, not a folder string: the dispatcher reads the
+        // artifact back through the same store that wrote it.
+        location: expect.objectContaining({
+          target: "local",
+          display: folderFor(),
+        }),
+        filename,
+        tier: "daily",
+        digest: createHash("sha256").update(onDisk).digest("hex"),
+        sizeBytes: onDisk.length,
+        origin: "automatic",
+      });
+    });
+
+    it("is dispatched only after the run's outcome is durable", async () => {
+      mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+      const order: string[] = [];
+      updateBuilder.execute.mockImplementation(async () => {
+        order.push("outcome");
+        return { affected: 1 };
+      });
+      mockOffsiteDispatch.dispatchAfterBackup.mockImplementation(async () => {
+        order.push("dispatch");
+      });
+
+      await service.handleAutoBackupCron();
+
+      // A copy that preceded the outcome write could be the only record of a
+      // run whose own row never landed.
+      expect(order).toEqual(["outcome", "dispatch"]);
+    });
+
+    it("is dispatched from a manual run too, marked as one", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: root }),
+      );
+
+      await service.runManualBackup(userId);
+
+      expect(
+        mockOffsiteDispatch.dispatchAfterBackup.mock.calls[0][0],
+      ).toMatchObject({ origin: "manual", tier: "daily" });
+    });
+
+    it("is not dispatched for a partial artifact", async () => {
+      mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+      mockBackupService.exportToBuffer.mockResolvedValue({
+        buffer: Buffer.from("incomplete-export"),
+        report: {
+          complete: false,
+          expectedAttachments: 3,
+          includedAttachments: 1,
+          missingAttachments: 2,
+          inconsistentAttachments: 0,
+        },
+      });
+
+      await service.handleAutoBackupCron();
+
+      expect(await listBackups(folderFor())).toEqual([
+        expect.stringMatching(/^monize-backup-partial-/),
+      ]);
+      expect(mockOffsiteDispatch.dispatchAfterBackup).not.toHaveBeenCalled();
+    });
+
+    it("does not let a dispatch rejection change the recorded status", async () => {
+      mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+      // The real service never rejects; this is the double doing what it must
+      // not, so the assertion is about this class's containment rather than the
+      // other's promise.
+      mockOffsiteDispatch.dispatchAfterBackup.mockRejectedValue(
+        new Error("the bucket is on fire"),
+      );
+
+      await expect(service.handleAutoBackupCron()).resolves.toBeUndefined();
+
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastBackupStatus: "success",
+          lastBackupError: null,
+        }),
+      );
+      expect(updateBuilder.set).not.toHaveBeenCalledWith(
+        expect.objectContaining({ lastBackupStatus: "failed" }),
+      );
+      // The artifact is still on disk, which is the whole point of the copy
+      // being a copy.
+      expect(await listBackups(folderFor())).toHaveLength(1);
+    });
+  });
+
+  /**
+   * Every user keeping the default folder wrote
+   * `monize-backup-daily-<date>.json.gz` to the same path, so the second job of
+   * the day replaced the first's artifact -- and retention then enumerated the
+   * whole folder and applied whichever user's counts it was running for. One
+   * replica and two users was enough.
+   */
+  describe("tenant isolation on a shared root", () => {
+    // These tests assert the daily-only artifact set; the suite-wide SUITE_CLOCK
+    // is already a plain day-of-month, so nothing promotes. See runManualBackup.
+    it("writes two users' same-day backups to different files", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ folderPath: root }),
+      );
+      const a = await service.runManualBackup(userId);
+      const b = await service.runManualBackup(otherUserId);
+
+      // Same filename, different directory: the name is date-based by design,
+      // so isolation has to come from the path.
+      expect(a.filename).toBe(b.filename);
+      expect(await listBackups(folderFor())).toEqual([a.filename]);
+      expect(await listBackups(folderFor(otherUserId))).toEqual([b.filename]);
+    });
+
+    it("applies one user's retention only to their own artifacts", async () => {
+      // A keeps 30 days of history; B keeps one.
+      await fs.mkdir(folderFor(), { recursive: true });
+      for (const day of ["01", "02", "03"]) {
+        await fs.writeFile(
+          join(folderFor(), `monize-backup-daily-2026-04-${day}.json.gz`),
+          "A",
+        );
+      }
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          userId: otherUserId,
+          folderPath: root,
+          retentionDaily: 1,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+
+      await service.runManualBackup(otherUserId);
+
+      // B's aggressive retention must not touch A's history.
+      expect(await listBackups(folderFor())).toEqual([
+        "monize-backup-daily-2026-04-01.json.gz",
+        "monize-backup-daily-2026-04-02.json.gz",
+        "monize-backup-daily-2026-04-03.json.gz",
+      ]);
+    });
+  });
+
+  describe("handleAutoBackupCron", () => {
+    // These tests assert the daily-only artifact set; the suite-wide SUITE_CLOCK
+    // is already a plain day-of-month, so nothing promotes. Promotion behaviour
+    // is covered, with its own dates, in the partial-backup and retention
+    // describes below.
+    it("should do nothing if no backups are due", async () => {
+      mockSettingsRepo.find.mockResolvedValue([]);
+
+      await service.handleAutoBackupCron();
+
+      expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+    });
+
+    it("should process due backups and update status", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastBackupStatus: "success",
+          lastBackupError: null,
+        }),
+      );
+      expect(await listBackups(folderFor())).toHaveLength(1);
+      // The schedule was advanced by the claim, not by re-saving the snapshot.
+      const claim = scoped.manager.query.mock.calls.find((call) =>
+        String(call[0]).includes("UPDATE auto_backup_settings"),
+      );
+      expect(claim).toBeDefined();
+      expect(claim![1]![0]).toBeInstanceOf(Date);
+    });
+
+    it("should write under BACKUP_CONTAINER_DIR when a due row has no folder path", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: "",
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(await listBackups(folderFor())).toEqual([
+        expect.stringMatching(/^monize-backup-daily-/),
+      ]);
+    });
+
+    it("keeps two due users' artifacts apart", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          folderPath: root,
+          enabled: true,
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+        createSettings({
+          userId: otherUserId,
+          folderPath: root,
+          enabled: true,
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(await listBackups(folderFor())).toHaveLength(1);
+      expect(await listBackups(folderFor(otherUserId))).toHaveLength(1);
+    });
+
+    it("leaves one artifact and no temp files after two runs on the same day (FV-004)", async () => {
+      // #1061 established that a pid-based temp name is not unique: a manual and a
+      // scheduled backup for the same user, day and extension collide inside one
+      // process, and two replicas sharing a volume can hold the same pid. The
+      // loser's rename then fails with ENOENT -- or its cleanup unlinks the file
+      // the winner is about to rename -- so a run that was going to succeed fails.
+      //
+      // That fix now lives in `atomic-file.ts` (a UUID in the temp name), so what
+      // is checked here is the observable consequence rather than the call: two
+      // runs leave exactly one final artifact, replacing our own same-day file as
+      // intended, and no intermediate file behind.
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: "",
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+      await service.handleAutoBackupCron();
+
+      const left = await listBackups(folderFor());
+      expect(left).toHaveLength(1);
+      expect(left[0]).toMatch(/^monize-backup-daily-/);
+      expect(left.filter((n) => n.startsWith("."))).toEqual([]);
+    });
+
+    it("should mark status as failed on error and continue", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: join(root, "gone"),
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastBackupStatus: "failed",
+          lastBackupError: expect.any(String),
+        }),
+      );
+    });
+
+    it("raises a BACKUP_FAILED admin alert beside the failure row -- the row alone notified nobody", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: join(root, "gone"),
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSystemAlerts.raiseAdminAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "BACKUP_FAILED",
+          severity: "critical",
+          dedupeKey: expect.stringMatching(
+            new RegExp(`^BACKUP_FAILED:${userId}:\\d{4}-\\d{2}-\\d{2}$`),
+          ),
+          data: expect.objectContaining({
+            system: true,
+            affectedUserId: userId,
+            error: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it("keeps sweeping the remaining users after raising one user's failure alert", async () => {
+      // Two due users; the first one's folder cannot exist. The alert raise is
+      // inside the per-user try, and the (never-throwing) alert service must
+      // not stop user two's backup either way.
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: join(root, "gone"),
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+        createSettings({
+          userId: otherUserId,
+          enabled: true,
+          folderPath: "",
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(await listBackups(folderFor(otherUserId))).toHaveLength(1);
+      expect(mockSystemAlerts.raiseAdminAlert).toHaveBeenCalledTimes(1);
+    });
+
+    describe("multi-replica coordination", () => {
+      function dueSettings() {
+        return createSettings({
+          enabled: true,
+          folderPath: root,
+          nextBackupAt: new Date(Date.now() - 3600000),
+        });
+      }
+
+      it("claims the window by advancing next_backup_at, guarded on it still being due", async () => {
+        mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+
+        await service.handleAutoBackupCron();
+
+        const [sql, params] = scoped.manager.query.mock.calls.find((call) =>
+          String(call[0]).includes("UPDATE auto_backup_settings"),
+        )!;
+        expect(sql).toContain("next_backup_at <= $3");
+        expect(sql).toContain("enabled = true");
+        expect(params).toHaveLength(3);
+      });
+
+      it("returns a column this table actually has", async () => {
+        // The regression: the claim ended `RETURNING id`, and
+        // `auto_backup_settings` has no `id` -- `user_id` is its primary key.
+        // Postgres raised 42703 out of `claimDueBackup`, which runs before the
+        // per-user `try`, so the whole sweep aborted on the first due user and
+        // nothing was even recorded as failed.
+        //
+        // This assertion is deliberately not `toContain("RETURNING user_id")`:
+        // the previous one was `toContain("RETURNING id")`, and a mocked
+        // `manager.query` cannot tell a real column from a plausible one. The
+        // column is checked against `database/schema.sql`, and the tree-wide
+        // version of the same check is
+        // `backend/src/common/db/raw-sql-columns.spec.ts`.
+        const schema = parseSchemaColumns(
+          readFileSync(
+            join(__dirname, "..", "..", "..", "database", "schema.sql"),
+            "utf8",
+          ),
+        );
+        mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+        await service.handleAutoBackupCron();
+        const claimSql = String(
+          scoped.manager.query.mock.calls.find((call) =>
+            String(call[0]).includes("UPDATE auto_backup_settings"),
+          )![0],
+        );
+        const claims = statementClaims(claimSql).flatMap(
+          (statement) => statement.claims,
+        );
+        expect(claims).toContainEqual({
+          table: "auto_backup_settings",
+          column: "user_id",
+          clause: "RETURNING",
+        });
+        expect(
+          claims
+            .map((claim) => columnProblem(claim, schema))
+            .filter((problem) => problem !== null),
+        ).toEqual([]);
+      });
+
+      it("runs the users after one whose claim throws", async () => {
+        // The regression this pairs with: `RETURNING id` raised 42703 from
+        // inside `claimDueBackup`, which sat *outside* the per-user try, so the
+        // throw left `handleAutoBackupCron` entirely. Every user after the
+        // first due one was skipped, hour after hour, and none of them was even
+        // recorded as failed -- the settings page showed the last successful
+        // run from before the deploy.
+        mockSettingsRepo.find.mockResolvedValue([
+          dueSettings(),
+          createSettings({
+            userId: otherUserId,
+            folderPath: root,
+            enabled: true,
+            nextBackupAt: new Date(Date.now() - 3600000),
+          }),
+        ]);
+        scoped.manager.query
+          .mockRejectedValueOnce(new Error('column "id" does not exist'))
+          .mockResolvedValue([[{ user_id: otherUserId }], 1]);
+
+        await service.handleAutoBackupCron();
+
+        expect(await listBackups(folderFor())).toHaveLength(0);
+        expect(await listBackups(folderFor(otherUserId))).toHaveLength(1);
+        // And the user whose window failed is told so, rather than being left
+        // showing the last run that worked.
+        expect(updateBuilder.set).toHaveBeenCalledWith(
+          expect.objectContaining({
+            lastBackupStatus: "failed",
+            lastBackupError: expect.stringContaining("does not exist"),
+          }),
+        );
+      });
+
+      it("runs the users after one whose maintenance pre-check throws", async () => {
+        // The pre-check was outside the try as well, and it reads two other
+        // tables -- so the same one-user-ends-the-sweep failure was reachable
+        // without any backup being attempted at all.
+        mockSettingsRepo.find.mockResolvedValue([
+          dueSettings(),
+          createSettings({
+            userId: otherUserId,
+            folderPath: root,
+            enabled: true,
+            nextBackupAt: new Date(Date.now() - 3600000),
+          }),
+        ]);
+        maintenance.isUnderMaintenance
+          .mockRejectedValueOnce(new Error("db down"))
+          .mockResolvedValue(false);
+
+        await service.handleAutoBackupCron();
+
+        expect(await listBackups(folderFor(otherUserId))).toHaveLength(1);
+      });
+
+      it("continues when recording the failure fails too", async () => {
+        // The outcome write is a database call, so whatever broke the backup can
+        // break the recording of it. Throwing from the recorder would put the
+        // sweep back where it started.
+        mockSettingsRepo.find.mockResolvedValue([
+          dueSettings(),
+          createSettings({
+            userId: otherUserId,
+            folderPath: root,
+            enabled: true,
+            nextBackupAt: new Date(Date.now() - 3600000),
+          }),
+        ]);
+        scoped.manager.query
+          .mockRejectedValueOnce(new Error("claim failed"))
+          .mockResolvedValue([[{ user_id: otherUserId }], 1]);
+        updateBuilder.execute.mockRejectedValueOnce(new Error("write failed"));
+
+        await expect(service.handleAutoBackupCron()).resolves.toBeUndefined();
+
+        expect(await listBackups(folderFor(otherUserId))).toHaveLength(1);
+      });
+
+      it("exports nothing when another replica claimed the window", async () => {
+        // The regression: every replica fires this cron, so with no claim a
+        // two-replica cluster writes each user's backup twice -- and one
+        // replica's retention sweep can delete the file the other is writing.
+        mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+        scoped.manager.query.mockResolvedValue([[], 0]);
+
+        await service.handleAutoBackupCron();
+
+        expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+        expect(updateBuilder.execute).not.toHaveBeenCalled();
+      });
+
+      it("does not read a claim result as a win just because the driver returned a tuple", async () => {
+        // `[rows, rowCount]` has length 2 whatever happened, so an open-coded
+        // `result.length > 0` would make every replica a winner.
+        mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+        scoped.manager.query.mockResolvedValue([[], 0]);
+
+        await service.handleAutoBackupCron();
+
+        expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+      });
+
+      it("defers, without claiming, while the user's data is being replaced", async () => {
+        // A `.mny` import with "start fresh" commits its wipe and then writes
+        // rows for minutes. Backing up in that window saves the empty dataset as
+        // today's file and then enforces retention -- rotating the last good
+        // backup out to make room for one containing nothing (DR-04-02).
+        mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+        maintenance.isUnderMaintenance.mockResolvedValue(true);
+
+        await service.handleAutoBackupCron();
+
+        expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+        // Not claimed, so next_backup_at stays in the past and the next hour
+        // retries rather than skipping the whole period.
+        const claim = scoped.manager.query.mock.calls.find((call) =>
+          String(call[0]).includes("UPDATE auto_backup_settings"),
+        );
+        expect(claim).toBeUndefined();
+      });
+
+      it("does not enforce retention while deferring", async () => {
+        // Retention runs inside the backup path, so deferring has to skip it
+        // too: pruning to N files without having written a new one loses a
+        // generation for nothing.
+        mockSettingsRepo.find.mockResolvedValue([
+          createSettings({
+            enabled: true,
+            folderPath: root,
+            nextBackupAt: new Date(Date.now() - 3600000),
+            retentionDaily: 1,
+          }),
+        ]);
+        await fs.mkdir(folderFor(), { recursive: true });
+        const existing = [
+          "monize-backup-daily-2026-04-01.json.gz",
+          "monize-backup-daily-2026-04-02.json.gz",
+        ];
+        for (const name of existing) {
+          await fs.writeFile(join(folderFor(), name), "x");
+        }
+        maintenance.isUnderMaintenance.mockResolvedValue(true);
+
+        await service.handleAutoBackupCron();
+
+        // retentionDaily=1 would prune to a single file if the backup path had
+        // run; deferring skips it, so both pre-existing dailies survive.
+        expect((await listBackups(folderFor())).sort()).toEqual(existing);
+      });
+
+      it("writes only the outcome columns, never the whole snapshot", async () => {
+        // `repo.save(settings)` would write back the folder, frequency and
+        // retention this sweep read minutes ago, reverting anything the user
+        // changed in the meantime.
+        mockSettingsRepo.find.mockResolvedValue([dueSettings()]);
+
+        await service.handleAutoBackupCron();
+
+        expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+        const written = Object.keys(updateBuilder.set.mock.calls[0][0]);
+        expect(written.sort()).toEqual([
+          "lastBackupAt",
+          "lastBackupError",
+          "lastBackupStatus",
+        ]);
+      });
+    });
+  });
+
+  /**
+   * F3R7-001: an incomplete backup is written (the ledger is captured) but never
+   * promoted or used for retention, so it cannot displace or age out a complete
+   * copy, and its status is `partial` rather than `success`.
+   */
+  describe("a partial backup (some attachment bytes could not be included)", () => {
+    beforeEach(() => {
+      mockBackupService.exportToBuffer.mockResolvedValue({
+        buffer: Buffer.from("gzipped-export"),
+        report: {
+          complete: false,
+          expectedAttachments: 3,
+          includedAttachments: 2,
+          missingAttachments: 1,
+          inconsistentAttachments: 0,
+        },
+      });
+    });
+
+    it("publishes it under its own tier name, never a daily one", async () => {
+      storePolicy({ enabled: true, folderPath: root });
+
+      const result = await service.runManualBackup(userId);
+
+      expect(result.filename).toMatch(
+        /^monize-backup-partial-\d{4}-\d{2}-\d{2}\.json\.gz$/,
+      );
+      expect(await listBackups(folderFor())).toEqual([result.filename]);
+    });
+
+    async function seed(names: string[]): Promise<void> {
+      await fs.mkdir(folderFor(), { recursive: true });
+      for (const name of names) {
+        await fs.writeFile(join(folderFor(), name), "x");
+      }
+    }
+
+    it("records `partial` status, not success, and explains why", async () => {
+      storePolicy({ enabled: true, folderPath: root });
+
+      const result = await service.runManualBackup(userId);
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ lastBackupStatus: "partial" }),
+      );
+      const calls = mockSettingsRepo.save.mock.calls;
+      const saved = calls[calls.length - 1][0];
+      expect(saved.lastBackupError).toMatch(/attachment/i);
+      expect(result.message).toMatch(/not promoted|not.*retention|attachment/i);
+    });
+
+    it("still writes the artifact so the ledger is captured", async () => {
+      storePolicy({ enabled: true, folderPath: root });
+
+      const result = await service.runManualBackup(userId);
+
+      expect(
+        await fs.readFile(join(folderFor(), ownArtifact(result)), "utf-8"),
+      ).toBe("gzipped-export");
+    });
+
+    it("raises a BACKUP_PARTIAL admin alert naming the attachments reason and the counts", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSystemAlerts.raiseAdminAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "BACKUP_PARTIAL",
+          severity: "warning",
+          dedupeKey: expect.stringMatching(
+            new RegExp(
+              `^BACKUP_PARTIAL:${userId}:attachments:\\d{4}-\\d{2}-\\d{2}$`,
+            ),
+          ),
+          data: expect.objectContaining({
+            system: true,
+            affectedUserId: userId,
+            reason: "attachments",
+            missingAttachments: 1,
+            expectedAttachments: 3,
+          }),
+        }),
+      );
+    });
+
+    it("raises nothing for a manual Back up now -- the caller is reading the result", async () => {
+      // The manual path shares applyBackupOutcome, so before the origin
+      // argument a "Back up now" filed an admin alert titled "Automatic
+      // backup incomplete", took that day's dedupe key (silencing the real
+      // automatic failure behind it), and made the HTTP request wait on a
+      // per-administrator SMTP fan-out after the backup had succeeded.
+      storePolicy({ enabled: true, folderPath: root });
+
+      const result = await service.runManualBackup(userId);
+
+      expect(mockSystemAlerts.raiseAdminAlert).not.toHaveBeenCalled();
+      // The caller is still told, in the response they are waiting on.
+      expect(result.message).toMatch(/attachment/i);
+    });
+
+    it("does not run retention, so complete copies past the window survive", async () => {
+      storePolicy({
+        enabled: true,
+        folderPath: root,
+        retentionDaily: 1,
+        retentionWeekly: 0,
+        retentionMonthly: 0,
+      });
+      // Three complete dailies already on disk, retention set to keep 1.
+      await seed([
+        "monize-backup-daily-2026-04-01.json.gz",
+        "monize-backup-daily-2026-04-02.json.gz",
+        "monize-backup-daily-2026-04-03.json.gz",
+      ]);
+
+      await service.runManualBackup(userId);
+
+      // A complete backup would have deleted the two oldest; a partial must not.
+      const remaining = await listBackups(folderFor());
+      expect(remaining).toContain("monize-backup-daily-2026-04-01.json.gz");
+      expect(remaining).toContain("monize-backup-daily-2026-04-02.json.gz");
+      expect(remaining).toContain("monize-backup-daily-2026-04-03.json.gz");
+    });
+
+    it("does not promote a partial to weekly or monthly", async () => {
+      // Day 7 would normally trigger a weekly promotion.
+      await withClockAt("2026-04-07T12:00:00Z", async () => {
+        storePolicy({ enabled: true, folderPath: root });
+
+        await service.runManualBackup(userId);
+
+        const remaining = await listBackups(folderFor());
+        expect(remaining.some((n) => n.includes("weekly"))).toBe(false);
+        expect(remaining.some((n) => n.includes("monthly"))).toBe(false);
+      });
+    });
+
+    it("the cron records partial and preserves complete copies too", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 1,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+          nextBackupAt: new Date("2000-01-01"),
+        }),
+      ]);
+      await seed([
+        "monize-backup-daily-2026-04-01.json.gz",
+        "monize-backup-daily-2026-04-02.json.gz",
+      ]);
+
+      await service.handleAutoBackupCron();
+
+      // The cron records the outcome with a targeted UPDATE (recordBackupOutcome),
+      // not a whole-row repo.save, so a concurrent settings edit is never reverted.
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({ lastBackupStatus: "partial" }),
+      );
+      const remaining = await listBackups(folderFor());
+      expect(remaining).toContain("monize-backup-daily-2026-04-01.json.gz");
+      expect(remaining).toContain("monize-backup-daily-2026-04-02.json.gz");
+    });
+
+    it("a later complete backup resumes normal promotion and retention", async () => {
+      storePolicy({
+        enabled: true,
+        folderPath: root,
+        retentionDaily: 1,
+        retentionWeekly: 0,
+        retentionMonthly: 0,
+      });
+      await seed([
+        "monize-backup-daily-2026-04-01.json.gz",
+        "monize-backup-daily-2026-04-02.json.gz",
+      ]);
+      // First run partial: everything preserved.
+      await service.runManualBackup(userId);
+      expect(await listBackups(folderFor())).toContain(
+        "monize-backup-daily-2026-04-01.json.gz",
+      );
+
+      // Storage recovers; the next backup is complete and retention runs.
+      mockBackupService.exportToBuffer.mockResolvedValue({
+        buffer: Buffer.from("gzipped-export"),
+        report: {
+          complete: true,
+          expectedAttachments: 3,
+          includedAttachments: 3,
+          missingAttachments: 0,
+          inconsistentAttachments: 0,
+        },
+      });
+      await service.runManualBackup(userId);
+
+      const remaining = await listBackups(folderFor());
+      expect(remaining).not.toContain("monize-backup-daily-2026-04-01.json.gz");
+      expect(mockSettingsRepo.save).toHaveBeenLastCalledWith(
+        expect.objectContaining({ lastBackupStatus: "success" }),
+      );
+    });
+  });
+
+  /**
+   * F3RB-001 (issue #1069): a partial artifact used to be published under the
+   * ordinary `daily-<date>` name and only afterwards *recorded* as partial, in
+   * the settings row -- so it replaced that day's complete artifact before
+   * anything looked at completeness, and every later retention pass counted it
+   * as a complete daily. With `retentionDaily = 3`, three complete recovery
+   * points could become one.
+   *
+   * These tests assert on the artifacts' **bytes**, not on their names. A name
+   * is what the previous design got wrong, so a suite that reads names to decide
+   * which artifact survived would be asking the defect to grade itself.
+   */
+  describe("promotion and retention failures become admin alerts", () => {
+    // These paths have no durable state of their own: the daily artifact is
+    // complete, `lastBackupStatus` rightly stays "success", and before the
+    // alert a failed weekly copy or a stuck delete was one `logger.warn`
+    // nobody saw. The helpers report their failure as a return value, and
+    // `applyBackupOutcome` turns it into a BACKUP_PARTIAL alert with the
+    // reason -- spied here because a real copy/unlink failure needs
+    // filesystem permissions the suite cannot portably arrange.
+
+    beforeEach(() => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          nextBackupAt: new Date(Date.now() - 3600000),
+        }),
+      ]);
+    });
+
+    it("a failed weekly/monthly copy raises reason 'promotion' while the status stays success", async () => {
+      jest
+        .spyOn(
+          service as unknown as {
+            copyToWeeklyIfNeeded: () => Promise<string | null>;
+          },
+          "copyToWeeklyIfNeeded",
+        )
+        .mockResolvedValue("weekly: EACCES: permission denied");
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSystemAlerts.raiseAdminAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "BACKUP_PARTIAL",
+          dedupeKey: expect.stringContaining(
+            `BACKUP_PARTIAL:${userId}:promotion:`,
+          ),
+          data: expect.objectContaining({ reason: "promotion" }),
+        }),
+      );
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({ lastBackupStatus: "success" }),
+      );
+    });
+
+    it("a failed retention delete raises reason 'retention' naming the stuck file", async () => {
+      jest
+        .spyOn(
+          service as unknown as { enforceRetention: () => string[] },
+          "enforceRetention",
+        )
+        .mockReturnValue([
+          "monize-backup-daily-2026-04-01.json.gz: EACCES: permission denied",
+        ]);
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSystemAlerts.raiseAdminAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "BACKUP_PARTIAL",
+          dedupeKey: expect.stringContaining(
+            `BACKUP_PARTIAL:${userId}:retention:`,
+          ),
+          data: expect.objectContaining({
+            reason: "retention",
+            error: expect.stringContaining(
+              "monize-backup-daily-2026-04-01.json.gz",
+            ),
+          }),
+        }),
+      );
+      expect(updateBuilder.set).toHaveBeenCalledWith(
+        expect.objectContaining({ lastBackupStatus: "success" }),
+      );
+    });
+
+    it("a clean complete run raises nothing", async () => {
+      await service.handleAutoBackupCron();
+      expect(mockSystemAlerts.raiseAdminAlert).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("a partial artifact never displaces or ages out a complete one", () => {
+    const COMPLETE = {
+      complete: true,
+      expectedAttachments: 3,
+      includedAttachments: 3,
+      missingAttachments: 0,
+      inconsistentAttachments: 0,
+    };
+    const PARTIAL = {
+      complete: false,
+      expectedAttachments: 3,
+      includedAttachments: 2,
+      missingAttachments: 1,
+      inconsistentAttachments: 0,
+    };
+
+    /** The next export produces exactly `content`, complete or not. */
+    function nextExport(content: string, complete: boolean): void {
+      mockBackupService.exportToBuffer.mockResolvedValueOnce({
+        buffer: Buffer.from(content),
+        report: complete ? COMPLETE : PARTIAL,
+      });
+    }
+
+    /** An artifact already on disk when this run starts. */
+    async function put(name: string, content: string): Promise<void> {
+      await fs.mkdir(folderFor(), { recursive: true });
+      await fs.writeFile(join(folderFor(), name), content);
+    }
+
+    /** The bytes under `name`, or `null` when nothing is there. */
+    async function read(name: string): Promise<string | null> {
+      try {
+        return await fs.readFile(join(folderFor(), name), "utf-8");
+      } catch {
+        return null;
+      }
+    }
+
+    /** What every artifact in the user's folder currently holds. */
+    async function contents(): Promise<Record<string, string>> {
+      const names = await listBackups(folderFor());
+      const entries = await Promise.all(
+        names.map(async (name) => [name, await read(name)] as const),
+      );
+      return Object.fromEntries(entries) as Record<string, string>;
+    }
+
+    it("a same-day partial run leaves the complete artifact's bytes intact", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+
+      nextExport("complete-02:00", true);
+      const complete = await service.runManualBackup(userId);
+      nextExport("partial-08:00", false);
+      const partial = await service.runManualBackup(userId);
+
+      expect(partial.filename).not.toBe(complete.filename);
+      // The whole of the defect: this used to read "partial-08:00".
+      expect(await read(ownArtifact(complete))).toBe("complete-02:00");
+      expect(await read(ownArtifact(partial))).toBe("partial-08:00");
+    });
+
+    it("every6hours: an 08:00 partial cron run does not replace the 02:00 complete one", async () => {
+      mockSettingsRepo.find.mockResolvedValue([
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          frequency: "every6hours",
+          nextBackupAt: new Date("2000-01-01"),
+        }),
+      ]);
+
+      nextExport("complete-02:00", true);
+      await service.handleAutoBackupCron();
+      nextExport("partial-08:00", false);
+      await service.handleAutoBackupCron();
+
+      expect(await contents()).toEqual({
+        "monize-backup-daily-2026-04-15.json.gz": "complete-02:00",
+        "monize-backup-partial-2026-04-15.json.gz": "partial-08:00",
+      });
+    });
+
+    it("keeps retentionDaily complete recovery points across a run of partial days", async () => {
+      // The issue's worked example: days 1-3 complete, days 4-6 partial, a
+      // complete backup on day 7 running retention with `retentionDaily = 3`.
+      // Under the defect the three partial days occupied the three daily slots
+      // and every complete artifact was deleted.
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 3,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await put("monize-backup-daily-2026-04-01.json.gz", "complete-day-1");
+      await put("monize-backup-daily-2026-04-02.json.gz", "complete-day-2");
+      await put("monize-backup-daily-2026-04-03.json.gz", "complete-day-3");
+
+      for (const day of ["04", "05", "06"]) {
+        await withClockAt(`2026-04-${day}T02:00:00Z`, async () => {
+          nextExport(`partial-day-${day}`, false);
+          await service.runManualBackup(userId);
+        });
+      }
+      await withClockAt("2026-04-10T02:00:00Z", async () => {
+        nextExport("complete-day-10", true);
+        await service.runManualBackup(userId);
+      });
+
+      // Three complete recovery points, judged by what the files hold rather
+      // than by what they are called.
+      const onDisk = await contents();
+      const complete = Object.values(onDisk).filter((body) =>
+        body.startsWith("complete-"),
+      );
+      expect(complete.sort()).toEqual([
+        "complete-day-10",
+        "complete-day-2",
+        "complete-day-3",
+      ]);
+      // ...and the three partial days are all still there, kept to their own
+      // count in their own tier. Neither number is spent on the other's
+      // artifacts: three complete recovery points and three partial ones.
+      expect(
+        Object.values(onDisk)
+          .filter((body) => body.startsWith("partial-"))
+          .sort(),
+      ).toEqual(["partial-day-04", "partial-day-05", "partial-day-06"]);
+    });
+
+    it("classifies artifacts on a rescan, with no settings row to consult", async () => {
+      // Completeness has to live in the artifact's identity, because the state
+      // that used to hold it does not survive a restart, a copied file or a
+      // directory somebody else mounted. A fresh service instance and a settings
+      // row that remembers nothing must sweep both tiers correctly from the
+      // listing alone.
+      await put("monize-backup-daily-2026-04-01.json.gz", "complete-day-1");
+      await put("monize-backup-daily-2026-04-02.json.gz", "complete-day-2");
+      await put("monize-backup-partial-2026-04-03.json.gz", "partial-day-3");
+      await put("monize-backup-partial-2026-04-04.json.gz", "partial-day-4");
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 1,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+          lastBackupStatus: null,
+        }),
+      );
+
+      const restarted = await createService();
+      nextExport("complete-today", true);
+      await restarted.runManualBackup(userId);
+
+      expect(await contents()).toEqual({
+        "monize-backup-daily-2026-04-15.json.gz": "complete-today",
+        "monize-backup-partial-2026-04-04.json.gz": "partial-day-4",
+      });
+    });
+
+    it("publishes a complete and a partial run concurrently without either losing", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+      nextExport("complete-bytes", true);
+      nextExport("partial-bytes", false);
+
+      await Promise.all([
+        service.runManualBackup(userId),
+        service.runManualBackup(userId),
+      ]);
+
+      // Two replicas, or a manual run beside a cron one: sharing one filename
+      // made the outcome a race whose loser was a whole recovery point.
+      expect(await contents()).toEqual({
+        "monize-backup-daily-2026-04-15.json.gz": "complete-bytes",
+        "monize-backup-partial-2026-04-15.json.gz": "partial-bytes",
+      });
+    });
+
+    it("leaves a promoted weekly copy alone when a later partial run follows", async () => {
+      // Derived from the service's own promotion calendar rather than hardcoded,
+      // for the reason the suite-clock guard above exists.
+      const weeklyDay = String(WEEKLY_DAYS[0]).padStart(2, "0");
+      await withClockAt(`2026-04-${weeklyDay}T02:00:00Z`, async () => {
+        mockSettingsRepo.findOne.mockResolvedValue(
+          createSettings({ enabled: true, folderPath: root }),
+        );
+        nextExport("complete-promoted", true);
+        await service.runManualBackup(userId);
+        nextExport("partial-later", false);
+        await service.runManualBackup(userId);
+
+        expect(await contents()).toEqual({
+          [`monize-backup-daily-2026-04-${weeklyDay}.json.gz`]:
+            "complete-promoted",
+          [`monize-backup-weekly-2026-04-${weeklyDay}.json.gz`]:
+            "complete-promoted",
+          [`monize-backup-partial-2026-04-${weeklyDay}.json.gz`]:
+            "partial-later",
+        });
+      });
+    });
+
+    it("a partial run bounds older partial artifacts and no complete ones", async () => {
+      // The other half of giving partials a tier: they must not accumulate
+      // without bound while storage is broken. The only thing a partial run may
+      // delete is an older partial.
+      await put("monize-backup-daily-2026-04-01.json.gz", "complete-day-1");
+      await put("monize-backup-daily-2026-04-02.json.gz", "complete-day-2");
+      await put("monize-backup-partial-2026-04-03.json.gz", "partial-day-3");
+      await put("monize-backup-partial-2026-04-04.json.gz", "partial-day-4");
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 1,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+
+      nextExport("partial-today", false);
+      await service.runManualBackup(userId);
+
+      expect(await contents()).toEqual({
+        "monize-backup-daily-2026-04-01.json.gz": "complete-day-1",
+        "monize-backup-daily-2026-04-02.json.gz": "complete-day-2",
+        "monize-backup-partial-2026-04-15.json.gz": "partial-today",
+      });
+    });
+  });
+
+  /**
+   * The policy is deployment state, so it must survive every account operation.
+   * It used to live on the earliest active administrator's own settings row,
+   * where deactivating or demoting that account handed the policy to whichever
+   * administrator was next -- usually one with no row, so the whole deployment
+   * silently reverted to the built-in defaults -- and restoring their personal
+   * backup replayed a months-old policy over every account.
+   */
+  describe("the policy is the deployment's, not an account's", () => {
+    it("does not read any user to decide whose policy this is", async () => {
+      storePolicy({ enabled: true, folderPath: root, frequency: "weekly" });
+      mockUsersRepo.findOne.mockClear();
+
+      const result = await service.getSettings(userId);
+
+      expect(result.frequency).toBe("weekly");
+      // No "who is the primary administrator" lookup exists to go stale.
+      expect(mockUsersRepo.findOne).not.toHaveBeenCalled();
+    });
+
+    it("is not exported with an account's backup, so a restore cannot replay it", () => {
+      // The table has no user_id to export it under, and excluding it is what
+      // stops one account's restore rewriting the deployment's schedule.
+      expect(INTENTIONALLY_EXCLUDED_TABLES.has("auto_backup_policy")).toBe(
+        true,
+      );
+    });
+  });
+
+  describe("the manual fan-out claim", () => {
+    it("refuses a second run while one is already walking every account", async () => {
+      // The claim's conditional UPDATE matched no row: somebody holds it.
+      scoped.manager.query.mockImplementation((sql: string) =>
+        Promise.resolve(
+          typeof sql === "string" && sql.includes("auto_backup_policy")
+            ? [[], 0]
+            : [[{ user_id: userId }], 1],
+        ),
+      );
+
+      await expect(service.runManualBackup(userId)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(mockBackupService.exportToBuffer).not.toHaveBeenCalled();
+    });
+
+    it("releases the claim when the run throws", async () => {
+      storePolicy({ enabled: true, folderPath: root });
+      mockBackupService.exportToBuffer.mockRejectedValue(
+        new Error("export blew up"),
+      );
+
+      await expect(service.runManualBackup(userId)).rejects.toThrow(
+        /export blew up/,
+      );
+
+      // A claim a failed run kept would block every later one until it aged
+      // out.
+      const released = scoped.manager.query.mock.calls.some(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("UPDATE auto_backup_policy") &&
+          sql.includes("manual_run_claimed_at = NULL"),
+      );
+      expect(released).toBe(true);
+    });
+  });
+
+  describe("policy reconciliation", () => {
+    const otherUserId = "77777777-7777-7777-7777-777777777777";
+
+    /**
+     * Reconciliation reads the settings rows of the accounts it found; the
+     * due-backup fan-out reads the enabled rows that are due. Both go
+     * through `find`, so answer them by their `where` clause.
+     */
+    function settingsFind({
+      managed = [],
+      due = [],
+    }: {
+      managed?: AutoBackupSettings[];
+      due?: AutoBackupSettings[];
+    }) {
+      mockSettingsRepo.find.mockImplementation((options) =>
+        Promise.resolve("userId" in (options?.where ?? {}) ? managed : due),
+      );
+    }
+
+    it("enrolls a non-admin user who has no settings row", async () => {
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({});
+
+      await service.handleAutoBackupCron();
+
+      // Automatic backups are not something a non-admin can switch on, so
+      // nothing would ever back them up unless this did.
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: otherUserId,
+          enabled: true,
+          folderPath: root,
+          frequency: "daily",
+          backupTime: "02:00",
+          retentionDaily: 7,
+          retentionWeekly: 4,
+          retentionMonthly: 6,
+          nextBackupAt: expect.any(Date),
+        }),
+      );
+    });
+
+    it("sweeps every active account, administrators included", async () => {
+      mockUsersRepo.find.mockResolvedValue([]);
+
+      await service.handleAutoBackupCron();
+
+      // A deactivated account is not backed up; every active one is. The role
+      // is deliberately NOT part of the filter any more: a second
+      // administrator used to be excluded here and enrolled by nothing, so
+      // unless they opened the settings screen themselves their data was never
+      // backed up at all.
+      expect(mockUsersRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { isActive: true } }),
+      );
+    });
+
+    it("enrols the administrator too -- there is no excepted account", async () => {
+      // Two exceptions have been made here and both cost somebody their
+      // backups: every administrator, and then the account the policy was
+      // stored on. The second left an operator who had never pressed Save the
+      // one account the policy did not reach, while the screen counted them as
+      // covered.
+      mockUsersRepo.find.mockResolvedValue([{ id: userId }]);
+      settingsFind({});
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId,
+          enabled: true,
+          nextBackupAt: expect.any(Date),
+        }),
+      );
+    });
+
+    it("writes nothing for an account whose row already matches the policy", async () => {
+      const settled = createSettings({
+        enabled: true,
+        folderPath: root,
+        nextBackupAt: new Date("2026-04-16T02:00:00Z"),
+      });
+      settled.userId = otherUserId;
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({ managed: [settled] });
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+      expect(scoped.manager.query).not.toHaveBeenCalledWith(
+        expect.stringContaining("UPDATE auto_backup_settings\n            SET"),
+        expect.anything(),
+      );
+    });
+
+    it("re-arms every account when the operator moves the backup time", async () => {
+      // Carrying the old next_backup_at forward runs the next backup on the
+      // schedule the operator just replaced -- up to a week late on `weekly` --
+      // and leaves the status line contradicting the form that set it.
+      const armed = createSettings({
+        enabled: true,
+        folderPath: root,
+        backupTime: "02:00",
+        nextBackupAt: new Date("2026-04-16T02:00:00Z"),
+      });
+      armed.userId = otherUserId;
+      storePolicy({ enabled: true, folderPath: root, backupTime: "23:00" });
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({ managed: [armed] });
+
+      await service.handleAutoBackupCron();
+
+      const update = scoped.manager.query.mock.calls.find(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("UPDATE auto_backup_settings") &&
+          sql.includes("retention_daily"),
+      );
+      expect(update).toBeDefined();
+      const params = update?.[1] as unknown[];
+      // Re-armed, at the time that was actually asked for.
+      expect(params[10]).toBe(true);
+      expect((params[9] as Date).getUTCHours()).toBe(23);
+    });
+
+    it("leaves the schedule alone when only retention moved", async () => {
+      // The other half of the same rule: disturbing next_backup_at for a change
+      // that does not decide when the next run is would revert a claim for
+      // nothing.
+      const armed = createSettings({
+        enabled: true,
+        folderPath: root,
+        retentionDaily: 7,
+        nextBackupAt: new Date("2026-04-16T02:00:00Z"),
+      });
+      armed.userId = otherUserId;
+      storePolicy({ enabled: true, folderPath: root, retentionDaily: 30 });
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({ managed: [armed] });
+
+      await service.handleAutoBackupCron();
+
+      const update = scoped.manager.query.mock.calls.find(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("UPDATE auto_backup_settings") &&
+          sql.includes("retention_daily"),
+      );
+      const params = update?.[1] as unknown[];
+      expect(params[10]).toBe(false);
+      expect(update?.[0]).toContain("COALESCE(next_backup_at,");
+    });
+
+    it("never overwrites a next_backup_at another replica may have claimed", async () => {
+      // `next_backup_at` is the cron's claim. A whole-entity save wrote it back
+      // from a snapshot read before the loop, so a replica that had just
+      // claimed a window and begun exporting would have the claim reverted
+      // under it and the account backed up twice. The armed path only fills in
+      // a row that has none.
+      const drifted = createSettings({
+        enabled: true,
+        folderPath: root,
+        retentionDaily: 99,
+        nextBackupAt: new Date("2026-04-16T02:00:00Z"),
+      });
+      drifted.userId = otherUserId;
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({ managed: [drifted] });
+
+      await service.handleAutoBackupCron();
+
+      const update = scoped.manager.query.mock.calls.find(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("UPDATE auto_backup_settings") &&
+          sql.includes("retention_daily"),
+      );
+      expect(update).toBeDefined();
+      // COALESCE, not an assignment: a held claim survives.
+      expect(update?.[0]).toContain("COALESCE(next_backup_at,");
+      // And the row is not rewritten wholesale.
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+
+    it("reconciles every account onto the administrator's stored policy, not the hardcoded defaults", async () => {
+      // The defect this closes: the schedule, folder and retention an operator
+      // chose governed their own row and nothing else, while the screen said it
+      // was configuring the deployment.
+      storePolicy({
+        enabled: true,
+        folderPath: root,
+        frequency: "every6hours",
+        backupTime: "23:30",
+        retentionDaily: 30,
+        retentionWeekly: 12,
+        retentionMonthly: 24,
+      });
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({});
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: otherUserId,
+          enabled: true,
+          frequency: "every6hours",
+          backupTime: "23:30",
+          retentionDaily: 30,
+          retentionWeekly: 12,
+          retentionMonthly: 24,
+        }),
+      );
+    });
+
+    it("disarms every account when the policy is disabled", async () => {
+      storePolicy({ enabled: false, folderPath: root });
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      const armed = createSettings({
+        enabled: true,
+        folderPath: root,
+        nextBackupAt: new Date("2026-04-16T02:00:00Z"),
+      });
+      armed.userId = otherUserId;
+      settingsFind({ managed: [armed] });
+
+      await service.handleAutoBackupCron();
+
+      // Leaving the old `next_backup_at` behind would have a disabled policy
+      // keep taking backups, so this is the one case that overrides a claim --
+      // an operator switching automatic backups off means now.
+      const update = scoped.manager.query.mock.calls.find(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("UPDATE auto_backup_settings") &&
+          sql.includes("retention_daily"),
+      );
+      expect(update).toBeDefined();
+      // The disabled branch clears the schedule outright -- the one case where
+      // overriding a claim is the point.
+      expect(update?.[0]).toContain("WHEN NOT $2 THEN NULL");
+      expect((update?.[1] as unknown[])[0]).toBe(otherUserId);
+      expect((update?.[1] as unknown[])[1]).toBe(false);
+    });
+
+    it("writes no row at all for an account a disabled policy has never reached", async () => {
+      storePolicy({ enabled: false, folderPath: root });
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({});
+
+      await service.handleAutoBackupCron();
+
+      // There is no schedule to record, and a table of disabled rows is not one.
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+
+    it("falls back to an ENABLED default policy when no administrator has saved one", async () => {
+      // An instance that has never had its backup policy opened still backs
+      // every account up: a disabled default would have turned automatic
+      // backups off for every such deployment the moment the policy started
+      // being honoured.
+      mockSettingsRepo.findOne.mockResolvedValue(null);
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({});
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: otherUserId, enabled: true }),
+      );
+    });
+
+    it("brings a drifted row back to the deployment defaults", async () => {
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      const drifted = createSettings({
+        enabled: false,
+        folderPath: "/somewhere/else",
+        retentionDaily: 99,
+        nextBackupAt: new Date("2026-04-01T02:00:00Z"),
+      });
+      drifted.userId = otherUserId;
+      settingsFind({ managed: [drifted] });
+
+      await service.handleAutoBackupCron();
+
+      const update = scoped.manager.query.mock.calls.find(
+        ([sql]) =>
+          typeof sql === "string" &&
+          sql.includes("UPDATE auto_backup_settings") &&
+          sql.includes("retention_daily"),
+      );
+      expect(update).toBeDefined();
+      const params = update?.[1] as unknown[];
+      expect(params[0]).toBe(otherUserId);
+      expect(params[1]).toBe(true);
+      expect(params[2]).toBe(root);
+      expect(params[6]).toBe(7);
+      // The schedule's own bookkeeping is not reset -- COALESCE keeps whatever
+      // the row already holds -- so reconciling does not re-trigger a backup
+      // every hour, and cannot revert another replica's claim.
+      expect(update?.[0]).toContain("COALESCE(next_backup_at,");
+    });
+
+    it("writes nothing when the managed row already matches", async () => {
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      const settled = createSettings({
+        enabled: true,
+        folderPath: root,
+        nextBackupAt: new Date("2026-04-01T02:00:00Z"),
+      });
+      settled.userId = otherUserId;
+      settingsFind({ managed: [settled] });
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+
+    it("keeps enrolling after one user's row fails to save", async () => {
+      const thirdUserId = "88888888-8888-8888-8888-888888888888";
+      mockUsersRepo.find.mockResolvedValue([
+        { id: otherUserId },
+        { id: thirdUserId },
+      ]);
+      settingsFind({});
+      mockSettingsRepo.save.mockImplementationOnce(() =>
+        Promise.reject(new Error("db down")),
+      );
+
+      await service.handleAutoBackupCron();
+
+      expect(mockSettingsRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: thirdUserId, enabled: true }),
+      );
+    });
+
+    it("enrolls nobody in demo mode", async () => {
+      isDemo = true;
+      service = await createService();
+      mockUsersRepo.find.mockResolvedValue([{ id: otherUserId }]);
+      settingsFind({});
+
+      await service.handleAutoBackupCron();
+
+      // Demo accounts are regenerated daily; backing them up writes throwaway
+      // exports for data that is about to be deleted.
+      expect(mockUsersRepo.find).not.toHaveBeenCalled();
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("retention policy", () => {
+    async function seed(names: string[]): Promise<void> {
+      await fs.mkdir(folderFor(), { recursive: true });
+      for (const name of names) {
+        await fs.writeFile(join(folderFor(), name), "x");
+      }
+    }
+
+    it("should keep the most recent N daily backups", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 2,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed([
+        "monize-backup-daily-2026-04-01.json.gz",
+        "monize-backup-daily-2026-04-02.json.gz",
+        "monize-backup-daily-2026-04-03.json.gz",
+      ]);
+
+      await service.runManualBackup(userId);
+
+      const remaining = await listBackups(folderFor());
+      expect(remaining).not.toContain("monize-backup-daily-2026-04-01.json.gz");
+      expect(remaining).toContain("monize-backup-daily-2026-04-03.json.gz");
+    });
+
+    it("should keep the most recent N weekly backups independently", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 7,
+          retentionWeekly: 2,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed([
+        "monize-backup-weekly-2026-03-07.json.gz",
+        "monize-backup-weekly-2026-03-14.json.gz",
+        "monize-backup-weekly-2026-03-21.json.gz",
+      ]);
+
+      await service.runManualBackup(userId);
+
+      const remaining = await listBackups(folderFor());
+      expect(remaining).not.toContain(
+        "monize-backup-weekly-2026-03-07.json.gz",
+      );
+      expect(remaining).toContain("monize-backup-weekly-2026-03-21.json.gz");
+    });
+
+    it("should keep the most recent N monthly backups independently", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 7,
+          retentionWeekly: 4,
+          retentionMonthly: 1,
+        }),
+      );
+      await seed([
+        "monize-backup-monthly-26-01.json.gz",
+        "monize-backup-monthly-26-02.json.gz",
+      ]);
+
+      await service.runManualBackup(userId);
+
+      const remaining = await listBackups(folderFor());
+      expect(remaining).not.toContain("monize-backup-monthly-26-01.json.gz");
+      expect(remaining).toContain("monize-backup-monthly-26-02.json.gz");
+    });
+
+    it("never deletes a file left flat in the base folder by an older version", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          // Three, not two: the run about to happen writes today's artifact,
+          // which is the newest daily and occupies one retention slot itself.
+          retentionDaily: 3,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed([
+        "monize-backup-daily-2026-04-03.json.gz",
+        "monize-backup-daily-2026-04-04.json.gz",
+      ]);
+      const legacyNames = [
+        "monize-backup-daily-2026-04-01.json.gz",
+        "monize-backup-daily-2026-04-02.json.gz",
+      ];
+      for (const name of legacyNames) {
+        await fs.writeFile(join(root, name), "legacy");
+      }
+
+      await service.runManualBackup(userId);
+
+      // A legacy flat file carries no user id, so it is nobody's to delete:
+      // any user's pass would otherwise sweep another owner's only
+      // pre-upgrade recovery points (A26-M07, INV-BACKUP-001).
+      for (const name of legacyNames) {
+        await expect(fs.access(join(root, name))).resolves.toBeUndefined();
+      }
+      const remaining = await listBackups(folderFor());
+      expect(remaining).toContain("monize-backup-daily-2026-04-03.json.gz");
+      expect(remaining).toContain("monize-backup-daily-2026-04-04.json.gz");
+    });
+
+    it("still prunes the user's own sharded files to the limit beside legacy ones", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          // Today's write takes one slot, leaving one for the seeded files.
+          retentionDaily: 2,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed([
+        "monize-backup-daily-2026-04-03.json.gz",
+        "monize-backup-daily-2026-04-04.json.gz",
+      ]);
+      const legacy = join(root, "monize-backup-daily-2026-04-05.json.gz");
+      await fs.writeFile(legacy, "legacy");
+
+      await service.runManualBackup(userId);
+
+      // The newer legacy file neither takes a slot nor is deleted; the user's
+      // own oldest sharded file is still pruned.
+      await expect(fs.access(legacy)).resolves.toBeUndefined();
+      const remaining = await listBackups(folderFor());
+      expect(remaining).not.toContain("monize-backup-daily-2026-04-03.json.gz");
+      expect(remaining).toContain("monize-backup-daily-2026-04-04.json.gz");
+    });
+
+    it("keeps both the sharded and the legacy copy on an equal date", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          // Today's write takes the first slot; the second is what the two
+          // equal-dated copies compete for.
+          retentionDaily: 2,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      const legacy = join(root, "monize-backup-daily-2026-04-01.json.gz");
+      await fs.writeFile(legacy, "legacy");
+      await seed(["monize-backup-daily-2026-04-01.json.gz"]);
+
+      await service.runManualBackup(userId);
+
+      // The sharded file is this user's and within the limit; the flat one is
+      // not this user's to delete, whatever its date.
+      await expect(fs.access(legacy)).resolves.toBeUndefined();
+      expect(await listBackups(folderFor())).toContain(
+        "monize-backup-daily-2026-04-01.json.gz",
+      );
+    });
+
+    it("should copy daily to weekly on days 7, 14, 21, 28", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+
+      await withClockAt("2026-04-14T10:00:00Z", async () => {
+        await service.runManualBackup(userId);
+
+        expect(await listBackups(folderFor())).toEqual([
+          "monize-backup-daily-2026-04-14.json.gz",
+          "monize-backup-weekly-2026-04-14.json.gz",
+        ]);
+      });
+    });
+
+    it("should copy daily to monthly on day 1", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({ enabled: true, folderPath: root }),
+      );
+
+      await withClockAt("2026-04-01T10:00:00Z", async () => {
+        await service.runManualBackup(userId);
+
+        expect(await listBackups(folderFor())).toEqual([
+          "monize-backup-daily-2026-04-01.json.gz",
+          "monize-backup-monthly-26-04.json.gz",
+        ]);
+      });
+    });
+
+    it("should not delete non-backup files", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 1,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed(["some-other-file.txt", "readme.md"]);
+
+      await service.runManualBackup(userId);
+
+      const remaining = await listBackups(folderFor());
+      expect(remaining).toContain("some-other-file.txt");
+      expect(remaining).toContain("readme.md");
+    });
+
+    /**
+     * A partial write is not a backup. Counting one towards "keep 7 daily" would
+     * silently shorten the retention window -- and it would be counted, because
+     * a truncated file has a valid name and a plausible date.
+     */
+    it("does not count an interrupted write towards retention", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 2,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed([
+        "monize-backup-daily-2026-04-01.json.gz",
+        ".monize-backup-tmp-999-1-monize-backup-daily-2026-04-02.json.gz",
+      ]);
+
+      await service.runManualBackup(userId);
+
+      // Two real artifacts now exist (April 1 and today), which is the limit --
+      // so April 1 survives. Had the temp file been counted, it would not have.
+      expect(await listBackups(folderFor())).toContain(
+        "monize-backup-daily-2026-04-01.json.gz",
+      );
+    });
+
+    it("leaves another user's folder alone", async () => {
+      mockSettingsRepo.findOne.mockResolvedValue(
+        createSettings({
+          enabled: true,
+          folderPath: root,
+          retentionDaily: 1,
+          retentionWeekly: 0,
+          retentionMonthly: 0,
+        }),
+      );
+      await seed(["monize-backup-daily-2026-04-01.json.gz"]);
+      await fs.mkdir(folderFor(otherUserId), { recursive: true });
+      await fs.writeFile(
+        join(folderFor(otherUserId), "monize-backup-daily-2026-04-01.json.gz"),
+        "theirs",
+      );
+
+      const result = await service.runManualBackup(userId);
+
+      // Retention demonstrably ran -- the caller's own April file is gone --
+      // and still never crossed into the other user's folder.
+      expect(await listBackups(folderFor())).toEqual([result.filename]);
+      expect(await listBackups(folderFor(otherUserId))).toEqual([
+        "monize-backup-daily-2026-04-01.json.gz",
+      ]);
+    });
+  });
+
+  describe("frequency calculation with backup time", () => {
+    // The schedule is derived where an account's row is written, which is
+    // the reconcile that `updateSettings` runs -- the policy itself carries
+    // no `next_backup_at`. So these need one active account with no row yet.
+    beforeEach(() => {
+      mockUsersRepo.find.mockResolvedValue([{ id: userId }]);
+      mockSettingsRepo.find.mockResolvedValue([]);
+    });
+
+    it("should schedule daily backup at configured time", async () => {
+      storePolicy({
+        folderPath: root,
+        backupTime: "03:30",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "daily",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      expect(nextAt.getUTCHours()).toBe(3);
+      // Minutes are snapped to 0 since the cron fires at minute 0 each hour
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+
+    it("should schedule next slot for sub-daily frequency", async () => {
+      storePolicy({
+        folderPath: root,
+        backupTime: "00:00",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "every6hours",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      // Should be at minute 0 (aligned to configured time)
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+
+    it("should schedule weekly backup at configured time", async () => {
+      storePolicy({
+        folderPath: root,
+        backupTime: "23:00",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "weekly",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      expect(nextAt.getUTCHours()).toBe(23);
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+
+    it("should convert local timezone backup time to UTC", async () => {
+      // America/New_York is UTC-5 (EST) or UTC-4 (EDT)
+      storePolicy({
+        folderPath: root,
+        backupTime: "02:00",
+        timezone: "America/New_York",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "daily",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      // 02:00 EST = 07:00 UTC, or 02:00 EDT = 06:00 UTC
+      expect([6, 7]).toContain(nextAt.getUTCHours());
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+
+    it("should handle UTC timezone without offset", async () => {
+      storePolicy({
+        folderPath: root,
+        backupTime: "14:30",
+        timezone: "UTC",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "daily",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      expect(nextAt.getUTCHours()).toBe(14);
+      // Minutes are snapped to 0 since the cron fires at minute 0 each hour
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+
+    it("should handle positive UTC offset timezone", async () => {
+      // Europe/Berlin is UTC+1 (CET) or UTC+2 (CEST)
+      storePolicy({
+        folderPath: root,
+        backupTime: "03:00",
+        timezone: "Europe/Berlin",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "daily",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      // 03:00 CET = 02:00 UTC, or 03:00 CEST = 01:00 UTC
+      expect([1, 2]).toContain(nextAt.getUTCHours());
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+
+    it("should store timezone when updating settings", async () => {
+      const existing = createSettings({ folderPath: root });
+      mockSettingsRepo.findOne.mockResolvedValue(existing);
+
+      await service.updateSettings(userId, {
+        timezone: "Asia/Tokyo",
+      });
+
+      const savedCall = reconciledRow();
+      expect(savedCall.timezone).toBe("Asia/Tokyo");
+    });
+
+    it("should use timezone for sub-daily frequency scheduling", async () => {
+      // America/Chicago is UTC-6 (CST) or UTC-5 (CDT)
+      storePolicy({
+        folderPath: root,
+        backupTime: "06:00",
+        timezone: "America/Chicago",
+      });
+
+      await service.updateSettings(userId, {
+        enabled: true,
+        frequency: "every12hours",
+      });
+
+      const nextAt = reconciledRow().nextBackupAt as Date;
+      // 06:00 CST = 12:00 UTC, or 06:00 CDT = 11:00 UTC
+      // Slots are at 06:00 and 18:00 local, so UTC equivalents vary
+      expect(nextAt.getUTCMinutes()).toBe(0);
+    });
+  });
+  /**
+   * A store with no location for anybody to choose.
+   *
+   * The `s3` target is the one that has this shape today, but what is under
+   * test is the service's half of the rule rather than that target's: a store
+   * whose `locationSelectable` is false must not have a base written into the
+   * settings column, because a value nothing reads is a value a deployment that
+   * later switched back to a `local` store would read as a directory and refuse
+   * (`docs/specs/backup-storage-targets.md` section 11, decision 1).
+   *
+   * The target here is a minimal stand-in rather than the real `s3` one: it
+   * implements the same interface -- so `tsc` rejects a shape the real method
+   * cannot produce -- and keeps the assertions about the service rather than
+   * about an object store.
+   */
+  describe("a store with no location to choose", () => {
+    const DISPLAY = "s3://monize-store/backups/";
+
+    let fixedStore: BackupStorageTarget;
+    let published: Array<{ filename: string; bytes: Buffer }>;
+
+    const buildService = async (): Promise<AutoBackupService> => {
+      published = [];
+      fixedStore = {
+        name: "fixed",
+        locationSelectable: false,
+        defaultBase: DISPLAY,
+        resolveBase: () => DISPLAY,
+        acceptBase: () => {
+          throw new BadRequestException("no folder to choose");
+        },
+        describeLocation: () => DISPLAY,
+        resolveLocation: async () => ({ target: "fixed", display: DISPLAY }),
+        describeStore: async () => ({
+          available: true,
+          location: DISPLAY,
+          locationSelectable: false,
+          artifactCount: 3,
+        }),
+        validateFolder: async () => ({
+          valid: false,
+          error: "no folder to browse",
+        }),
+        browseFolders: () => {
+          throw new BadRequestException("no folder to browse");
+        },
+        publish: async (_location, filename, bytes) => {
+          published.push({ filename, bytes });
+        },
+        promote: async () => undefined,
+        list: async () => [],
+        open: async () => null,
+        remove: async () => undefined,
+        sweepIncomplete: async () => 0,
+      };
+
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          { provide: DataSource, useValue: scoped.dataSource },
+          AutoBackupService,
+          { provide: BackupService, useValue: mockBackupService },
+          userMaintenanceProvider(maintenance),
+          { provide: BackupEncryptionService, useValue: mockBackupEncryption },
+          {
+            provide: DemoModeService,
+            useValue: {
+              get isDemo() {
+                return isDemo;
+              },
+            },
+          },
+          { provide: SystemAlertService, useValue: mockSystemAlerts },
+          {
+            provide: BackupOffsiteDispatchService,
+            useValue: mockOffsiteDispatch,
+          },
+          { provide: BACKUP_STORAGE_TARGET, useValue: fixedStore },
+        ],
+      }).compile();
+      return module.get<AutoBackupService>(AutoBackupService);
+    };
+
+    it("reports the store as fixed, with what it already holds", async () => {
+      const svc = await buildService();
+      storePolicy();
+
+      await expect(svc.describeCapability(userId)).resolves.toEqual({
+        available: true,
+        folderPath: DISPLAY,
+        // The flag the settings screen hides its folder picker on, rather than
+        // offering a control whose endpoints refuse.
+        locationSelectable: false,
+        // Switching store is forward-only, so the count is how an operator sees
+        // the gap instead of inferring it.
+        artifactCount: 3,
+        // Named, not inferred: "not selectable" is the absence of a folder
+        // picker, which is not the same fact as "the artifacts are in a
+        // bucket".
+        storageProvider: "fixed",
+      });
+    });
+
+    it("refuses a folder somebody asks to store", async () => {
+      const svc = await buildService();
+      storePolicy();
+
+      await expect(
+        svc.updateSettings(userId, { folderPath: "/data/backups" }),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockSettingsRepo.save).not.toHaveBeenCalled();
+    });
+
+    it("answers a refusal rather than validating or browsing a folder", async () => {
+      const svc = await buildService();
+
+      await expect(svc.validateFolder("/data/backups")).resolves.toEqual({
+        valid: false,
+        error: "no folder to browse",
+      });
+      await expect(svc.browseFolders("/data/backups")).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it("writes no base into the settings column when a schedule is enabled", async () => {
+      const svc = await buildService();
+      storePolicy();
+
+      await svc.updateSettings(userId, { enabled: true });
+
+      // Not DISPLAY: a deployment that later switched back to a local store
+      // would read an `s3://` URL as a directory and refuse every backup.
+      expect(writtenPolicy()?.folderPath).toBe("");
+    });
+
+    it("leaves the stored column alone on a manual run", async () => {
+      const svc = await buildService();
+      storePolicy();
+
+      await svc.runManualBackup(userId);
+
+      expect(published).toHaveLength(1);
+      expect(mockSettingsRepo.save.mock.calls[0][0].folderPath).toBe("");
+    });
+  });
+});

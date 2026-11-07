@@ -1,0 +1,16 @@
+{
+  "openInInvestments": "投資で開く",
+  "income": {
+    "title": "投資収益",
+    "dividendsInterest": "配当・利息",
+    "realizedGains": "実現利益",
+    "ytd": "年初来",
+    "realizedKnownPart": "判明分: {amount}",
+    "realizedUnknownReason": "この損益は算出できません。このポジションには取得原価なしで追加された株式があるため、売却した株式の原価が不明です。それらを追加した取引を開いて、価格を入力してください。",
+    "empty": "今年の投資収益はありません"
+  },
+  "register": {
+    "deleteFailed": "取引を削除できませんでした",
+    "loadFailed": "取引の読み込みに失敗しました"
+  }
+}

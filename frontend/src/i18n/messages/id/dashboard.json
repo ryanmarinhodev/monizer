@@ -1,0 +1,311 @@
+{
+  "page": {
+    "welcomePrefix": "Selamat datang",
+    "welcomeWithName": "Selamat datang, {name}!",
+    "subtitle": "Berikut ikhtisar keuangan Anda"
+  },
+  "favouriteAccounts": {
+    "title": "Akun Favorit",
+    "empty": "Belum ada akun favorit. Tandai akun sebagai favorit untuk melihatnya di sini.",
+    "reorder": "Susun ulang",
+    "dragToReorder": "Seret akun untuk menyusun ulang, atau gunakan tombol panah.",
+    "done": "Selesai",
+    "moveUp": "Pindah ke atas",
+    "moveDown": "Pindah ke bawah",
+    "marketValue": "Nilai pasar",
+    "due": "Jatuh tempo: {ordinal}",
+    "dueTooltip": "Hari setiap bulan ketika pembayaran kartu kredit Anda jatuh tempo",
+    "settlement": "Penyelesaian: {ordinal}",
+    "settlementTooltip": "Hari terakhir siklus tagihan. Transaksi yang diposting pada atau sebelum hari ini muncul pada laporan saat ini."
+  },
+  "upcomingBills": {
+    "title": "Tagihan & Setoran Mendatang",
+    "empty": "Tidak ada tagihan, setoran, atau transfer yang lewat jatuh tempo atau mendatang dalam jendela pengingat mereka.",
+    "postTransaction": "Posting transaksi ini",
+    "manual": "Manual",
+    "negativeBalanceWarning": "Transaksi ini akan menyebabkan saldo akun menjadi di bawah nol",
+    "negativeBalanceLegend": "Membuat saldo akunnya di bawah nol",
+    "moreItems": "+{count} lagi",
+    "overdue": "Lewat jatuh tempo",
+    "today": "Hari ini",
+    "tomorrow": "Besok",
+    "daysUntil": "{count} hari",
+    "typeBadge": {
+      "bill": "Tagihan",
+      "deposit": "Setoran",
+      "transfer": "Transfer",
+      "reminder": "Pengingat",
+      "unknown": "Tidak diketahui"
+    },
+    "scope": {
+      "dueSoon": "Segera jatuh tempo",
+      "all": "Semua mendatang"
+    },
+    "viewLabel": "Tampilan",
+    "viewList": "Daftar",
+    "viewCalendar": "Kalender",
+    "previousMonth": "Bulan sebelumnya",
+    "nextMonth": "Bulan berikutnya",
+    "emptyAll": "Tidak ada tagihan, setoran, atau transfer aktif yang dijadwalkan."
+  },
+  "cashFlowForecast": {
+    "title": "Prakiraan Arus Kas",
+    "period": "Periode prakiraan",
+    "loadFailed": "Tidak dapat memuat transaksi yang sudah bertanggal setelah hari ini, sehingga prakiraan tidak dapat ditampilkan. Muat ulang dasbor untuk mencoba lagi."
+  },
+  "gettingStarted": {
+    "title": "Memulai",
+    "subtitle": "Atur akun Anda dalam beberapa langkah cepat",
+    "dismiss": "Tutup",
+    "steps": {
+      "settings": {
+        "title": "Tinjau pengaturan Anda",
+        "description": "Atur mata uang, format tanggal, dan tema"
+      },
+      "categories": {
+        "title": "Atur kategori",
+        "description": "Buat kategori atau impor set bawaan"
+      },
+      "account": {
+        "title": "Tambahkan akun pertama Anda",
+        "description": "Buat rekening bank untuk mulai melacak"
+      },
+      "import": {
+        "title": "Impor dari QIF",
+        "description": "Impor akun dan transaksi dari file QIF"
+      }
+    }
+  },
+  "budgetStatus": {
+    "title": "Status Anggaran",
+    "noBudget": "Tidak ada anggaran aktif. Buat anggaran untuk melacak pengeluaran Anda.",
+    "createBudget": "Buat Anggaran",
+    "viewFullBudget": "Lihat anggaran lengkap",
+    "daysLeft": "{count} hari tersisa",
+    "safeToSpend": "Aman untuk dibelanjakan hari ini",
+    "topCategories": "Kategori Teratas"
+  },
+  "insights": {
+    "title": "Wawasan Pengeluaran",
+    "empty": "Tidak ada wawasan tersedia. Kunjungi halaman Wawasan untuk menghasilkan analisis pertama Anda.",
+    "goToInsights": "Pergi ke Wawasan",
+    "activeCount": "{count} aktif"
+  },
+  "warrantiesExpiring": {
+    "title": "Garansi yang segera berakhir",
+    "empty": "Tidak ada yang berakhir dalam 30 hari ke depan",
+    "loadFailed": "Garansi Anda yang akan berakhir tidak dapat dimuat. Muat ulang dasbor untuk mencoba lagi."
+  },
+  "topMovers": {
+    "title": "Penggerak Teratas",
+    "empty": {
+      "noInvestments": "Tambahkan akun investasi untuk melacak penggerak harian.",
+      "noPrices": "Belum ada perubahan harga yang tersedia.",
+      "noGainers": "Tidak ada yang naik hari ini.",
+      "noLosers": "Tidak ada yang turun hari ini."
+    },
+    "dailyChange": "Perubahan harian",
+    "dailyChangeOn": "Perubahan harian · {date}",
+    "openPriceHistory": "Riwayat harga {symbol}",
+    "refreshPrices": "Perbarui harga",
+    "viewPortfolio": "Lihat portofolio",
+    "filter": {
+      "all": "Semua ({count})",
+      "gainers": "Naik ({count})",
+      "losers": "Turun ({count})",
+      "label": "Arah"
+    },
+    "metric": {
+      "label": "Tampilkan",
+      "price": "Harga",
+      "holdings": "Kepemilikan"
+    }
+  },
+  "favouriteSecurities": {
+    "title": "Sekuritas Favorit",
+    "empty": "Belum ada sekuritas favorit. Kunjungi <securitiesLink>halaman Sekuritas</securitiesLink> dan bintangi sekuritas yang ingin Anda lacak di sini.",
+    "noPriceYet": "Belum ada harga",
+    "dailyChange": "Perubahan harian",
+    "dailyChangeOn": "Perubahan harian · {date}",
+    "openPriceHistory": "Riwayat harga {symbol}",
+    "refreshPrices": "Perbarui harga"
+  },
+  "netWorth": {
+    "title": "Nilai Bersih",
+    "empty": "Belum ada data nilai bersih yang tersedia.",
+    "barStyle": "Gaya batang",
+    "barStyleNetWorth": "Nilai bersih",
+    "barStyleAccountType": "Menurut jenis akun",
+    "loadFailed": "Tidak dapat memuat riwayat nilai bersih Anda. Muat ulang dasbor untuk mencoba lagi."
+  },
+  "assetsVsLiabilities": {
+    "title": "Aset vs Liabilitas",
+    "empty": "Belum ada data nilai bersih yang tersedia.",
+    "current": "Saat ini",
+    "netWorthLabel": "Nilai Bersih",
+    "assets": "Aset",
+    "liabilities": "Liabilitas",
+    "partialName": "{name} (parsial)",
+    "viewCallouts": "Label",
+    "viewLegend": "Keterangan"
+  },
+  "expensesPieChart": {
+    "title": "Pengeluaran per Kategori",
+    "empty": "Tidak ada data pengeluaran untuk periode ini.",
+    "total": "Total",
+    "uncategorized": "Tidak berkategori",
+    "other": "Lainnya",
+    "insideOther": "{count, plural, other {# kategori dalam Lainnya}}",
+    "topLevelOnly": "Kategori tingkat atas",
+    "topLevelOnlyHint": "Hitung subkategori pada induknya",
+    "viewCallouts": "Label",
+    "viewLegend": "Keterangan"
+  },
+  "incomeExpenses": {
+    "title": "Pendapatan vs Pengeluaran",
+    "income": "Pendapatan",
+    "expenses": "Pengeluaran",
+    "net": "Bersih"
+  },
+  "customize": {
+    "button": "Sesuaikan",
+    "title": "Sesuaikan dasbor",
+    "description": "Tata letak di bawah mencerminkan dasbor Anda: widget mengalir dari kiri ke kanan, dua per baris di layar besar.",
+    "moveEarlier": "Pindahkan {name} lebih awal",
+    "moveLater": "Pindahkan {name} lebih akhir",
+    "dragToReorder": "Seret widget untuk menata ulang, atau gunakan tombol panah.",
+    "hiddenWidgets": "Widget tersembunyi",
+    "hide": "Sembunyikan {name}",
+    "show": "Tampilkan {name}",
+    "atLeastOne": "Pilih setidaknya satu widget untuk ditampilkan di dasbor.",
+    "reset": "Atur ulang ke bawaan",
+    "toasts": {
+      "saveFailed": "Gagal menyimpan tata letak dasbor"
+    }
+  },
+  "favouriteReports": {
+    "title": "Laporan Favorit",
+    "empty": "Belum ada laporan favorit. Bintangi laporan di halaman Laporan untuk melihatnya di sini.",
+    "browseReports": "Jelajahi laporan"
+  },
+  "widgets": {
+    "configure": "Konfigurasikan {name}",
+    "asOf": "per {date}",
+    "done": "Selesai",
+    "configSaveFailed": "Tidak dapat menyimpan pengaturan widget. Silakan coba lagi.",
+    "timeframe": "Kerangka Waktu",
+    "accounts": "Akun",
+    "chartType": "Tipe Grafik",
+    "view": "Tampilan",
+    "viewCalloutsHint": "Label memerlukan layar yang lebih lebar. Jika tidak muat, keterangan yang ditampilkan.",
+    "displayName": "Nama tampilan",
+    "description": "Deskripsi",
+    "descriptionPlaceholder": "Tambahkan deskripsi opsional",
+    "rangeLabels": {
+      "1m": "1M",
+      "3m": "3M",
+      "6m": "6M",
+      "1y": "1Y",
+      "2y": "2Y",
+      "5y": "5Y",
+      "10y": "10Y",
+      "ytd": "YTD",
+      "all": "Semua",
+      "1w": "1M",
+      "mtd": "MTD"
+    }
+  },
+  "portfolioValue": {
+    "title": "Nilai Portofolio",
+    "empty": "Belum ada riwayat investasi untuk ditampilkan.",
+    "refresh": "Segarkan nilai saat ini",
+    "investmentResult": "Hasil Investasi",
+    "periodBreakdownInvestedTooltip": "Nilai sekuritas berubah {valueChange} selama periode ini. Dari jumlah itu, {netInvested} adalah dana yang dimasukkan, setelah dikurangi penjualan, dan sekuritas membayar {income} berupa dividen dan bunga. Distribusi yang diinvestasikan kembali dalam saham dihitung di keduanya. Angka di atas adalah hasil investasi itu sendiri, tanpa kas yang tidak diinvestasikan.",
+    "notAvailable": "N/A"
+  },
+  "spendingByPayee": {
+    "title": "Pengeluaran per Penerima",
+    "empty": "Tidak ada pengeluaran dalam periode ini.",
+    "totalLabel": "Total"
+  },
+  "monthlySpendingTrend": {
+    "title": "Tren Pengeluaran Bulanan",
+    "empty": "Tidak ada data untuk periode ini.",
+    "expenses": "Pengeluaran",
+    "income": "Pendapatan"
+  },
+  "incomeBySource": {
+    "title": "Pendapatan per Sumber",
+    "empty": "Tidak ada pendapatan dalam periode ini.",
+    "totalLabel": "Total Pendapatan"
+  },
+  "creditUtilizationAccounts": {
+    "title": "Utilisasi per Akun",
+    "empty": "Tidak ada akun kredit dengan batas yang ditetapkan.",
+    "utilization": "Utilisasi",
+    "used": "Digunakan",
+    "noRate": "tidak tersedia (tidak ada kurs {currency})"
+  },
+  "creditUtilizationTotal": {
+    "title": "Total Utilisasi",
+    "empty": "Tidak ada akun kredit dengan batas yang ditetapkan.",
+    "used": "Digunakan",
+    "available": "Tersedia"
+  },
+  "sectorWeightings": {
+    "title": "Alokasi Sektor",
+    "empty": "Tidak ada data sektor tersedia.",
+    "direct": "Langsung",
+    "etf": "ETF"
+  },
+  "securityTypeAllocation": {
+    "title": "Alokasi Tipe Keamanan Dokumen",
+    "empty": "Tidak ada kepemilikan untuk ditampilkan.",
+    "types": {
+      "STOCK": "Saham",
+      "ETF": "ETF",
+      "MUTUAL_FUND": "Reksadana",
+      "BOND": "Obligasi",
+      "CASH": "Tunai"
+    },
+    "viewType": "Jenis efek",
+    "viewAssetClass": "Kelas aset",
+    "otherAssetClasses": "Lainnya",
+    "emptyAssetClass": "Belum ada rincian kelas aset yang tersedia."
+  },
+  "geographicAllocation": {
+    "title": "Alokasi Geografis",
+    "empty": "Tidak ada kepemilikan untuk ditampilkan.",
+    "viewRegion": "Wilayah",
+    "viewExchange": "Bursa",
+    "viewCountry": "Negara",
+    "listingBasisNote": "Dikelompokkan menurut bursa tempat setiap kepemilikan tercatat. Beralih ke Negara untuk melihat isi dana."
+  },
+  "recurringExpenses": {
+    "title": "Pengeluaran Berulang Teratas",
+    "empty": "Tidak ada pengeluaran berulang ditemukan.",
+    "minOccurrences": "Kejadian minimum",
+    "minOccurrencesOption": "{count} atau lebih",
+    "occurrences": "{count} kejadian",
+    "monthlyEstimate": "Perkiraan Bulanan",
+    "viewCallouts": "Label",
+    "viewLegend": "Keterangan"
+  },
+  "weekendVsWeekday": {
+    "title": "Pengeluaran Akhir Pekan vs Hari Kerja",
+    "empty": "Tidak ada pengeluaran dalam periode ini.",
+    "weekendLabel": "Akhir Pekan",
+    "weekdayLabel": "Hari Kerja",
+    "viewOverview": "Ikhtisar",
+    "viewByDay": "Per Hari"
+  },
+  "cashFlowSankey": {
+    "title": "Sankey Arus Kas",
+    "empty": "Tidak ada pemasukan, pengeluaran, atau transfer pada periode ini.",
+    "depth": "Rincian",
+    "depthCategories": "Kategori",
+    "depthSubcategories": "Subkategori",
+    "viewDiagram": "Diagram",
+    "viewTable": "Tabel"
+  }
+}

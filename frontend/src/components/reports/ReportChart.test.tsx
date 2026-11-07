@@ -1,0 +1,637 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, act } from '@/test/render';
+import { ReportChart } from './ReportChart';
+import { ReportViewType, GroupByType, TableColumn, MetricType } from '@/types/custom-report';
+
+vi.mock('@/hooks/useNumberFormat', async () => {
+  const { numberFormatMockDefaults } = await import('@/test/number-format-mock');
+  return {
+    useNumberFormat: () => ({
+      ...numberFormatMockDefaults(),
+      formatCurrency: (n: number) => `$${n.toFixed(2)}`,
+      formatNumber: (n: number, decimals: number) => n.toFixed(decimals),
+      defaultCurrency: 'CAD',
+    }),
+  };
+});
+vi.mock('@/hooks/useDateFormat', () => ({
+  useDateFormat: () => ({ dateFormat: 'browser', datePattern: 'YYYY-MM-DD',
+    formatDate: (d: string) => d,
+  }),
+}));
+
+vi.mock('@/lib/chart-colours', () => ({
+  CHART_COLOURS: ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b'],
+}));
+
+vi.mock('recharts', () => ({
+  ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
+  PieChart: ({ children }: any) => <div data-testid="pie-chart">{children}</div>,
+  BarChart: ({ children }: any) => <div data-testid="bar-chart">{children}</div>,
+  LineChart: ({ children }: any) => <div data-testid="line-chart">{children}</div>,
+  Pie: ({ onClick, data }: any) => (
+    <div data-testid="pie">
+      <button data-testid="pie-click-with-id" onClick={() => onClick && onClick(data[0])}>click-id</button>
+      <button data-testid="pie-click-no-id" onClick={() => onClick && onClick({ value: 1 })}>click-no-id</button>
+    </div>
+  ),
+  Bar: ({ onClick, children }: any) => (
+    <div data-testid="bar">
+      {children}
+      <button data-testid="bar-click-with-id" onClick={() => onClick && onClick({ id: 'cat-1', value: 100 })}>bar-id</button>
+      <button data-testid="bar-click-no-id" onClick={() => onClick && onClick({ value: 100 })}>bar-no-id</button>
+    </div>
+  ),
+  Line: () => null,
+  Cell: () => null,
+  XAxis: ({ tickFormatter }: any) => <div>{tickFormatter ? tickFormatter(100) : ''}</div>,
+  YAxis: ({ tickFormatter }: any) => <div>{tickFormatter ? tickFormatter(1000) : ''}</div>,
+  CartesianGrid: () => null,
+  Tooltip: ({ content }: any) => {
+    if (content && content.type) {
+      const C = content.type;
+      return (
+        <div data-testid="tooltip">
+          <C {...content.props} active={true} payload={[{ payload: { label: 'Groceries', value: 500, count: 20, color: '#000' } }]} />
+          <C {...content.props} active={true} payload={[{ payload: { label: 'Single', value: 100, count: 1, color: '#000' } }]} />
+          <C {...content.props} active={true} payload={[{ payload: { label: 'NoCount', value: 0, color: '#000' } }]} />
+          <C {...content.props} active={false} payload={[]} />
+        </div>
+      );
+    }
+    return null;
+  },
+}));
+
+vi.mock('@/lib/csv-export', () => ({
+  exportToCsv: vi.fn(),
+}));
+
+vi.mock('@/lib/pdf-export', () => ({
+  exportToPdf: vi.fn().mockResolvedValue(undefined),
+}));
+
+const sampleData = [
+  { label: 'Groceries', value: 500, count: 20, id: 'cat-1' },
+  { label: 'Transport', value: 200, count: 10, id: 'cat-2' },
+  { label: 'Entertainment', value: 100, count: 5, id: 'cat-3' },
+];
+
+describe('ReportChart', () => {
+  it('renders pie chart view', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.PIE_CHART}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+      />
+    );
+    expect(screen.getByTestId('pie-chart')).toBeInTheDocument();
+  });
+
+  it('renders bar chart view', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.BAR_CHART}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+      />
+    );
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+  });
+
+  it('renders line chart view', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.LINE_CHART}
+        data={sampleData}
+        groupBy={GroupByType.MONTH}
+      />
+    );
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('renders table view with data', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+      />
+    );
+    expect(screen.getByText('Category')).toBeInTheDocument();
+    expect(screen.getByText('Groceries')).toBeInTheDocument();
+    expect(screen.getByText('Transport')).toBeInTheDocument();
+    expect(screen.getByText('Entertainment')).toBeInTheDocument();
+    expect(screen.getByText('Total')).toBeInTheDocument();
+  });
+
+  it('renders table with custom columns', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.PAYEE}
+        tableColumns={[TableColumn.LABEL, TableColumn.VALUE]}
+      />
+    );
+    expect(screen.getByText('Payee')).toBeInTheDocument();
+    expect(screen.getByText('Amount')).toBeInTheDocument();
+  });
+
+  it('renders table with NONE groupBy showing Item header', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.NONE}
+      />
+    );
+    expect(screen.getByText('Item')).toBeInTheDocument();
+  });
+
+  it('renders table with MONTH groupBy showing Period header', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.MONTH}
+      />
+    );
+    expect(screen.getByText('Period')).toBeInTheDocument();
+  });
+
+  it('renders table with all column types', () => {
+    const dataWithExtras = [
+      {
+        label: 'Test',
+        value: 500,
+        count: 20,
+        id: 'cat-1',
+        date: '2025-01-15',
+        payee: 'Store A',
+        description: 'Groceries shopping',
+        memo: 'Weekly groceries',
+        category: 'Food: Fast Food',
+        account: 'Chequing',
+      },
+    ];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={dataWithExtras}
+        groupBy={GroupByType.NONE}
+        tableColumns={[
+          TableColumn.DATE,
+          TableColumn.LABEL,
+          TableColumn.PAYEE,
+          TableColumn.DESCRIPTION,
+          TableColumn.MEMO,
+          TableColumn.CATEGORY,
+          TableColumn.ACCOUNT,
+          TableColumn.VALUE,
+          TableColumn.PERCENTAGE,
+          TableColumn.COUNT,
+        ]}
+      />
+    );
+    expect(screen.getByText('Date')).toBeInTheDocument();
+    expect(screen.getByText('Payee')).toBeInTheDocument();
+    expect(screen.getByText('Description')).toBeInTheDocument();
+    expect(screen.getByText('Memo')).toBeInTheDocument();
+    expect(screen.getByText('Account')).toBeInTheDocument();
+    expect(screen.getByText('%')).toBeInTheDocument();
+    expect(screen.getByText('Count')).toBeInTheDocument();
+    expect(screen.getByText('Store A')).toBeInTheDocument();
+    expect(screen.getByText('Weekly groceries')).toBeInTheDocument();
+    // Category column shows 'Parent: Child' format for subcategories
+    expect(screen.getByText('Food: Fast Food')).toBeInTheDocument();
+  });
+
+  it('renders dash for missing optional fields', () => {
+    const dataWithMissing = [
+      { label: 'Test', value: 100, count: 0, id: 'cat-1' },
+    ];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={dataWithMissing}
+        groupBy={GroupByType.NONE}
+        tableColumns={[
+          TableColumn.DATE,
+          TableColumn.LABEL,
+          TableColumn.PAYEE,
+          TableColumn.DESCRIPTION,
+          TableColumn.MEMO,
+          TableColumn.CATEGORY,
+          TableColumn.ACCOUNT,
+          TableColumn.VALUE,
+          TableColumn.COUNT,
+        ]}
+      />
+    );
+    // Multiple dashes for missing values
+    const dashes = screen.getAllByText('-');
+    expect(dashes.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('renders table footer with Total in DATE column when both DATE and LABEL', () => {
+    const data = [{ label: 'Test', value: 100, count: 5, id: 'cat-1', date: '2025-01-01' }];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={data}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.DATE, TableColumn.LABEL, TableColumn.VALUE, TableColumn.PERCENTAGE, TableColumn.COUNT]}
+      />
+    );
+    expect(screen.getByText('Total')).toBeInTheDocument();
+    expect(screen.getByText('100%')).toBeInTheDocument();
+  });
+
+  it('handles table row click with onDataPointClick', async () => {
+    const onClick = vi.fn();
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+        onDataPointClick={onClick}
+      />
+    );
+    fireEvent.click(screen.getByText('Groceries'));
+    expect(onClick).toHaveBeenCalledWith('cat-1');
+  });
+
+  it('renders line chart with time-based groupBy', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.LINE_CHART}
+        data={sampleData}
+        groupBy={GroupByType.WEEK}
+      />
+    );
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('renders line chart with DAY groupBy', () => {
+    render(
+      <ReportChart
+        viewType={ReportViewType.LINE_CHART}
+        data={sampleData}
+        groupBy={GroupByType.DAY}
+      />
+    );
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('renders default/fallback as table view for unknown viewType', () => {
+    render(
+      <ReportChart
+        viewType={'UNKNOWN' as ReportViewType}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+      />
+    );
+    expect(screen.getByText('Category')).toBeInTheDocument();
+  });
+
+  it('assigns colours from CHART_COLOURS when data has no color', () => {
+    const dataNoColor = [
+      { label: 'A', value: 100, count: 1 },
+      { label: 'B', value: 200, count: 2 },
+    ];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={dataNoColor}
+        groupBy={GroupByType.CATEGORY}
+      />
+    );
+    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('B')).toBeInTheDocument();
+  });
+
+  it('shows percentage with item.percentage when provided', () => {
+    const dataWithPercentage = [
+      { label: 'A', value: 100, count: 1, percentage: 42.5 },
+    ];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={dataWithPercentage}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.LABEL, TableColumn.VALUE, TableColumn.PERCENTAGE]}
+      />
+    );
+    expect(screen.getByText('42.5%')).toBeInTheDocument();
+  });
+
+  it('handles pie chart click with and without id', () => {
+    const onClick = vi.fn();
+    render(
+      <ReportChart
+        viewType={ReportViewType.PIE_CHART}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+        onDataPointClick={onClick}
+      />
+    );
+    fireEvent.click(screen.getByTestId('pie-click-with-id'));
+    fireEvent.click(screen.getByTestId('pie-click-no-id'));
+    expect(onClick).toHaveBeenCalledWith('cat-1');
+  });
+
+  it('handles bar chart click with and without id', () => {
+    const onClick = vi.fn();
+    render(
+      <ReportChart
+        viewType={ReportViewType.BAR_CHART}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+        onDataPointClick={onClick}
+      />
+    );
+    fireEvent.click(screen.getByTestId('bar-click-with-id'));
+    fireEvent.click(screen.getByTestId('bar-click-no-id'));
+    expect(onClick).toHaveBeenCalledWith('cat-1');
+  });
+
+  it('exports csv', async () => {
+    const { exportToCsv } = await import('@/lib/csv-export');
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+        exportFilename="my-report"
+        reportTitle="My Report"
+        reportSubtitle="Subtitle"
+      />
+    );
+    const exportBtn = screen.getByRole('button', { name: /export/i });
+    fireEvent.click(exportBtn);
+    const csvBtn = screen.queryByText(/CSV/i);
+    if (csvBtn) {
+      fireEvent.click(csvBtn);
+    }
+    expect(exportToCsv).toHaveBeenCalled();
+  });
+
+  it('exports pdf with various views', async () => {
+    const { exportToPdf } = await import('@/lib/pdf-export');
+    render(
+      <ReportChart
+        viewType={ReportViewType.PIE_CHART}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+        exportFilename="my-report"
+        reportTitle="My Report"
+        reportSubtitle="Subtitle"
+      />
+    );
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+    const pdfBtn = screen.queryByText(/PDF/i);
+    if (pdfBtn) {
+      await act(async () => { fireEvent.click(pdfBtn); });
+    }
+    expect(exportToPdf).toHaveBeenCalled();
+  });
+
+  it('exports csv with all columns and date label', async () => {
+    const { exportToCsv } = await import('@/lib/csv-export');
+    (exportToCsv as any).mockClear();
+    const data = [
+      {
+        label: 'X', value: 100, count: 5, id: 'a',
+        date: '2024-01-01', payee: 'P', description: 'D', memo: 'M',
+        category: 'C', account: 'A', percentage: 50,
+      },
+    ];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={data}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[
+          TableColumn.DATE, TableColumn.LABEL, TableColumn.PAYEE,
+          TableColumn.DESCRIPTION, TableColumn.MEMO, TableColumn.CATEGORY,
+          TableColumn.ACCOUNT, TableColumn.VALUE, TableColumn.PERCENTAGE,
+          TableColumn.COUNT, TableColumn.TAG,
+        ]}
+      />
+    );
+    const exportBtn = screen.getByRole('button', { name: /export/i });
+    fireEvent.click(exportBtn);
+    const csvBtn = screen.queryByText(/CSV/i);
+    if (csvBtn) {
+      fireEvent.click(csvBtn);
+    }
+    expect(exportToCsv).toHaveBeenCalled();
+  });
+
+  it('exports the pdf with formatted cells, a cent-exact total and a partial marker', async () => {
+    const { exportToPdf } = await import('@/lib/pdf-export');
+    (exportToPdf as any).mockClear();
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={[
+          { label: 'A', value: 0.1, count: 1, id: 'a', percentage: 50 },
+          { label: 'B', value: 0.2, count: 2, id: 'b', percentage: 50 },
+        ]}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.LABEL, TableColumn.VALUE, TableColumn.PERCENTAGE, TableColumn.COUNT]}
+        partialTotal={{ value: 0.3, missingCurrencies: ['JPY'], excludedCount: 1 }}
+      />
+    );
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+    await act(async () => { fireEvent.click(screen.getByText(/PDF/i)); });
+
+    const { tableData } = (exportToPdf as any).mock.calls[0][0];
+    expect(tableData.rows[0]).toEqual(['A', '$0.10', '50.0%', '1']);
+    // 0.1 + 0.2 is 0.30000000000000004 as a float.
+    expect(tableData.totalRow[1]).toBe('$0.30 (partial)');
+  });
+
+  it('exports csv with the metric-aware Total row, marked when partial', async () => {
+    const { exportToCsv } = await import('@/lib/csv-export');
+    (exportToCsv as any).mockClear();
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={[
+          { label: 'A', value: 10, count: 1, id: 'a' },
+          { label: 'B', value: 30, count: 3, id: 'b' },
+        ]}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.LABEL, TableColumn.VALUE, TableColumn.PERCENTAGE, TableColumn.COUNT]}
+        metric={MetricType.AVERAGE}
+        totalRowValue={17.5}
+        partialTotal={{ value: 17.5, missingCurrencies: [], excludedCount: 1 }}
+      />
+    );
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+    await act(async () => { fireEvent.click(screen.getByText(/CSV/i)); });
+
+    const rows = (exportToCsv as any).mock.calls[0][2];
+    expect(rows).toHaveLength(3);
+    expect(rows[2]).toEqual(['Total', '17.5 (partial)', 100, 4]);
+  });
+
+  it('prints the count metric as a number and the server headline in the total row', async () => {
+    const { exportToPdf } = await import('@/lib/pdf-export');
+    (exportToPdf as any).mockClear();
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={[{ label: 'A', value: 3, count: 3, id: 'a' }]}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.LABEL, TableColumn.VALUE]}
+        metric={MetricType.COUNT}
+        totalRowValue={7}
+      />
+    );
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+    await act(async () => { fireEvent.click(screen.getByText(/PDF/i)); });
+
+    const { tableData } = (exportToPdf as any).mock.calls[0][0];
+    expect(tableData.rows[0][1]).toBe('3');
+    expect(tableData.totalRow[1]).toBe('7');
+  });
+
+  it('exports pdf with DATE-only label fallback in totalRow', async () => {
+    const { exportToPdf } = await import('@/lib/pdf-export');
+    (exportToPdf as any).mockClear();
+    render(
+      <ReportChart
+        viewType={ReportViewType.PIE_CHART}
+        data={[{ label: '2024', value: 100, count: 5, date: '2024-01-01' }]}
+        groupBy={GroupByType.MONTH}
+        tableColumns={[TableColumn.DATE, TableColumn.VALUE, TableColumn.PERCENTAGE, TableColumn.COUNT]}
+      />
+    );
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+    const pdfBtn = screen.queryByText(/PDF/i);
+    if (pdfBtn) {
+      await act(async () => { fireEvent.click(pdfBtn); });
+    }
+  });
+
+  it('exports pdf for table view (no chart container)', async () => {
+    const { exportToPdf } = await import('@/lib/pdf-export');
+    (exportToPdf as any).mockClear();
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={sampleData}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.DATE, TableColumn.VALUE, TableColumn.PERCENTAGE, TableColumn.COUNT]}
+      />
+    );
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+    const pdfBtn = screen.queryByText(/PDF/i);
+    if (pdfBtn) {
+      await act(async () => { fireEvent.click(pdfBtn); });
+    }
+  });
+
+  it('renders totalCount as dash when zero', () => {
+    const data = [{ label: 'A', value: 100 }];
+    render(
+      <ReportChart
+        viewType={ReportViewType.TABLE}
+        data={data}
+        groupBy={GroupByType.CATEGORY}
+        tableColumns={[TableColumn.LABEL, TableColumn.VALUE, TableColumn.COUNT]}
+      />
+    );
+    const dashes = screen.getAllByText('-');
+    expect(dashes.length).toBeGreaterThanOrEqual(1);
+  });
+
+  // Discussion #1978: a both-direction list keeps its signs, so a share of the
+  // net total means nothing and the Total row names what it sums.
+  describe('signed rows', () => {
+    const signedData = [
+      { label: 'Salary', value: 1000, count: 1, id: 'tx-1' },
+      { label: 'Rent', value: -300, count: 1, id: 'tx-2' },
+    ];
+    const columns = [TableColumn.LABEL, TableColumn.VALUE, TableColumn.PERCENTAGE, TableColumn.COUNT];
+
+    it('prints signed amounts, no shares and the named total in the table', () => {
+      render(
+        <ReportChart
+          viewType={ReportViewType.TABLE}
+          data={signedData}
+          groupBy={GroupByType.NONE}
+          tableColumns={columns}
+          totalRowValue={700}
+          totalLabel="Net amount"
+          signed
+        />
+      );
+      expect(screen.getByText('$-300.00')).toBeInTheDocument();
+      expect(screen.getByText('$700.00')).toBeInTheDocument();
+      expect(screen.getByText('Net amount')).toBeInTheDocument();
+      expect(screen.queryByText('Total')).not.toBeInTheDocument();
+      expect(screen.queryByText('100%')).not.toBeInTheDocument();
+      expect(screen.getAllByText('-')).toHaveLength(2);
+    });
+
+    it('exports csv with blank shares and the named Total row', async () => {
+      const { exportToCsv } = await import('@/lib/csv-export');
+      (exportToCsv as any).mockClear();
+      render(
+        <ReportChart
+          viewType={ReportViewType.TABLE}
+          data={signedData}
+          groupBy={GroupByType.NONE}
+          tableColumns={columns}
+          totalRowValue={700}
+          totalLabel="Net amount"
+          signed
+        />
+      );
+      await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+      await act(async () => { fireEvent.click(screen.getByText(/CSV/i)); });
+
+      const rows = (exportToCsv as any).mock.calls[0][2];
+      expect(rows).toEqual([
+        ['Salary', 1000, '', 1],
+        ['Rent', -300, '', 1],
+        ['Net amount', 700, '', 2],
+      ]);
+    });
+
+    it('exports pdf with blank shares and the named Total row', async () => {
+      const { exportToPdf } = await import('@/lib/pdf-export');
+      (exportToPdf as any).mockClear();
+      render(
+        <ReportChart
+          viewType={ReportViewType.TABLE}
+          data={signedData}
+          groupBy={GroupByType.NONE}
+          tableColumns={columns}
+          totalRowValue={700}
+          totalLabel="Net amount"
+          signed
+        />
+      );
+      await act(async () => { fireEvent.click(screen.getByRole('button', { name: /export/i })); });
+      await act(async () => { fireEvent.click(screen.getByText(/PDF/i)); });
+
+      const { tableData } = (exportToPdf as any).mock.calls[0][0];
+      expect(tableData.rows[1]).toEqual(['Rent', '$-300.00', '', '1']);
+      expect(tableData.totalRow).toEqual(['Net amount', '$700.00', '', '2']);
+    });
+
+    it('leaves the share out of the chart tooltip', () => {
+      render(
+        <ReportChart viewType={ReportViewType.BAR_CHART} data={signedData} groupBy={GroupByType.NONE} signed />
+      );
+      expect(screen.getByText('$500.00')).toBeInTheDocument();
+      expect(screen.queryByText(/%\)/)).not.toBeInTheDocument();
+    });
+  });
+});

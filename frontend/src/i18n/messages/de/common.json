@@ -1,0 +1,279 @@
+{
+  "chartFlag": {
+    "dismiss": "Diesen Wert ausblenden"
+  },
+  "appVersion": {
+    "releaseNotes": "Versionshinweise für v{version} anzeigen"
+  },
+  "whatsNew": {
+    "title": "Neuigkeiten",
+    "versionLabel": "Version {version}",
+    "expandAll": "Alle ausklappen",
+    "collapseAll": "Alle einklappen",
+    "viewFullNotes": "Vollständige Versionshinweise anzeigen",
+    "dontShowAgain": "Nicht mehr anzeigen",
+    "showNextLogin": "Bei der nächsten Anmeldung anzeigen",
+    "close": "Schließen",
+    "unavailable": "Für diese Version sind keine Versionshinweise verfügbar.",
+    "englishOnly": "Die Versionshinweise unten sind nur auf Englisch verfügbar. Monize selbst, einschließlich der geführten Touren, folgt Ihrer Spracheinstellung."
+  },
+  "transferPayee": "{direction, select, to {Überweisung an {name}} other {Überweisung von {name}}}",
+  "save": "Speichern",
+  "cancel": "Abbrechen",
+  "delete": "Löschen",
+  "edit": "Bearbeiten",
+  "close": "Schließen",
+  "actions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "view": "Anzeigen",
+    "duplicate": "Duplizieren",
+    "merge": "Zusammenführen",
+    "reactivate": "Reaktivieren",
+    "reconcile": "Abgleichen",
+    "post": "Buchen",
+    "skip": "Überspringen",
+    "close": "Schließen",
+    "reopen": "Wieder öffnen",
+    "scheduleRecurring": "Wiederkehrend machen",
+    "more": "Weitere Aktionen"
+  },
+  "columns": {
+    "button": "Spalten",
+    "buttonWithHidden": "Spalten, {count} ausgeblendet",
+    "menuLabel": "Spalten ein- oder ausblenden",
+    "showAll": "Alle einblenden",
+    "hideColumn": "Spalte ausblenden",
+    "sheetSubtitle": "Über das Spaltenmenü wieder einblenden."
+  },
+  "loading": "Wird geladen...",
+  "pagination": {
+    "showing": "Angezeigt",
+    "of": "von",
+    "firstPage": "Erste Seite",
+    "lastPage": "Letzte Seite",
+    "previousPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "back10Pages": "10 Seiten zurück",
+    "forward10Pages": "10 Seiten vor",
+    "enterPageNumber": "Seitennummer eingeben"
+  },
+  "confirmDialog": {
+    "confirm": "Bestätigen"
+  },
+  "unsavedChanges": {
+    "title": "Nicht gespeicherte Änderungen",
+    "message": "Sie haben nicht gespeicherte Änderungen. Was möchten Sie tun?",
+    "discard": "Verwerfen"
+  },
+  "exportDropdown": {
+    "export": "Exportieren",
+    "exportCsv": "CSV exportieren",
+    "exporting": "Wird exportiert...",
+    "exportPdf": "PDF exportieren",
+    "exportReport": "Bericht exportieren",
+    "failedPdf": "PDF-Export fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "dateRange": {
+    "custom": "Benutzerdefiniert",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum"
+  },
+  "colorPicker": {
+    "custom": "Benutzerdefiniert:",
+    "apply": "Anwenden"
+  },
+  "chartDownload": {
+    "downloadAsPng": "{filename} als PNG herunterladen",
+    "unableToCapture": "Diagrammbild konnte nicht erfasst werden",
+    "failedToDownload": "Diagramm konnte nicht heruntergeladen werden"
+  },
+  "csvDownload": {
+    "downloadAsCsv": "{filename} als CSV herunterladen"
+  },
+  "chartViewToggle": {
+    "pieChart": "Kreisdiagramm",
+    "barChart": "Balkendiagramm",
+    "stackedChart": "100 % gestapeltes Balkendiagramm",
+    "lineChart": "Liniendiagramm",
+    "areaChart": "Flächendiagramm",
+    "sankeyChart": "Flussdiagramm",
+    "table": "Tabelle"
+  },
+  "formActions": {
+    "cancel": "Abbrechen",
+    "save": "Speichern"
+  },
+  "themeToggle": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System",
+    "title": "Design: {label}. Klicken zum Ändern."
+  },
+  "errorPage": {
+    "title": "Etwas ist schiefgelaufen",
+    "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support, wenn das Problem weiterhin besteht.",
+    "errorId": "Fehler-ID: {digest}",
+    "tryAgain": "Erneut versuchen",
+    "goToDashboard": "Zum Dashboard"
+  },
+  "errorBoundary": {
+    "defaultMessage": "Beim Rendern dieser Komponente ist ein Fehler aufgetreten."
+  },
+  "calendar": {
+    "clear": "Löschen",
+    "today": "Heute"
+  },
+  "multiSelect": {
+    "search": "Suchen...",
+    "selectAll": "Alle auswählen",
+    "clear": "Löschen",
+    "clearSearch": "Suche löschen",
+    "noOptions": "Keine Optionen gefunden",
+    "selectedCount": "{count} ausgewählt"
+  },
+  "categoryFilter": {
+    "uncategorized": "Nicht kategorisiert",
+    "transfers": "Überweisungen",
+    "allIncome": "Alle Einnahmenkategorien",
+    "allExpenses": "Alle Ausgabenkategorien"
+  },
+  "combobox": {
+    "createOption": "\"{value}\" erstellen",
+    "deleteOption": "„{value}“ löschen"
+  },
+  "passwordInput": {
+    "show": "Eingabe anzeigen",
+    "hide": "Eingabe ausblenden"
+  },
+  "currencyInput": {
+    "openCalculator": "Rechner öffnen",
+    "calculator": "Rechner",
+    "toggleSign": "Vorzeichen ändern",
+    "apply": "Übernehmen"
+  },
+  "dateInput": {
+    "shortcutsTitle": "Tastaturkürzel",
+    "openPicker": "Datumsauswahl öffnen",
+    "today": "Heute",
+    "firstDayOfYear": "Erster Tag des Jahres",
+    "lastDayOfYear": "Letzter Tag des Jahres",
+    "firstDayOfMonth": "Erster Tag des Monats",
+    "lastDayOfMonth": "Letzter Tag des Monats",
+    "nextDay": "Nächster Tag",
+    "previousDay": "Vorheriger Tag",
+    "nextMonth": "Nächster Monat",
+    "previousMonth": "Vorheriger Monat",
+    "partialDateHint": "Geben Sie einen Teil eines Datums ein, der Rest wird ergänzt: Tag und Monat übernehmen das aktuelle Jahr."
+  },
+  "accountTypes": {
+    "CHEQUING": "Girokonto",
+    "SAVINGS": "Sparkonto",
+    "CREDIT_CARD": "Kreditkarte",
+    "INVESTMENT": "Investmentkonto",
+    "LOAN": "Darlehen",
+    "MORTGAGE": "Hypothek",
+    "CASH": "Bargeld",
+    "LINE_OF_CREDIT": "Kreditlinie",
+    "ASSET": "Aktiva",
+    "CRYPTO": "Krypto-Wallet",
+    "OTHER": "Sonstiges"
+  },
+  "accountFilter": {
+    "allAccounts": "Alle Konten",
+    "allBut": "Alle außer {names}"
+  },
+  "passwordRequirements": "Das Passwort muss mindestens 12 Zeichen lang sein und einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.",
+  "passwordValidation": {
+    "min": "Das Passwort muss mindestens 12 Zeichen lang sein",
+    "max": "Das Passwort darf höchstens 100 Zeichen lang sein",
+    "lowercase": "Muss einen Kleinbuchstaben enthalten",
+    "uppercase": "Muss einen Großbuchstaben enthalten",
+    "number": "Muss eine Zahl enthalten",
+    "special": "Muss ein Sonderzeichen enthalten"
+  },
+  "codeValidation": {
+    "length": "Der Code muss genau 6 Ziffern lang sein",
+    "digits": "Der Code muss 6 Ziffern haben"
+  },
+  "monthsShort": [
+    "Jan",
+    "Feb",
+    "Mär",
+    "Apr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dez"
+  ],
+  "weekdaysShort": [
+    "So",
+    "Mo",
+    "Di",
+    "Mi",
+    "Do",
+    "Fr",
+    "Sa"
+  ],
+  "weekdaysMin": [
+    "So",
+    "Mo",
+    "Di",
+    "Mi",
+    "Do",
+    "Fr",
+    "Sa"
+  ],
+  "weekdaysNarrow": [
+    "S",
+    "M",
+    "D",
+    "M",
+    "D",
+    "F",
+    "S"
+  ],
+  "dateFormat": {
+    "browserAuto": "Browser-Gebietsschema verwenden (automatisch erkannt: {sample})",
+    "custom": "Benutzerdefiniert..."
+  },
+  "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+  "noSectionAccess": "Sie haben keinen Zugriff auf diesen Bereich.",
+  "undoRedo": {
+    "nothingToUndo": "Nichts rückgängig zu machen",
+    "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden",
+    "undoFailed": "Rückgängig machen fehlgeschlagen",
+    "nothingToRedo": "Nichts zu wiederholen",
+    "cannotRedo": "Diese Aktion kann nicht wiederholt werden",
+    "redoFailed": "Wiederholen fehlgeschlagen"
+  },
+  "partialTotal": {
+    "srSuffix": "(Teilsumme)",
+    "explanation": "Teilsumme: {count, plural, one {# Betrag} other {# Beträge}} konnten nicht einbezogen werden, daher schließt der angezeigte Wert sie aus. Für {currencies} ist kein Kurs zu {displayCurrency} verfügbar.",
+    "explanationExcluded": "Teilsumme: {count, plural, one {# Betrag} other {# Beträge}} konnten nicht ermittelt werden, daher schließt der angezeigte Wert sie aus."
+  },
+  "unknownAmount": {
+    "marker": "—",
+    "srLabel": "Betrag nicht verfügbar",
+    "scheduledFx": "Der aktuelle Betrag lässt sich nicht ermitteln: Für das Abrechnungs-Währungspaar dieses geplanten Eintrags ist kein Wechselkurs verfügbar. Der gespeicherte Betrag wurde mit einem älteren Kurs berechnet und wird daher nicht angezeigt.",
+    "displayFx": "Dieser Wert kann hier nicht angezeigt werden: der Betrag ist bekannt, aber es ist kein Wechselkurs verfügbar, um ihn in die Währung dieser Summe umzurechnen. Aktualisieren Sie die Kurse auf der Seite Währungen.",
+    "noCashBalance": "Dieser Wert lässt sich nicht ermitteln: Ein Geldkonto in dieser Ansicht hat für diesen Tag keinen Saldo gemeldet, sein Bestand ist also unbekannt und nicht null. Laden Sie den Bericht neu; bleibt es dabei, konnten die Salden des Tages nicht ermittelt werden, und das ist meldenswert.",
+    "noPrice": "Dieser Wert lässt sich nicht ermitteln: Die gehaltenen Anteile sind bekannt, aber für das Wertpapier liegt kein Kurs vor, mit dem sie bewertet werden könnten. Aktualisieren Sie die Kurse oder tragen Sie einen Kurs manuell im Kursverlauf des Wertpapiers ein.",
+    "noBaseline": "Dieser Wert kann nicht ermittelt werden: Er ist ein Vergleich, und es gibt keinen früheren Wert, mit dem er verglichen werden kann. Es fehlt nichts, also ist nichts hinzuzufügen.",
+    "staleQuote": "Die Tagesveränderung lässt sich nicht ermitteln: Der jüngste Kurs des Wertpapiers ist älter als die letzte Handelssitzung, jede Veränderung daraus wäre also die eines früheren Tages. Aktualisieren Sie die Kurse oder prüfen Sie den Kursanbieter des Wertpapiers.",
+    "unknownCurrency": "Dieser Betrag kann nicht angezeigt werden: Der Datensatz nennt kein Wertpapier, daher ist die Währung des Betrags unbekannt. Öffnen Sie die Transaktion und weisen Sie ihr ein Wertpapier zu, damit ihre Beträge beschriftet werden können."
+  },
+  "density": {
+    "title": "Zeilendichte umschalten",
+    "normal": "Normal",
+    "compact": "Kompakt",
+    "dense": "Dicht"
+  },
+  "scheduledOverdue": {
+    "included": "Enthält {count, plural, one {# überfällige terminierte Buchung} other {# überfällige terminierte Buchungen}}"
+  }
+}

@@ -1,0 +1,448 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@/test/render';
+import BudgetEditPage from './page';
+
+// Mock next/navigation
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+  usePathname: () => '/budgets/budget-1/edit',
+  useParams: () => ({ id: 'budget-1' }),
+}));
+
+// Mock next/image
+vi.mock('next/image', () => ({
+  default: ({ priority, fill, ...props }: any) => <img alt="" {...props} />,
+}));
+
+// Mock logger
+vi.mock('@/lib/logger', () => ({
+  createLogger: () => ({
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+  }),
+}));
+
+// Mock auth store
+vi.mock('@/store/authStore', () => ({
+  useAuthStore: Object.assign(
+    (selector?: any) => {
+      const state = {
+        user: { id: 'test-user-id', email: 'test@example.com', firstName: 'Test', lastName: 'User', role: 'user', hasPassword: true },
+        isAuthenticated: true,
+        isLoading: false,
+        _hasHydrated: true,
+        logout: vi.fn(),
+      };
+      return selector ? selector(state) : state;
+    },
+    {
+      getState: vi.fn(() => ({
+        user: { id: 'test-user-id', email: 'test@example.com', firstName: 'Test', lastName: 'User', role: 'user', hasPassword: true },
+        isAuthenticated: true,
+        isLoading: false,
+        _hasHydrated: true,
+      })),
+    },
+  ),
+}));
+
+// Mock preferences store
+vi.mock('@/store/preferencesStore', () => ({
+  usePreferencesStore: (selector?: any) => {
+    const state = {
+      preferences: { twoFactorEnabled: true, theme: 'system', defaultCurrency: 'USD', numberFormat: 'en-US' },
+      isLoaded: true,
+      _hasHydrated: true,
+    };
+    return selector ? selector(state) : state;
+  },
+}));
+
+// Mock auth API
+vi.mock('@/lib/auth', () => ({
+  authApi: {
+    getAuthMethods: vi.fn().mockResolvedValue({
+      local: true, oidc: false, registration: true, smtp: false, force2fa: false, demo: false,
+    }),
+  },
+}));
+
+// Mock errors
+vi.mock('@/lib/errors', () => ({
+  getErrorMessage: vi.fn((_e: any, fallback: string) => fallback),
+}));
+
+// Mock number format
+vi.mock('@/hooks/useNumberFormat', async () => {
+  const { numberFormatMockDefaults } = await import('@/test/number-format-mock');
+  return {
+    useNumberFormat: () => ({
+      ...numberFormatMockDefaults(),
+      formatCurrency: (amount: number) => `$${amount.toFixed(2)}`,
+      formatNumber: (amount: number) => amount.toFixed(2),
+      formatPercent: (amount: number) => `${amount}%`,
+      defaultCurrency: 'USD',
+    }),
+  };
+});
+
+// Mock budgets API
+const mockGetById = vi.fn();
+const mockGetSummary = vi.fn();
+const mockRemoveCategory = vi.fn();
+
+vi.mock('@/lib/budgets', () => ({
+  budgetsApi: {
+    getById: (...args: any[]) => mockGetById(...args),
+    getSummary: (...args: any[]) => mockGetSummary(...args),
+    update: vi.fn(),
+    updateCategory: vi.fn(),
+    removeCategory: (...args: any[]) => mockRemoveCategory(...args),
+  },
+}));
+
+// Mock components
+vi.mock('@/components/budgets/BudgetForm', () => ({
+  BudgetForm: ({ onCancel }: any) => (
+    <div data-testid="budget-form">
+      <button data-testid="form-cancel" onClick={onCancel}>Cancel</button>
+    </div>
+  ),
+}));
+
+vi.mock('@/components/budgets/BudgetCategoryForm', () => ({
+  BudgetCategoryForm: ({ onRemove }: any) => (
+    <div data-testid="category-form">
+      <button data-testid="category-remove" onClick={onRemove}>Remove from budget</button>
+    </div>
+  ),
+}));
+
+const mockToastSuccess = vi.fn();
+const mockToastError = vi.fn();
+vi.mock('react-hot-toast', () => ({
+  default: {
+    success: (...args: any[]) => mockToastSuccess(...args),
+    error: (...args: any[]) => mockToastError(...args),
+  },
+}));
+
+vi.mock('@/components/budgets/BudgetProgressBar', () => ({
+  BudgetProgressBar: () => <div data-testid="progress-bar" />,
+}));
+
+vi.mock('@/components/layout/PageLayout', () => ({
+  PageLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@/components/layout/PageHeader', () => ({
+  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
+    <div data-testid="page-header">
+      <h1>{title}</h1>
+      {actions}
+    </div>
+  ),
+}));
+
+vi.mock('@/components/ui/LoadingSpinner', () => ({
+  LoadingSpinner: () => <div data-testid="loading-spinner">Loading...</div>,
+}));
+
+vi.mock('@/components/ui/Modal', () => ({
+  Modal: ({ children, isOpen }: { children: React.ReactNode; isOpen: boolean }) =>
+    isOpen ? <div data-testid="modal">{children}</div> : null,
+}));
+
+vi.mock('@/components/ui/ConfirmDialog', () => ({
+  ConfirmDialog: ({ isOpen, title, message, confirmLabel, onConfirm, onCancel }: any) =>
+    isOpen ? (
+      <div data-testid="confirm-dialog">
+        <h3>{title}</h3>
+        <p>{message}</p>
+        <button onClick={onConfirm}>{confirmLabel}</button>
+        <button onClick={onCancel}>Keep</button>
+      </div>
+    ) : null,
+}));
+
+const mockBudget = {
+  id: 'budget-1',
+  userId: 'user-1',
+  name: 'February 2026',
+  description: null,
+  budgetType: 'MONTHLY',
+  periodStart: '2026-02-01',
+  periodEnd: '2026-02-28',
+  baseIncome: 6000,
+  incomeLinked: false,
+  strategy: 'FIXED',
+  isActive: true,
+  currencyCode: 'USD',
+  config: {},
+  categories: [
+    {
+      id: 'bc-1',
+      budgetId: 'budget-1',
+      categoryId: 'cat-1',
+      category: { id: 'cat-1', name: 'Groceries', isIncome: false },
+      amount: 600,
+      isIncome: false,
+      rolloverType: 'NONE',
+      rolloverCap: null,
+      flexGroup: null,
+      alertWarnPercent: 80,
+      alertCriticalPercent: 95,
+      notes: null,
+      sortOrder: 0,
+    },
+  ],
+  createdAt: '2026-02-01',
+  updatedAt: '2026-02-01',
+};
+
+const mockSummary = {
+  budget: mockBudget,
+  totalBudgeted: 5200,
+  totalSpent: 3100,
+  totalIncome: 6000,
+  remaining: 2100,
+  percentUsed: 59.62,
+  categoryBreakdown: [
+    {
+      budgetCategoryId: 'bc-1',
+      categoryId: 'cat-1',
+      categoryName: 'Groceries',
+      budgeted: 600,
+      spent: 420,
+      remaining: 180,
+      percentUsed: 70,
+      isIncome: false,
+    },
+  ],
+};
+
+describe('BudgetEditPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetById.mockResolvedValue(mockBudget);
+    mockGetSummary.mockResolvedValue(mockSummary);
+    mockRemoveCategory.mockResolvedValue(undefined);
+  });
+
+  it('shows loading spinner initially', async () => {
+    render(<BudgetEditPage />);
+
+    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+
+    // Wait for async operations to complete to prevent act() warnings
+    await waitFor(() => {
+      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+    });
+  });
+
+  it('renders budget form after loading', async () => {
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('budget-form')).toBeInTheDocument();
+    });
+  });
+
+  it('displays budget name in header', async () => {
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Edit: February 2026')).toBeInTheDocument();
+    });
+  });
+
+  it('shows category list with expense categories', async () => {
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Groceries')).toBeInTheDocument();
+    });
+  });
+
+  it('shows expenses heading with count', async () => {
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Expenses (1)')).toBeInTheDocument();
+    });
+  });
+
+  it('returns to the budget through a chevron link above the title', async () => {
+    render(<BudgetEditPage />);
+
+    // The way back names the budget and sits on the line above the title,
+    // not among the header actions.
+    const back = await screen.findByRole('link', { name: 'Back to February 2026' });
+    expect(back).toHaveAttribute('href', '/budgets/budget-1');
+    expect(back.querySelector('svg')).not.toBeNull();
+    const header = screen.getByTestId('page-header');
+    expect(header.contains(back)).toBe(false);
+    expect(back.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByText('Back to Dashboard')).toBeNull();
+  });
+
+  it('redirects to budgets list on error', async () => {
+    mockGetById.mockRejectedValue(new Error('Not found'));
+
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/budgets');
+    });
+  });
+
+  it('opens category edit modal when expense category is clicked', async () => {
+    render(<BudgetEditPage />);
+
+    await waitFor(() => expect(screen.getByText('Groceries')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Groceries'));
+    await waitFor(() => {
+      expect(screen.getByTestId('modal')).toBeInTheDocument();
+      expect(screen.getByTestId('category-form')).toBeInTheDocument();
+    });
+  });
+
+  it('shows modal title with category name when editing', async () => {
+    render(<BudgetEditPage />);
+
+    await waitFor(() => expect(screen.getByText('Groceries')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Groceries'));
+    await waitFor(() => {
+      expect(screen.getByText('Edit Groceries')).toBeInTheDocument();
+    });
+  });
+
+  it('shows income categories section when income categories exist', async () => {
+    const budgetWithIncome = {
+      ...mockBudget,
+      categories: [
+        ...mockBudget.categories,
+        {
+          id: 'bc-income-1',
+          budgetId: 'budget-1',
+          categoryId: 'cat-income',
+          category: { id: 'cat-income', name: 'Salary', isIncome: true },
+          amount: 5000,
+          isIncome: true,
+          rolloverType: 'NONE',
+          rolloverCap: null,
+          flexGroup: null,
+          alertWarnPercent: 0,
+          alertCriticalPercent: 0,
+          notes: null,
+          sortOrder: 0,
+        },
+      ],
+    };
+    mockGetById.mockResolvedValue(budgetWithIncome);
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Salary')).toBeInTheDocument();
+    });
+  });
+
+  it('shows parent category name in getCategoryDisplayName', async () => {
+    const budgetWithParent = {
+      ...mockBudget,
+      categories: [
+        {
+          id: 'bc-sub',
+          budgetId: 'budget-1',
+          categoryId: 'cat-sub',
+          category: {
+            id: 'cat-sub',
+            name: 'Groceries',
+            isIncome: false,
+            parent: { id: 'cat-parent', name: 'Food' },
+          },
+          amount: 400,
+          isIncome: false,
+          rolloverType: 'ROLLOVER',
+          rolloverCap: null,
+          flexGroup: 'flex-group-1',
+          alertWarnPercent: 80,
+          alertCriticalPercent: 95,
+          notes: null,
+          sortOrder: 0,
+        },
+      ],
+    };
+    mockGetById.mockResolvedValue(budgetWithParent);
+    render(<BudgetEditPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Food: Groceries')).toBeInTheDocument();
+    });
+    // Also check rollover text and flex group badge
+    expect(screen.getByText('Rollover: rollover')).toBeInTheDocument();
+    expect(screen.getByText('flex-group-1')).toBeInTheDocument();
+  });
+
+  describe('removing a category', () => {
+    async function openRemoveConfirm() {
+      render(<BudgetEditPage />);
+      await waitFor(() => expect(screen.getByText('Groceries')).toBeInTheDocument());
+      fireEvent.click(screen.getByText('Groceries'));
+      fireEvent.click(await screen.findByTestId('category-remove'));
+      return screen.findByTestId('confirm-dialog');
+    }
+
+    it('asks for confirmation, naming the line and its allocation, before removing', async () => {
+      const dialog = await openRemoveConfirm();
+
+      expect(dialog).toHaveTextContent('Remove Category');
+      expect(dialog).toHaveTextContent('Remove "Groceries" from this budget? Its $600.00 allocation');
+      // The edit modal closes so the confirmation is the only dialog open.
+      expect(screen.queryByTestId('category-form')).not.toBeInTheDocument();
+      expect(mockRemoveCategory).not.toHaveBeenCalled();
+    });
+
+    it('removes the budget line and reloads the budget on confirm', async () => {
+      await openRemoveConfirm();
+      mockGetById.mockClear();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
+      await waitFor(() => {
+        expect(mockRemoveCategory).toHaveBeenCalledWith('budget-1', 'bc-1');
+      });
+      await waitFor(() => expect(mockGetById).toHaveBeenCalledWith('budget-1'));
+      // The reload settles back to the page, not the spinner.
+      await screen.findByTestId('budget-form');
+      expect(mockToastSuccess).toHaveBeenCalledWith('Category removed from budget');
+      expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument();
+    });
+
+    it('does not remove anything when the confirmation is cancelled', async () => {
+      await openRemoveConfirm();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Keep' }));
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument();
+      });
+      expect(mockRemoveCategory).not.toHaveBeenCalled();
+    });
+
+    it('reports a failed removal', async () => {
+      mockRemoveCategory.mockRejectedValue(new Error('boom'));
+      await openRemoveConfirm();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
+      await waitFor(() => {
+        expect(mockToastError).toHaveBeenCalledWith('Failed to remove category');
+      });
+      expect(mockToastSuccess).not.toHaveBeenCalled();
+    });
+  });
+});

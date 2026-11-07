@@ -1,0 +1,424 @@
+{
+  "test": {
+    "subject": "Monize 测试邮件",
+    "heading": "Monize 测试邮件",
+    "greeting": "您好，{{ name }}，",
+    "body": "这是一封来自 Monize 的测试邮件。如果您收到了此邮件，说明您的邮件通知功能运行正常。"
+  },
+  "billReminder": {
+    "subjectOne": "Monize：1 个即将到期的账单需要关注",
+    "subjectMany": "Monize：{{ count }} 个即将到期的账单需要关注",
+    "heading": "即将到期账单提醒",
+    "greeting": "您好，{{ name }}，",
+    "introOne": "您有 1 个即将到期的账单需要关注：",
+    "introMany": "您有 {{ count }} 个即将到期的账单需要关注：",
+    "colPayee": "收款人",
+    "colDueDate": "到期日",
+    "colType": "类型",
+    "colAmount": "金额",
+    "typeIncome": "收入",
+    "typeExpense": "支出",
+    "typeUnknown": "方向未知",
+    "amountUnavailable": "金额不可用",
+    "button": "查看账单与存款"
+  },
+  "mortgageReminder": {
+    "subject": "Monize：1 笔抵押贷款的利率期限即将结束",
+    "subjectPlural": "Monize：{{ count }} 笔抵押贷款的利率期限即将结束",
+    "heading": "抵押贷款利率期限提醒",
+    "greeting": "您好，{{ name }}，",
+    "introOne": "您有 1 笔抵押贷款的当前利率期限即将结束。请在结束前联系贷款机构，安排下一期利率或续期：",
+    "introMany": "您有 {{ count }} 笔抵押贷款的当前利率期限即将结束。请在每笔结束前联系贷款机构，安排下一期利率或续期：",
+    "colMortgage": "抵押贷款",
+    "colTermEndDate": "期限到期日",
+    "colTimeRemaining": "剩余时间",
+    "daysRemainingOne": "1 天",
+    "daysRemainingMany": "{{ count }} 天",
+    "button": "查看账户"
+  },
+  "severity": {
+    "critical": "严重",
+    "warning": "警告",
+    "success": "好消息",
+    "info": "信息"
+  },
+  "budgetAlertImmediate": {
+    "subject": "Monize：提醒 - {{ title }}",
+    "subjectPlural": "Monize：{{ count }} 个提醒需要关注",
+    "heading": "提醒",
+    "greeting": "您好，{{ name }}，",
+    "intro": "您的预算需要关注：",
+    "colSeverity": "严重性",
+    "colAlert": "提醒",
+    "colDetails": "详情",
+    "button": "查看预算"
+  },
+  "budgetWeeklyDigest": {
+    "subject": "Monize：您的每周预算摘要",
+    "heading": "每周预算摘要",
+    "greeting": "您好，{{ name }}，",
+    "intro": "以下是您的每周预算摘要：<strong>{{ budgets }}</strong>",
+    "criticalOne": "个严重",
+    "criticalMany": "个严重",
+    "warningOne": "个警告",
+    "warningMany": "个警告",
+    "positiveOne": "个正面",
+    "positiveMany": "个正面",
+    "thisWeek": "本周：",
+    "noAlerts": "无提醒",
+    "totalAlerts": "总提醒数：{{ count }}",
+    "topAlertsHeading": "主要提醒",
+    "andMore": "...还有 {{ count }} 个",
+    "button": "查看预算仪表盘"
+  },
+  "budgetMonthlySummary": {
+    "subject": "Monize：月度预算摘要 - {{ period }}",
+    "subjectPlural": "Monize：{{ count }} 个预算的月度摘要",
+    "heading": "月度预算摘要",
+    "greeting": "您好，{{ name }}，",
+    "intro": "以下是刚刚结束的周期的月度预算摘要：",
+    "overBudget": "超出预算",
+    "healthScore": "健康评分：",
+    "labelBudgeted": "预算",
+    "labelSpent": "已支出",
+    "labelRemaining": "剩余",
+    "percentUsed": "已用 {{ percent }}%",
+    "topCategories": "主要分类",
+    "button": "查看预算仪表盘"
+  },
+  "oidcLink": {
+    "subject": "Monize：确认 SSO 账户关联",
+    "heading": "关联您的 SSO 账户",
+    "greeting": "您好，{{ name }}，",
+    "intro": "有人尝试通过 SSO 使用与您现有 Monize 账户匹配的电子邮件登录。要将您的 SSO 身份关联到此账户，请点击下方按钮：",
+    "button": "确认账户关联",
+    "disclaimer": "如果您未发起此请求，可以安全忽略此邮件。链接将在 1 小时后过期。"
+  },
+  "accountLocked": {
+    "subject": "账户已暂时锁定",
+    "heading": "账户已暂时锁定",
+    "greeting": "您好，{{ name }}，",
+    "body1": "由于多次登录失败，您的 Monize 账户已被暂时锁定。这是保护您账户安全的措施。",
+    "body2": "锁定将自动过期。如果您未尝试登录，建议立即重置密码。"
+  },
+  "passwordReset": {
+    "subject": "Monize 密码重置",
+    "heading": "密码重置请求",
+    "greeting": "您好，{{ name }}，",
+    "intro": "我们收到了您的密码重置请求。点击下方按钮设置新密码：",
+    "button": "重置密码",
+    "disclaimer": "此链接将在 1 小时后过期。如果您未请求密码重置，可以安全忽略此邮件。"
+  },
+  "emailVerification": {
+    "subject": "验证您的 Monize 邮箱",
+    "heading": "验证您的邮箱地址",
+    "greeting": "您好，{{ name }}，",
+    "intro": "感谢您注册 Monize。请确认您的邮箱地址以激活账户并登录：",
+    "button": "验证邮箱",
+    "disclaimer": "此链接将在 24 小时后过期。如果您未创建 Monize 账户，可以安全忽略此邮件。"
+  },
+  "emailChangeConfirm": {
+    "subject": "确认您的 Monize 新邮箱",
+    "heading": "确认您的新邮箱地址",
+    "greeting": "您好，{{ name }}，",
+    "intro": "有人请求将此地址用于 Monize 账户。在您点击下方按钮确认之前，您的邮箱不会更改：",
+    "button": "确认更改邮箱",
+    "disclaimer": "此链接将在 24 小时后过期。如果您未请求此更改，可以安全忽略此邮件。"
+  },
+  "emailChangeNotice": {
+    "subject": "已请求更改 Monize 邮箱",
+    "heading": "已请求更改邮箱",
+    "greeting": "您好，{{ name }}，",
+    "body1": "有人请求将您的 Monize 账户邮箱地址更改为 {{ email }}。只有从该地址确认后，更改才会生效。",
+    "body2": "如果这不是您发起的请求，请立即更改密码，并检查已登录您账户的设备。"
+  },
+  "accountInvite": {
+    "subject": "您的 Monize 账户已准备就绪",
+    "heading": "您的 Monize 账户已准备就绪",
+    "greeting": "您好，{{ name }}，",
+    "intro": "管理员已为您创建了 Monize 账户。点击下方按钮设置密码并登录：",
+    "button": "设置密码",
+    "disclaimer": "此链接将在 24 小时后过期。如果您未期待此邮件，可以安全忽略。"
+  },
+  "delegateInvite": {
+    "subject": "您已受邀加入 Monize",
+    "heading": "您已受邀加入 Monize",
+    "greeting": "您好，{{ name }}，",
+    "intro": "{{ owner }} 邀请您作为委托人访问其 Monize 账户。点击下方按钮设置密码并开始使用：",
+    "button": "设置密码",
+    "disclaimer": "此链接将在 24 小时后过期。如果您未期待此邀请，可以安全忽略此邮件。"
+  },
+  "emergencyAccessReminder": {
+    "subjectOne": "Monize：您的账户已有 1 天未活跃",
+    "subjectMany": "Monize：您的账户已有 {{ daysSinceLogin }} 天未活跃",
+    "heading": "Monize 紧急访问提醒",
+    "greeting": "您好，{{ name }}，",
+    "grantPhraseToday": "今天",
+    "grantPhraseFutureOne": "1 天后",
+    "grantPhraseFutureMany": "{{ count }} 天后",
+    "bodyOne": "您已有 <strong>1 天</strong>未登录 Monize。如果您继续不活跃，您指定的紧急联系人将 {{ grantPhrase }} 获得对您账户的完全访问权限。",
+    "bodyMany": "您已有 <strong>{{ daysSinceLogin }} 天</strong>未登录 Monize。如果您继续不活跃，您指定的紧急联系人将 {{ grantPhrase }} 获得对您账户的完全访问权限。",
+    "contactsLabel": "指定联系人：",
+    "button": "立即登录",
+    "footer": "登录将重置计时器。如果您不再需要此功能，可以在设置 → 紧急访问中将其禁用。"
+  },
+  "emergencyAccessGrant": {
+    "subject": "您已获得对 {{ owner }} 的 Monize 账户的紧急访问权限",
+    "heading": "紧急访问已授权",
+    "greeting": "您好，{{ name }}，",
+    "body": "<strong>{{ owner }}</strong> 之前将您指定为其 Monize 账户的紧急联系人。由于他们已长时间未登录，现授予您完全访问权限以接管该账户。",
+    "claimIntro": "要获取访问权限，请点击下方链接并设置新密码。您将以账户持有人身份登录。",
+    "button": "领取紧急访问权限",
+    "expiry": "此链接有效期至 <strong>{{ expiry }}</strong>，且只能使用一次。如果多位联系人收到了此邮件，第一个领取者将接管账户。"
+  },
+  "emergencyAccessGrantRevoked": {
+    "subject": "Monize：您不在期间紧急访问权限已被授予",
+    "heading": "您不在期间紧急访问权限已被授予",
+    "greeting": "您好，{{ name }}，",
+    "body1": "由于您的账户已处于不活跃状态，您指定的紧急联系人收到了接管账户的链接。您现在已重新登录，因此<strong>这些链接已被撤销</strong>，安全保障已重新启动。",
+    "body2": "如果这是预期的，则无需采取任何行动。如果您未预料到此情况，请检查您的登录活动和紧急访问设置。",
+    "button": "查看紧急访问"
+  },
+  "providerOutage": {
+    "subject": "Monize：{{ provider }} 无响应",
+    "heading": "市场数据提供方不可用",
+    "greeting": "您好，{{ name }}，",
+    "intro": "自 {{ since }} 起（{{ duration }}），Monize 一直无法连接 <strong>{{ provider }}</strong>。对该提供方的请求已暂停，并会以逐渐延长的间隔重试。",
+    "labelFailures": "失败尝试次数",
+    "labelLastError": "最近一次错误",
+    "labelLastSuccess": "最近一次成功响应",
+    "valueNever": "从未",
+    "valueUnknown": "未知",
+    "impact": "依赖该提供方的价格、图表和指数对比在其恢复响应前可能缺失或过时。Monize 中记录的数据没有丢失。",
+    "whatToCheck": "如果提供方本身正常，请检查此服务器的出站网络访问和 DNS——无法解析或无法连接提供方的容器正是以这种方式失败的。",
+    "throttleNote": "提供方恢复后你会再收到一封邮件。关于同一提供方的告警最多每 {{ hours }} 小时发送一次，因此反复抖动的提供方不会填满你的收件箱。",
+    "durationMinutes": "{{ minutes }} 分钟",
+    "durationHoursMinutes": "{{ hours }} 小时 {{ minutes }} 分钟"
+  },
+  "providerRecovery": {
+    "subject": "Monize：{{ provider }} 已恢复响应",
+    "heading": "市场数据提供方已恢复响应",
+    "greeting": "您好，{{ name }}，",
+    "intro": "<strong>{{ provider }}</strong> 已于 {{ restoredAt }} 恢复响应，本次故障持续了 {{ duration }}。",
+    "backfill": "故障期间缺失的价格和指数历史会在下一次计划刷新时补齐，无需任何操作。"
+  },
+  "systemAlert": {
+    "subject": "Monize: {{ title }}",
+    "heading": "系统警报",
+    "greeting": "您好，{{ name }}，",
+    "intro": "您的 Monize 部署出现了需要管理员关注的问题。",
+    "footer": "此警报也会显示在应用的通知铃铛中。无论有多少个服务器副本发现该问题，每次事件最多只会生成一条警报。"
+  },
+  "notificationImmediate": {
+    "subject": "您有一条新的 Monize 通知",
+    "eyebrow": "Monize 通知",
+    "button": "在 Monize 中打开",
+    "footer": "您收到此邮件是因为此通知类型已开启即时邮件。可在设置、通知中更改。"
+  },
+  "notificationCopy": {
+    "billDue": {
+      "titleOverdue": "{{ payee }} 已逾期",
+      "titleToday": "{{ payee }} 今天到期",
+      "titleTomorrow": "{{ payee }} 明天到期",
+      "titleInDays": "{{ payee }} 将在 {{ days }} 天后到期",
+      "amountDue": "{{ date }} 应付 {{ amount }}",
+      "amountUnavailable": "金额不可用（无当前汇率），到期日 {{ date }}"
+    },
+    "gemSignal": {
+      "riskTitle": "{{ strategy }} 已切换为{{ state }}",
+      "riskMessage": "您的 GEM 策略“{{ strategy }}”已从{{ fromState }}变为{{ toState }}。打开以查看建议。",
+      "allocationTitle": "{{ strategy }} 更改了目标",
+      "allocationMessage": "您的 GEM 策略“{{ strategy }}”现在的目标是 {{ target }}。打开以查看建议。",
+      "riskOn": "风险偏好",
+      "riskOff": "避险",
+      "roles": {
+        "US_EQUITY": "标普 500",
+        "EX_US_EQUITY": "除美国外的发达市场",
+        "EM_EQUITY": "新兴市场",
+        "SAFE": "避险资产",
+        "RISK_FREE": "无风险基准"
+      },
+      "allocationMessageUnknown": "您的GEM策略“{{ strategy }}”已更改目标。打开以查看建议。"
+    },
+    "portfolioMovement": {
+      "titleUp": "投资上涨 {{ percent }}%",
+      "titleDown": "投资下跌 {{ percent }}%",
+      "messageUp": "从 {{ from }} 到 {{ to }}，您的投资上涨了 {{ percent }}%（不含存入和取出）。打开以查看。",
+      "messageDown": "从 {{ from }} 到 {{ to }}，您的投资下跌了 {{ percent }}%（不含存入和取出）。打开以查看。"
+    },
+    "balanceThreshold": {
+      "titleLow": "{{ account }} 低于您的阈值",
+      "titleHigh": "{{ account }} 高于您的阈值",
+      "messageLow": "{{ account }} 降至 {{ balance }}，低于您的阈值 {{ threshold }}。",
+      "messageHigh": "{{ account }} 升至 {{ balance }}，高于您的阈值 {{ threshold }}。"
+    },
+    "system": {
+      "backupFailed": {
+        "title": "自动备份失败",
+        "message": "{{ user }} 的自动备份失败：{{ error }}"
+      },
+      "backupPartial": {
+        "title": "自动备份不完整",
+        "messageAttachments": "{{ user }} 的备份已写入，但 {{ expected }} 个附件中有 {{ missing }} 个无法包含，另有 {{ inconsistent }} 个与其元数据不匹配。完整备份已保留。",
+        "messagePromotion": "{{ user }} 的每日备份成功，但其每周或每月副本无法写入：{{ error }}",
+        "messageRetention": "{{ user }} 的备份成功，但旧的备份文件无法清理：{{ error }}"
+      },
+      "encryptionKeyMissing": {
+        "title": "未配置加密密钥",
+        "message": "未设置 ENCRYPTION_KEY，备份将以未加密方式写入，且无法保存机密信息。未来版本将在缺少该密钥时拒绝启动。"
+      },
+      "jwtSecretWeak": {
+        "title": "JWT_SECRET 强度不足",
+        "message": "JWT_SECRET 是公开的示例值或过于容易猜测，会话令牌可能被伪造。请生成一个强密钥（openssl rand -base64 32）。更改后，身份验证器应用中的验证码将失效，受信任设备也会被清除：用户使用备用码登录后重新设置 2FA，对于没有备用码的用户，请在用户管理中重置其 2FA。请先阅读 docs/backend/modules-and-runtime.md（Changing JWT_SECRET）。"
+      },
+      "smtpFailure": {
+        "title": "邮件发送失败",
+        "message": "Monize 无法发送邮件：{{ error }}。通知和提醒未能送达。"
+      },
+      "providerOutage": {
+        "title": "{{ provider }} 无响应",
+        "message": "无法获取 {{ provider }} 的市场数据。在其恢复响应之前，价格和指数数据可能已过时。"
+      },
+      "providerRecovered": {
+        "title": "{{ provider }} 已恢复响应",
+        "message": "故障已结束，{{ provider }} 的市场数据正在重新更新。"
+      },
+      "scheduledPostFailed": {
+        "title": "无法登记 {{ name }}",
+        "message": "您到期日为 {{ date }} 的定期交易未能自动登记：{{ error }}。您可以在“账单与存款”中手动登记。"
+      }
+    },
+    "budget": {
+      "overTitle": "{{ category }}已超出预算",
+      "overMessage": "您已在{{ category }}上支出{{ amount }}，预算为{{ limit }}（{{ percent }}%）。",
+      "criticalTitle": "{{ category }}接近限额",
+      "warningTitle": "{{ category }}即将达到预算限额",
+      "thresholdMessage": "您已使用{{ category }}预算的{{ percent }}%（{{ amount }}，总预算{{ limit }}）。",
+      "projectedTitle": "预计{{ category }}将超出预算",
+      "projectedMessage": "按目前的支出速度，预计{{ category }}在本期结束时将达到{{ projected }}（预算：{{ budgeted }}）。",
+      "flexTitle": "弹性组“{{ group }}”已达{{ percent }}%",
+      "flexMessage": "弹性组“{{ group }}”已使用{{ spent }}，总预算为{{ budgeted }}（{{ percent }}%）。",
+      "incomeTitle": "收入低于预期",
+      "incomeMessage": "在本期的这个阶段，您的实际收入（{{ actual }}）为预期收入（{{ expected }}）的{{ ratio }}%。",
+      "milestoneTitle": "预算执行良好",
+      "milestoneMessage": "本期已过去{{ progress }}%，而您仅使用了总预算的{{ percent }}%。继续保持！",
+      "seasonalTitle": "预计{{ category }}将出现季节性支出高峰",
+      "seasonalMessage": "上一个{{ month }}，您在{{ category }}上的支出是平时的{{ increase }}倍。请考虑调整预算。"
+    },
+    "priceMovement": {
+      "title": "价格变动提醒: {{ symbol }} ({{ percent }}%)",
+      "message": "{{ symbol }}：相对于上一个有数据的交易日变动 {{ percent }}%。"
+    },
+    "bankSync": {
+      "expiringTitleToday": "{{ institution }}：银行访问权限今天到期",
+      "expiringTitleOneDay": "{{ institution }}：银行访问权限将在 1 天内到期",
+      "expiringTitleDays": "{{ institution }}：银行访问权限将在 {{ days }} 天内到期",
+      "expiringMessage": "您授权 Monize 读取 {{ institution }} 的有效期至 {{ date }} 结束。请在 Monize 中续期连接以继续同步。",
+      "expiredTitle": "{{ institution }}：银行访问权限已到期",
+      "expiredMessage": "您授权 Monize 读取 {{ institution }} 的有效期已结束。请在 Monize 中续期连接以恢复同步。",
+      "failedTitle": "{{ institution }}：同步失败",
+      "failedMessage": "{{ institution }} 的每日同步在以下账户失败：{{ accounts }}。请打开银行同步设置查看原因。",
+      "failedCredentialsMessage": "由于银行同步凭据缺失或被拒绝，{{ institution }} 的每日同步无法启动。请在银行同步设置中检查凭据。",
+      "unnamedAccount": "一个账户",
+      "importedTitle": "{{ institution }}：已导入新交易",
+      "importedMessage": "每日同步从 {{ institution }} 导入的交易：{{ imported }} 笔。",
+      "importedNoneTitle": "{{ institution }}：没有新交易",
+      "importedNoneMessage": "{{ institution }} 的每日同步没有发现新交易。"
+    },
+    "bond": {
+      "maturitySoonTitle": "{{ series }} 将于 {{ date }} 到期",
+      "maturitySoonMessage": "{{ quantity }} × {{ series }} 将于 {{ date }} 到期。{{ payout }}",
+      "interestTitle": "{{ series }}：{{ date }} 支付利息",
+      "interestMessage": "{{ quantity }} × {{ series }} 将于 {{ date }} 支付利息 {{ amount }}。如果账户中尚未入账，请在证券页面记录。",
+      "interestMessageUnknown": "{{ quantity }} × {{ series }} 将于 {{ date }} 付息。金额暂未确定：所依据的利率尚未公布。",
+      "rateResetTitle": "{{ series }}：新的计息期",
+      "rateResetMessage": "{{ series }} 已于 {{ date }} 进入第 {{ period }} 期，年利率 {{ rate }}。",
+      "unbookedTitle": "{{ series }}：已到期，兑付未记录",
+      "unbookedMessage": "{{ quantity }} × {{ series }} 已于 {{ date }} 到期，但尚未记录兑付。{{ payout }}请在证券页面记录兑付。",
+      "payoutKnown": "兑付金额为 {{ payout }}。",
+      "payoutUnknown": "兑付金额暂未确定：{{ reason }}。",
+      "reason": {
+        "RATE_UNKNOWN": "所依据的利率尚未公布",
+        "TERMS_INCOMPLETE": "该系列的条款不完整",
+        "PURCHASE_OUTSIDE_SALE_WINDOW": "购买日期不在该系列的发售期内",
+        "other": "无法根据已存数据计算"
+      },
+      "benchmarkTitle": "{{ benchmark }}：新数据 {{ observation }}",
+      "benchmarkMessage": "{{ publisher }} 已公布 {{ observation }} 的 {{ benchmark }}：{{ value }}。使用该指标的系列：{{ series }}。",
+      "benchmarkMessageMore": "{{ publisher }} 已公布 {{ observation }} 的 {{ benchmark }}：{{ value }}。使用该指标的系列：{{ series }}，以及另外 {{ more }} 个。",
+      "missingTitle": "债券数据暂未确定",
+      "missingMessage": "部分债券数据无法计算：{{ causes }}。",
+      "benchmarks": {
+        "PL_CPI_GUS_YOY": "居民消费价格指数，12 个月 (GUS)",
+        "PL_NBP_REFERENCE": "NBP 基准利率"
+      },
+      "cause": {
+        "observation": "{{ benchmark }}（{{ publisher }}）{{ observation }} 的数据未存储：尚未公布，或此后未获取数据源；请在债券页面刷新",
+        "observationNoPublisher": "{{ benchmark }} {{ observation }} 的数据未存储：尚未公布，或此后未获取数据源；请在债券页面刷新",
+        "terms": "{{ series }} 的条款不完整；请在债券页面刷新该系列",
+        "purchase": "{{ series }} 于 {{ date }} 的购买不在其发售期（{{ from }} 至 {{ to }}）内；请更正购买日期",
+        "lots": "无法从账本推导出持仓批次（{{ code }}）；请更正账本",
+        "lotsRow": "{{ date }} 的{{ action }}：无法推导出持仓批次（{{ code }}）；请更正该交易",
+        "lotsRowSeries": "{{ date }} 的{{ action }}：未归入任何系列（{{ code }}）；请在该交易中选择系列",
+        "lotsRowRemoval": "{{ date }} 的{{ action }}：减少的数量超过账户持有的该系列数量（{{ code }}）；请更正该交易"
+      },
+      "action": {
+        "BUY": "买入",
+        "SELL": "卖出",
+        "REINVEST": "再投资",
+        "ADD_SHARES": "增加份额",
+        "REMOVE_SHARES": "减少份额",
+        "SPLIT": "拆分",
+        "TRANSFER_IN": "转入",
+        "TRANSFER_OUT": "转出",
+        "other": "交易"
+      }
+    },
+    "emailReceiptsAttention": {
+      "title": "电子邮件收据需要关注",
+      "message": "您的收据收件箱包含 {{ noParser }} 个没有个人资料的邮件和 {{ parseFailed }} 个其个人资料未识别的邮件。打开以查看。"
+    },
+    "aiReview": {
+      "readyTitle": "AI 审核提案正在等待您",
+      "readyMessage": "等待您决定的提案：{{ count }} 项。自上次通知以来新增：{{ added }} 项。打开以审核。",
+      "expiringTitle": "AI 审核提案即将过期",
+      "expiringMessage": "3 天内过期的提案：{{ count }} 项。最早的一项于 {{ date }} 过期。打开以审核。"
+    },
+    "warranty": {
+      "expiringTitle": "{{ name }}：保修即将到期",
+      "expiringMessage": "{{ name }} 的保修将于 {{ date }} 到期。打开即可查看其文档或记录保修申请。",
+      "todayTitle": "{{ name }}：保修今天到期",
+      "todayMessage": "{{ name }} 的保修于今天（{{ date }}）到期。打开即可查看其文档或记录保修申请。"
+    },
+    "payrollDeduction": {
+      "resetTitle": "{{ category }}：请确认明年的上限",
+      "resetMessage": "{{ bill }} 上的 {{ category }} 扣款将于 {{ date }} 重置。如果年度上限有变化请更新；否则 {{ amount }} 将再次适用。"
+    },
+    "shared": {
+      "title": "共同支出",
+      "message": "共享群组有更新。打开 Monize 查看。"
+    }
+  },
+  "backupOffsite": {
+    "copySubject": "Monize 备份 {{ filename }}",
+    "copyHeading": "您的 Monize 备份已作为附件发送",
+    "copyIntro": "这是您 Monize 账户 {{ date }} 的自动{{ tier }}备份。文件已附在本邮件中。",
+    "copyEncrypted": "附件已使用您的 Monize 备份密码加密。没有该密码无法打开，Monize 也无法为您找回，请将密码保存在本邮箱以外的地方。",
+    "copyRestore": "要恢复它，请打开 Monize，前往 设置、备份与恢复，上传此文件并输入您的备份密码。",
+    "copyVerify": "上面的 SHA-256 针对的是附件的字节内容，因此您以后可以核对所保留的副本是否就是本邮件送达的那一份。",
+    "tooLargeSubject": "Monize 备份 {{ filename }} 过大，无法通过邮件发送",
+    "tooLargeHeading": "您的 Monize 备份未通过邮件发送",
+    "tooLargeIntro": "今天的备份为 {{ size }}，超过了此部署对邮件发送备份所允许的 {{ limit }}（BACKUP_EMAIL_MAX_BYTES）。",
+    "tooLargeNoBytes": "本邮件未附带任何内容，也不提供下载链接：下载链接需要一个能够从存储中读回您备份的凭据，而此功能并不持有这样的凭据。",
+    "tooLargeUnaffected": "备份本身已正常写入。此服务器上的副本不受影响；若您启用了 S3 目标，那里的副本同样不受影响。",
+    "tooLargeWhatToDo": "若要在本机之外保留这种大小的备份副本，请在 设置、备份与恢复 中下载，启用 S3 目标，或请管理员提高邮件大小上限。",
+    "labelFile": "文件",
+    "labelSize": "大小",
+    "labelTier": "保留周期",
+    "labelLimit": "邮件上限",
+    "labelDigest": "SHA-256",
+    "tierDaily": "每日",
+    "tierWeekly": "每周",
+    "tierMonthly": "每月"
+  }
+}

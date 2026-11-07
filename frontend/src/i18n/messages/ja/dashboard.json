@@ -1,0 +1,311 @@
+{
+  "page": {
+    "welcomePrefix": "ようこそ",
+    "welcomeWithName": "ようこそ、{name}さん！",
+    "subtitle": "財務の概要をご確認ください"
+  },
+  "favouriteAccounts": {
+    "title": "お気に入りの勘定科目",
+    "empty": "お気に入りの勘定科目がまだありません。勘定科目をお気に入りに登録するとここに表示されます。",
+    "reorder": "並べ替え",
+    "dragToReorder": "勘定科目をドラッグして並べ替えるか、矢印ボタンを使用してください。",
+    "done": "完了",
+    "moveUp": "上へ移動",
+    "moveDown": "下へ移動",
+    "marketValue": "時価",
+    "due": "支払日: {ordinal}",
+    "dueTooltip": "毎月のクレジットカード支払い期日",
+    "settlement": "締め日: {ordinal}",
+    "settlementTooltip": "請求サイクルの最終日。この日以前に計上された取引が現在の明細に表示されます。"
+  },
+  "upcomingBills": {
+    "title": "今後の請求書・入金",
+    "empty": "リマインダー期間内に期限超過または予定されている請求書、入金、振替はありません。",
+    "postTransaction": "この取引を計上する",
+    "manual": "手動",
+    "negativeBalanceWarning": "この取引により勘定科目の残高がマイナスになります",
+    "negativeBalanceLegend": "口座残高がマイナスになります",
+    "moreItems": "+{count} 件",
+    "overdue": "期限超過",
+    "today": "今日",
+    "tomorrow": "明日",
+    "daysUntil": "{count} 日後",
+    "typeBadge": {
+      "bill": "請求書",
+      "deposit": "入金",
+      "transfer": "振替",
+      "reminder": "リマインダー",
+      "unknown": "不明"
+    },
+    "scope": {
+      "dueSoon": "期日が近い",
+      "all": "今後すべて"
+    },
+    "viewLabel": "表示形式",
+    "viewList": "リスト",
+    "viewCalendar": "カレンダー",
+    "previousMonth": "前の月",
+    "nextMonth": "次の月",
+    "emptyAll": "予定されている有効な請求、入金、振替はありません。"
+  },
+  "cashFlowForecast": {
+    "title": "キャッシュフロー予測",
+    "period": "予測期間",
+    "loadFailed": "今日より後の日付の取引を読み込めなかったため、予測を表示できません。ダッシュボードを再読み込みしてもう一度お試しください。"
+  },
+  "gettingStarted": {
+    "title": "はじめに",
+    "subtitle": "いくつかの簡単な手順でアカウントを設定してください",
+    "dismiss": "閉じる",
+    "steps": {
+      "settings": {
+        "title": "設定を確認する",
+        "description": "通貨、日付形式、テーマを設定してください"
+      },
+      "categories": {
+        "title": "カテゴリを設定する",
+        "description": "カテゴリを作成するかデフォルトセットをインポートしてください"
+      },
+      "account": {
+        "title": "最初の勘定科目を追加する",
+        "description": "銀行口座を作成して管理を始めましょう"
+      },
+      "import": {
+        "title": "QIF からインポートする",
+        "description": "QIF ファイルから勘定科目と取引をインポートしてください"
+      }
+    }
+  },
+  "budgetStatus": {
+    "title": "予算の状況",
+    "noBudget": "有効な予算が見つかりません。支出を管理するために予算を作成してください。",
+    "createBudget": "予算を作成",
+    "viewFullBudget": "予算の詳細を見る",
+    "daysLeft": "残り {count} 日",
+    "safeToSpend": "今日の使用可能額",
+    "topCategories": "主なカテゴリ"
+  },
+  "insights": {
+    "title": "支出インサイト",
+    "empty": "インサイトがありません。インサイトページを開いて最初の分析を生成してください。",
+    "goToInsights": "インサイトへ",
+    "activeCount": "{count} 件有効"
+  },
+  "warrantiesExpiring": {
+    "title": "まもなく期限切れになる保証",
+    "empty": "今後 30 日以内に期限切れになるものはありません",
+    "loadFailed": "期限切れが近い保証を読み込めませんでした。ダッシュボードを再読み込みして、もう一度お試しください。"
+  },
+  "topMovers": {
+    "title": "値動き上位",
+    "empty": {
+      "noInvestments": "日次値動きを追跡するには投資勘定科目を追加してください。",
+      "noPrices": "まだ価格変動データがありません。",
+      "noGainers": "今日の値上がり銘柄はありません。",
+      "noLosers": "今日の値下がり銘柄はありません。"
+    },
+    "dailyChange": "日次変動",
+    "dailyChangeOn": "日次変動 · {date}",
+    "openPriceHistory": "{symbol} の価格履歴",
+    "refreshPrices": "価格を更新",
+    "viewPortfolio": "ポートフォリオを見る",
+    "filter": {
+      "all": "すべて ({count})",
+      "gainers": "値上がり ({count})",
+      "losers": "値下がり ({count})",
+      "label": "方向"
+    },
+    "metric": {
+      "label": "表示",
+      "price": "株価",
+      "holdings": "保有"
+    }
+  },
+  "favouriteSecurities": {
+    "title": "お気に入りの有価証券",
+    "empty": "お気に入りの有価証券がまだありません。<securitiesLink>有価証券ページ</securitiesLink>を開いて追跡したい有価証券をスターしてください。",
+    "noPriceYet": "価格未登録",
+    "dailyChange": "日次変動",
+    "dailyChangeOn": "日次変動 · {date}",
+    "openPriceHistory": "{symbol} の価格履歴",
+    "refreshPrices": "価格を更新"
+  },
+  "netWorth": {
+    "title": "純資産",
+    "empty": "純資産データがまだありません。",
+    "barStyle": "棒の表示",
+    "barStyleNetWorth": "純資産",
+    "barStyleAccountType": "口座の種類別",
+    "loadFailed": "純資産の履歴を読み込めませんでした。ダッシュボードを再読み込みしてもう一度お試しください。"
+  },
+  "assetsVsLiabilities": {
+    "title": "資産 対 負債",
+    "empty": "純資産データがまだありません。",
+    "current": "現在",
+    "netWorthLabel": "純資産",
+    "assets": "資産",
+    "liabilities": "負債",
+    "partialName": "{name}（部分的）",
+    "viewCallouts": "ラベル",
+    "viewLegend": "凡例"
+  },
+  "expensesPieChart": {
+    "title": "カテゴリ別支出",
+    "empty": "この期間の支出データがありません。",
+    "total": "合計",
+    "uncategorized": "未分類",
+    "other": "その他",
+    "insideOther": "{count, plural, other {その他に# カテゴリ}}",
+    "topLevelOnly": "最上位カテゴリ",
+    "topLevelOnlyHint": "サブカテゴリを親カテゴリに集計します",
+    "viewCallouts": "ラベル",
+    "viewLegend": "凡例"
+  },
+  "incomeExpenses": {
+    "title": "収入 対 支出",
+    "income": "収入",
+    "expenses": "支出",
+    "net": "差引"
+  },
+  "customize": {
+    "button": "カスタマイズ",
+    "title": "ダッシュボードのカスタマイズ",
+    "description": "以下のレイアウトはダッシュボードと同じ配置です。ウィジェットは左から右へ並び、大きい画面では1行に2つ表示されます。",
+    "moveEarlier": "{name}を前へ移動",
+    "moveLater": "{name}を後ろへ移動",
+    "dragToReorder": "ウィジェットをドラッグして並べ替えるか、矢印ボタンを使用してください。",
+    "hiddenWidgets": "非表示のウィジェット",
+    "hide": "{name}を非表示にする",
+    "show": "{name}を表示する",
+    "atLeastOne": "ダッシュボードに表示するウィジェットを少なくとも1つ選択してください。",
+    "reset": "デフォルトに戻す",
+    "toasts": {
+      "saveFailed": "ダッシュボードレイアウトの保存に失敗しました"
+    }
+  },
+  "favouriteReports": {
+    "title": "お気に入りのレポート",
+    "empty": "お気に入りのレポートがまだありません。レポートページでレポートをスターするとここに表示されます。",
+    "browseReports": "レポートを見る"
+  },
+  "widgets": {
+    "configure": "{name}を設定",
+    "asOf": "{date}時点",
+    "done": "完了",
+    "configSaveFailed": "ウィジェット設定を保存できませんでした。もう一度お試しください。",
+    "timeframe": "期間",
+    "accounts": "口座",
+    "chartType": "グラフの種類",
+    "view": "表示",
+    "viewCalloutsHint": "ラベルには広い画面が必要です。収まらない場合は凡例が表示されます。",
+    "displayName": "表示名",
+    "description": "説明",
+    "descriptionPlaceholder": "任意の説明を追加",
+    "rangeLabels": {
+      "1m": "1M",
+      "3m": "3M",
+      "6m": "6M",
+      "1y": "1Y",
+      "2y": "2Y",
+      "5y": "5Y",
+      "10y": "10Y",
+      "ytd": "YTD",
+      "all": "すべて",
+      "1w": "1週",
+      "mtd": "月初来"
+    }
+  },
+  "portfolioValue": {
+    "title": "ポートフォリオ価値",
+    "empty": "表示する投資履歴がまだありません。",
+    "refresh": "現在の価値を更新",
+    "investmentResult": "投資成果",
+    "periodBreakdownInvestedTooltip": "この期間に証券の価値は {valueChange} 変動しました。そのうち {netInvested} は売却を差し引いた投資額で、配当と利息として {income} が支払われました。株式に再投資された分配金は両方に含まれます。上の数値は、投資されていない現金を除いた、投資そのものの成果です。",
+    "notAvailable": "N/A"
+  },
+  "spendingByPayee": {
+    "title": "支払先別支出",
+    "empty": "この期間に支出がありません。",
+    "totalLabel": "合計"
+  },
+  "monthlySpendingTrend": {
+    "title": "月次支出トレンド",
+    "empty": "この期間のデータがありません。",
+    "expenses": "支出",
+    "income": "収入"
+  },
+  "incomeBySource": {
+    "title": "収入源別収入",
+    "empty": "この期間に収入がありません。",
+    "totalLabel": "総収入"
+  },
+  "creditUtilizationAccounts": {
+    "title": "口座別使用率",
+    "empty": "限度額が設定されたクレジット口座がありません。",
+    "utilization": "使用率",
+    "used": "使用額",
+    "noRate": "利用不可（{currency} のレートなし）"
+  },
+  "creditUtilizationTotal": {
+    "title": "合計使用率",
+    "empty": "限度額が設定されたクレジット口座がありません。",
+    "used": "使用額",
+    "available": "利用可能額"
+  },
+  "sectorWeightings": {
+    "title": "セクター配分",
+    "empty": "セクターデータがありません。",
+    "direct": "直接",
+    "etf": "ETF"
+  },
+  "securityTypeAllocation": {
+    "title": "有価証券タイプ配分",
+    "empty": "表示する保有銘柄がありません。",
+    "types": {
+      "STOCK": "株式",
+      "ETF": "ETF",
+      "MUTUAL_FUND": "投資信託",
+      "BOND": "債券",
+      "CASH": "現金"
+    },
+    "viewType": "証券種別",
+    "viewAssetClass": "資産クラス",
+    "otherAssetClasses": "その他",
+    "emptyAssetClass": "資産クラスの内訳はまだありません。"
+  },
+  "geographicAllocation": {
+    "title": "地域配分",
+    "empty": "表示する保有銘柄がありません。",
+    "viewRegion": "地域",
+    "viewExchange": "取引所",
+    "viewCountry": "国",
+    "listingBasisNote": "各保有銘柄の上場市場でグループ化しています。ファンドの中身を見るには国に切り替えてください。"
+  },
+  "recurringExpenses": {
+    "title": "上位定期費用",
+    "empty": "定期費用が見つかりません。",
+    "minOccurrences": "最小発生回数",
+    "minOccurrencesOption": "{count} 回以上",
+    "occurrences": "{count} 回",
+    "monthlyEstimate": "月次見積もり",
+    "viewCallouts": "ラベル",
+    "viewLegend": "凡例"
+  },
+  "weekendVsWeekday": {
+    "title": "週末 vs 平日の支出",
+    "empty": "この期間に支出がありません。",
+    "weekendLabel": "週末",
+    "weekdayLabel": "平日",
+    "viewOverview": "概要",
+    "viewByDay": "曜日別"
+  },
+  "cashFlowSankey": {
+    "title": "キャッシュフロー サンキー",
+    "empty": "この期間の収入、支出、振替はありません。",
+    "depth": "詳細度",
+    "depthCategories": "カテゴリ",
+    "depthSubcategories": "サブカテゴリ",
+    "viewDiagram": "図",
+    "viewTable": "テーブル"
+  }
+}

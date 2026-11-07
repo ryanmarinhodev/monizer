@@ -1,0 +1,1162 @@
+import {
+  AiActionBuilderService,
+  investmentPreviewRow,
+  transactionPreviewRow,
+  transferPreviewRow,
+} from "./ai-action-builder.service";
+import { AiActionSigningService } from "./ai-action-signing.service";
+import {
+  CategorizeTransactionPreview,
+  CreateTransactionPreview,
+  UpdateTransactionPreview,
+  DeleteTransactionPreview,
+} from "../../transactions/transactions.service";
+import { CreatePayeePreview } from "../../payees/payees.service";
+import {
+  CreateInvestmentTransactionPreview,
+  UpdateInvestmentTransactionPreview,
+  DeleteInvestmentTransactionPreview,
+} from "../../securities/investment-transactions.service";
+import { InvestmentAction } from "../../securities/entities/investment-transaction.entity";
+
+describe("AiActionBuilderService", () => {
+  let builder: AiActionBuilderService;
+  let signing: { sign: jest.Mock };
+
+  beforeEach(() => {
+    signing = { sign: jest.fn().mockReturnValue("sig-123") };
+    builder = new AiActionBuilderService(
+      signing as unknown as AiActionSigningService,
+    );
+  });
+
+  it("builds a signed create_transaction action from a preview", () => {
+    const preview: CreateTransactionPreview = {
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -50,
+      transactionDate: "2025-01-15",
+      payeeId: "p1",
+      payeeName: "Store",
+      payeeMatched: true,
+      payeeWillBeCreated: false,
+      categoryId: "c1",
+      categoryName: "Groceries",
+      description: "weekly shop",
+      currencyCode: "USD",
+    };
+
+    const action = builder.buildCreateTransaction("u1", preview);
+
+    expect(action.type).toBe("create_transaction");
+    expect(action.signature).toBe("sig-123");
+    expect(action.expiresAt).toBeGreaterThan(Date.now());
+    expect(action.descriptor).toMatchObject({
+      type: "create_transaction",
+      userId: "u1",
+      accountId: "a1",
+      amount: -50,
+      payeeId: "p1",
+      createPayee: false,
+      categoryId: "c1",
+      currencyCode: "USD",
+    });
+    // The descriptor (not the preview) is what gets signed.
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({
+      accountName: "Checking",
+      amount: -50,
+      categoryName: "Groceries",
+    });
+  });
+
+  it("carries the rule effects of a create into the display-only preview, never the signed descriptor", () => {
+    const ruleEffects = {
+      changes: { categoryId: "c9", addTagIds: ["t1"], removeTagIds: [] },
+      trace: [],
+      aiReviewRequests: [],
+      labels: {
+        accounts: {},
+        categories: { c9: "Groceries" },
+        payees: {},
+        tags: {},
+        rules: {},
+      },
+    };
+    const preview: CreateTransactionPreview = {
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -50,
+      transactionDate: "2025-01-15",
+      payeeId: null,
+      payeeName: "Store",
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      description: null,
+      currencyCode: "USD",
+      ruleEffects,
+    };
+
+    const action = builder.buildCreateTransaction("u1", preview);
+    expect(action.preview.ruleEffects).toBe(ruleEffects);
+    expect(JSON.stringify(action.descriptor)).not.toContain("ruleEffects");
+    expect(transactionPreviewRow(preview).ruleEffects).toBe(ruleEffects);
+
+    const without = builder.buildCreateTransaction("u1", {
+      ...preview,
+      ruleEffects: undefined,
+    });
+    expect("ruleEffects" in without.preview).toBe(false);
+  });
+
+  it("builds a categorize_transaction action and omits a null account name", () => {
+    const preview: CategorizeTransactionPreview = {
+      transactionId: "t1",
+      payeeName: null,
+      amount: 12,
+      transactionDate: "2025-02-01",
+      accountName: null,
+      currentCategoryName: null,
+      categoryId: "c2",
+      newCategoryName: "Dining",
+    };
+
+    const action = builder.buildCategorizeTransaction("u1", preview);
+
+    expect(action.type).toBe("categorize_transaction");
+    expect(action.descriptor).toMatchObject({
+      type: "categorize_transaction",
+      userId: "u1",
+      transactionId: "t1",
+      categoryId: "c2",
+    });
+    expect(action.preview.accountName).toBeUndefined();
+    expect(action.preview.newCategoryName).toBe("Dining");
+  });
+
+  it("builds a create_payee action", () => {
+    const preview: CreatePayeePreview = {
+      name: "Hydro",
+      defaultCategoryId: "c3",
+      defaultCategoryName: "Utilities",
+    };
+
+    const action = builder.buildCreatePayee("u1", preview);
+
+    expect(action.type).toBe("create_payee");
+    expect(action.descriptor).toMatchObject({
+      type: "create_payee",
+      userId: "u1",
+      name: "Hydro",
+      defaultCategoryId: "c3",
+    });
+    expect(action.preview).toMatchObject({
+      name: "Hydro",
+      categoryName: "Utilities",
+    });
+  });
+
+  it("builds an update_payee action", () => {
+    const action = builder.buildUpdatePayee("u1", {
+      payeeId: "p9",
+      name: "Hydro One",
+      defaultCategoryId: "c3",
+      defaultCategoryName: "Utilities",
+    });
+
+    expect(action.type).toBe("update_payee");
+    expect(action.descriptor).toMatchObject({
+      type: "update_payee",
+      userId: "u1",
+      payeeId: "p9",
+      name: "Hydro One",
+      defaultCategoryId: "c3",
+    });
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({
+      name: "Hydro One",
+      categoryName: "Utilities",
+    });
+  });
+
+  it("builds a delete_payee action", () => {
+    const action = builder.buildDeletePayee("u1", {
+      payeeId: "p9",
+      name: "Hydro",
+    });
+
+    expect(action.type).toBe("delete_payee");
+    expect(action.descriptor).toMatchObject({
+      type: "delete_payee",
+      userId: "u1",
+      payeeId: "p9",
+    });
+    expect(action.preview).toMatchObject({ name: "Hydro" });
+  });
+
+  it("builds a create_security action from a preview", () => {
+    const preview = {
+      symbol: "AAPL",
+      name: "Apple Inc.",
+      securityType: "STOCK",
+      exchange: "NASDAQ",
+      currencyCode: "USD",
+      isFavourite: true,
+      quoteProvider: "yahoo" as const,
+      msnInstrumentId: null,
+    };
+
+    const action = builder.buildCreateSecurity("u1", preview);
+
+    expect(action.type).toBe("create_security");
+    expect(action.descriptor).toMatchObject({
+      type: "create_security",
+      userId: "u1",
+      symbol: "AAPL",
+      name: "Apple Inc.",
+      securityType: "STOCK",
+      exchange: "NASDAQ",
+      currencyCode: "USD",
+      isFavourite: true,
+      quoteProvider: "yahoo",
+    });
+    // The descriptor (not the preview) is what gets signed.
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({
+      symbol: "AAPL",
+      securityName: "Apple Inc.",
+      securityType: "STOCK",
+      exchange: "NASDAQ",
+      securityCurrency: "USD",
+      isFavourite: true,
+    });
+  });
+
+  it("carries both manual allocations into the signed update descriptor", () => {
+    const action = builder.buildUpdateSecurity("u1", {
+      securityId: "s9",
+      symbol: "VBAL",
+      name: "Vanguard Balanced ETF",
+      securityType: "ETF",
+      exchange: "TSX",
+      currencyCode: "CAD",
+      isFavourite: false,
+      countryWeightings: [{ name: "Canada", weight: 0.3 }],
+      assetWeightings: [
+        { name: "Equity", weight: 0.6 },
+        { name: "Fixed Income", weight: 0.4 },
+      ],
+    });
+
+    expect(action.descriptor).toMatchObject({
+      countryWeightings: [{ name: "Canada", weight: 0.3 }],
+      assetWeightings: [
+        { name: "Equity", weight: 0.6 },
+        { name: "Fixed Income", weight: 0.4 },
+      ],
+    });
+    // Signing covers the allocations, so a tampered breakdown fails verify.
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+  });
+
+  it("builds an update_security action", () => {
+    const action = builder.buildUpdateSecurity("u1", {
+      securityId: "s9",
+      symbol: "AAPL",
+      name: "Apple Inc.",
+      securityType: "ETF",
+      exchange: "NYSE",
+      currencyCode: "USD",
+      isFavourite: true,
+      countryWeightings: null,
+      assetWeightings: null,
+    });
+
+    expect(action.type).toBe("update_security");
+    expect(action.descriptor).toMatchObject({
+      type: "update_security",
+      userId: "u1",
+      securityId: "s9",
+      securityType: "ETF",
+      exchange: "NYSE",
+      currencyCode: "USD",
+      isFavourite: true,
+    });
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({
+      symbol: "AAPL",
+      securityName: "Apple Inc.",
+      securityType: "ETF",
+    });
+  });
+
+  it("builds a delete_security action", () => {
+    const action = builder.buildDeleteSecurity("u1", {
+      securityId: "s9",
+      symbol: "AAPL",
+      name: "Apple Inc.",
+    });
+
+    expect(action.type).toBe("delete_security");
+    expect(action.descriptor).toMatchObject({
+      type: "delete_security",
+      userId: "u1",
+      securityId: "s9",
+    });
+    expect(action.preview).toMatchObject({
+      symbol: "AAPL",
+      securityName: "Apple Inc.",
+    });
+  });
+
+  it("builds a create_investment_transaction action", () => {
+    const preview: CreateInvestmentTransactionPreview = {
+      accountId: "acc1",
+      accountName: "Brokerage",
+      accountCurrency: "USD",
+      action: InvestmentAction.BUY,
+      transactionDate: "2025-03-03",
+      securityId: "s1",
+      symbol: "VTI",
+      securityName: "Vanguard Total",
+      securityCurrency: "USD",
+      fundingAccountId: null,
+      quantity: 10,
+      price: 200,
+      commission: 1,
+      accruedInterest: 0,
+      exchangeRate: 1,
+      totalAmount: 2001,
+      cashAccountName: "Brokerage Cash",
+      cashCurrency: "USD",
+      cashAmount: -2001,
+      description: null,
+      bondInstrumentId: null,
+      bondSeriesCode: null,
+      redemptionSplit: null,
+    };
+
+    const action = builder.buildCreateInvestmentTransaction("u1", preview);
+
+    expect(action.type).toBe("create_investment_transaction");
+    expect(action.descriptor).toMatchObject({
+      type: "create_investment_transaction",
+      userId: "u1",
+      accountId: "acc1",
+      action: InvestmentAction.BUY,
+      securityId: "s1",
+      exchangeRate: 1,
+    });
+    expect(action.preview).toMatchObject({
+      symbol: "VTI",
+      investmentAction: InvestmentAction.BUY,
+      totalAmount: 2001,
+    });
+    expect(action.preview).not.toHaveProperty("scheduledName");
+
+    // A trade that pays a scheduled occurrence names it, and the due date the
+    // card was built for, on the card as well as in the signed descriptor.
+    const paying = builder.buildCreateInvestmentTransaction("u1", preview, {
+      scheduled: { id: "sch-1", name: "Monthly VTI", dueDate: "2025-03-04" },
+    });
+    expect(paying.descriptor).toMatchObject({
+      scheduledTransactionId: "sch-1",
+      scheduledDueDate: "2025-03-04",
+    });
+    expect(paying.preview).toMatchObject({
+      scheduledName: "Monthly VTI",
+      scheduledDueDate: "2025-03-04",
+    });
+  });
+
+  it("builds a bulk create_transactions action: signed rows are the valid ones, preview rows include flagged", () => {
+    const ok: CreateTransactionPreview = {
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -50,
+      transactionDate: "2025-01-15",
+      payeeId: null,
+      payeeName: "Store",
+      payeeMatched: false,
+      payeeWillBeCreated: true,
+      categoryId: "c1",
+      categoryName: "Groceries",
+      description: null,
+      currencyCode: "USD",
+    };
+    const previewRows = [
+      {
+        status: "ok" as const,
+        accountName: "Checking",
+        amount: -50,
+        payeeName: "Store",
+      },
+      {
+        status: "error" as const,
+        accountName: "Nope",
+        error: "Unknown account: Nope",
+      },
+    ];
+
+    const action = builder.buildCreateTransactions("u1", [ok], previewRows);
+
+    expect(action.type).toBe("create_transactions");
+    expect(action.descriptor.type).toBe("create_transactions");
+    if (action.descriptor.type !== "create_transactions") throw new Error();
+    // Only the valid row is signed into the descriptor.
+    expect(action.descriptor.rows).toHaveLength(1);
+    expect(action.descriptor.rows[0]).toMatchObject({
+      accountId: "a1",
+      amount: -50,
+      createPayee: true,
+      currencyCode: "USD",
+    });
+    // The display preview keeps both rows in pasted order.
+    expect(action.preview.rows).toHaveLength(2);
+    expect(action.preview.rows?.[1].status).toBe("error");
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+  });
+
+  it("carries the resolved series into the signed descriptor and its code onto the card (INV-BOND-007)", () => {
+    const preview: CreateInvestmentTransactionPreview = {
+      accountId: "acc1",
+      accountName: "Brokerage",
+      accountCurrency: "PLN",
+      action: InvestmentAction.BUY,
+      transactionDate: "2026-10-15",
+      securityId: "s1",
+      symbol: "EDO",
+      securityName: "EDO",
+      securityCurrency: "PLN",
+      fundingAccountId: null,
+      quantity: 10,
+      price: 100,
+      commission: 0,
+      accruedInterest: 0,
+      exchangeRate: 1,
+      totalAmount: 1000,
+      cashAccountName: "Cash",
+      cashCurrency: "PLN",
+      cashAmount: -1000,
+      description: null,
+      bondInstrumentId: "11111111-1111-5111-8111-111111111111",
+      bondSeriesCode: "EDO1036",
+      redemptionSplit: null,
+    };
+    const single = builder.buildCreateInvestmentTransaction("u1", preview);
+    expect(single.descriptor).toMatchObject({
+      bondInstrumentId: "11111111-1111-5111-8111-111111111111",
+    });
+    expect(single.preview).toMatchObject({ bondSeriesCode: "EDO1036" });
+    const bulk = builder.buildCreateInvestmentTransactions("u1", [preview], []);
+    expect(
+      (bulk.descriptor as { rows: Array<{ bondInstrumentId: string }> }).rows[0]
+        .bondInstrumentId,
+    ).toBe("11111111-1111-5111-8111-111111111111");
+    const update = builder.buildUpdateInvestmentTransaction("u1", {
+      ...preview,
+      transactionId: "it1",
+    });
+    expect(update.descriptor).toMatchObject({
+      bondInstrumentId: "11111111-1111-5111-8111-111111111111",
+    });
+    // The series is covered by the signature: it is part of what is signed.
+    expect(signing.sign).toHaveBeenCalledWith(single.descriptor);
+  });
+
+  it("carries the accrued interest and the redemption split of a bond REDEEM into the descriptor and the card (single and bulk)", () => {
+    const preview: CreateInvestmentTransactionPreview = {
+      accountId: "acc1",
+      accountName: "Brokerage",
+      accountCurrency: "PLN",
+      action: InvestmentAction.REDEEM,
+      transactionDate: "2026-04-01",
+      securityId: "s1",
+      symbol: "EDO",
+      securityName: "EDO",
+      securityCurrency: "PLN",
+      fundingAccountId: null,
+      quantity: 10,
+      price: 100,
+      commission: 0,
+      accruedInterest: 470.5,
+      exchangeRate: 1,
+      totalAmount: 1000,
+      cashAccountName: "Cash",
+      cashCurrency: "PLN",
+      cashAmount: 1470.5,
+      description: null,
+      bondInstrumentId: "11111111-1111-5111-8111-111111111111",
+      bondSeriesCode: "EDO0423",
+      redemptionSplit: {
+        principal: 1000,
+        interest: 470.5,
+        deduction: 0,
+        payout: 1470.5,
+        outcome: "filled",
+      },
+    };
+    const single = builder.buildCreateInvestmentTransaction("u1", preview);
+    expect(single.descriptor).toMatchObject({ accruedInterest: 470.5 });
+    expect(single.preview).toMatchObject({
+      accruedInterest: 470.5,
+      bondRedemptionSplit: preview.redemptionSplit,
+    });
+    const bulk = builder.buildCreateInvestmentTransactions(
+      "u1",
+      [preview],
+      [investmentPreviewRow(preview)],
+    );
+    expect(
+      (bulk.descriptor as { rows: Array<{ accruedInterest: number }> }).rows[0]
+        .accruedInterest,
+    ).toBe(470.5);
+    expect(bulk.preview.rows?.[0]).toMatchObject({
+      accruedInterest: 470.5,
+      bondRedemptionSplit: preview.redemptionSplit,
+    });
+    const update = builder.buildUpdateInvestmentTransaction("u1", {
+      ...preview,
+      transactionId: "it1",
+    });
+    expect(update.descriptor).toMatchObject({ accruedInterest: 470.5 });
+  });
+
+  it("builds a bulk create_investment_transactions action", () => {
+    const ok: CreateInvestmentTransactionPreview = {
+      accountId: "acc1",
+      accountName: "Brokerage",
+      accountCurrency: "USD",
+      action: InvestmentAction.BUY,
+      transactionDate: "2025-03-03",
+      securityId: "s1",
+      symbol: "VTI",
+      securityName: "Vanguard Total",
+      securityCurrency: "USD",
+      fundingAccountId: null,
+      quantity: 10,
+      price: 200,
+      commission: 1,
+      accruedInterest: 0,
+      exchangeRate: 1,
+      totalAmount: 2001,
+      cashAccountName: "Brokerage Cash",
+      cashCurrency: "USD",
+      cashAmount: -2001,
+      description: null,
+      bondInstrumentId: null,
+      bondSeriesCode: null,
+      redemptionSplit: null,
+    };
+
+    const action = builder.buildCreateInvestmentTransactions(
+      "u1",
+      [ok],
+      [{ status: "ok", symbol: "VTI" }],
+    );
+
+    expect(action.type).toBe("create_investment_transactions");
+    if (action.descriptor.type !== "create_investment_transactions")
+      throw new Error();
+    expect(action.descriptor.rows).toHaveLength(1);
+    expect(action.descriptor.rows[0]).toMatchObject({
+      accountId: "acc1",
+      action: InvestmentAction.BUY,
+      securityId: "s1",
+      exchangeRate: 1,
+    });
+    expect(action.preview.rows).toHaveLength(1);
+  });
+
+  it("builds an update_transaction action carrying the full resulting state", () => {
+    const preview: UpdateTransactionPreview = {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: "p1",
+      payeeName: "Store",
+      payeeMatched: true,
+      payeeWillBeCreated: false,
+      categoryId: "c1",
+      categoryName: "Groceries",
+      description: "edited",
+      currencyCode: "USD",
+      isReconciled: true,
+    };
+
+    const action = builder.buildUpdateTransaction("u1", preview);
+
+    expect(action.type).toBe("update_transaction");
+    expect(action.descriptor).toMatchObject({
+      type: "update_transaction",
+      userId: "u1",
+      transactionId: "t1",
+      accountId: "a1",
+      amount: -75,
+      payeeId: "p1",
+      createPayee: false,
+      categoryId: "c1",
+      currencyCode: "USD",
+    });
+    expect(signing.sign).toHaveBeenCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({
+      accountName: "Checking",
+      amount: -75,
+      categoryName: "Groceries",
+      description: "edited",
+      // Reconciled status is surfaced on the card so the user is warned.
+      isReconciled: true,
+    });
+  });
+
+  it("signs the AI review request an update answers, and only when one is named", () => {
+    const preview: UpdateTransactionPreview = {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      description: null,
+      currencyCode: "USD",
+      isReconciled: false,
+    };
+
+    const plain = builder.buildUpdateTransaction("u1", preview);
+    expect(plain.descriptor).not.toHaveProperty("aiReviewRequestId");
+
+    const answering = builder.buildUpdateTransaction(
+      "u1",
+      preview,
+      undefined,
+      undefined,
+      { aiReviewRequestId: "r1" },
+    );
+    expect(answering.descriptor).toMatchObject({ aiReviewRequestId: "r1" });
+    expect(signing.sign).toHaveBeenLastCalledWith(answering.descriptor);
+  });
+
+  it("signs the tag names an update adds, and shows which of them are new", () => {
+    const preview: UpdateTransactionPreview = {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      description: "d",
+      currencyCode: "USD",
+      isReconciled: false,
+      tagNames: ["Allegro", "Gifts"],
+      newTagNames: ["Gifts"],
+    };
+
+    const action = builder.buildUpdateTransaction("u1", preview);
+
+    // In the descriptor, so the signature covers them: a client cannot add a tag the card did not show.
+    expect(action.descriptor).toMatchObject({ tagNames: ["Allegro", "Gifts"] });
+    expect(signing.sign).toHaveBeenLastCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({
+      tagNames: ["Allegro", "Gifts"],
+      newTagNames: ["Gifts"],
+    });
+  });
+
+  it("signs the reference number an update sets and shows it on the card", () => {
+    const preview: UpdateTransactionPreview = {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      description: "d",
+      currencyCode: "USD",
+      isReconciled: false,
+      referenceNumber: "EX-1",
+    };
+    const action = builder.buildUpdateTransaction("u1", preview);
+    expect(action.descriptor).toMatchObject({ referenceNumber: "EX-1" });
+    expect(signing.sign).toHaveBeenLastCalledWith(action.descriptor);
+    expect(action.preview).toMatchObject({ referenceNumber: "EX-1" });
+
+    const { referenceNumber: _unused, ...unchanged } = preview;
+    const plain = builder.buildUpdateTransaction("u1", unchanged);
+    expect(plain.descriptor).not.toHaveProperty("referenceNumber");
+    expect(plain.preview).not.toHaveProperty("referenceNumber");
+  });
+
+  it("carries no tag keys when the update adds none", () => {
+    const preview: UpdateTransactionPreview = {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      description: "d",
+      currencyCode: "USD",
+      isReconciled: false,
+    };
+    const action = builder.buildUpdateTransaction("u1", preview);
+    expect(action.descriptor).not.toHaveProperty("tagNames");
+    expect(action.preview).not.toHaveProperty("tagNames");
+    expect(action.preview).not.toHaveProperty("newTagNames");
+  });
+
+  it("shows a tag the user already has without marking it new", () => {
+    const action = builder.buildUpdateTransaction("u1", {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      description: "d",
+      currencyCode: "USD",
+      isReconciled: false,
+      tagNames: ["Allegro"],
+    });
+    expect(action.preview).toMatchObject({ tagNames: ["Allegro"] });
+    expect(action.preview).not.toHaveProperty("newTagNames");
+  });
+
+  it("shows the AI's choice of a category on the card but signs none of it", () => {
+    const preview: UpdateTransactionPreview = {
+      transactionId: "t1",
+      accountId: "a1",
+      accountName: "Checking",
+      amount: -75,
+      transactionDate: "2025-04-01",
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: "c1",
+      categoryName: "Toys",
+      description: null,
+      currencyCode: "USD",
+      isReconciled: false,
+      categorySource: "ai",
+    };
+    const single = builder.buildUpdateTransaction("u1", preview);
+    expect(single.preview).toMatchObject({ categorySource: "ai" });
+    expect(single.descriptor).not.toHaveProperty("categorySource");
+
+    const split = builder.buildUpdateTransaction("u1", preview, [
+      {
+        categoryId: "c1",
+        categoryName: "Toys",
+        amount: -50,
+        memo: null,
+        categorySource: "ai",
+      },
+      { categoryId: "c2", categoryName: "Books", amount: -25, memo: null },
+    ]);
+    expect(split.preview.splits).toEqual([
+      { categoryName: "Toys", amount: -50, memo: null, categorySource: "ai" },
+      { categoryName: "Books", amount: -25, memo: null },
+    ]);
+    // The signed lines carry ids, amounts and memos only.
+    expect(JSON.stringify(split.descriptor)).not.toContain("categorySource");
+    // A split card has no single category row to mark.
+    expect(split.preview).not.toHaveProperty("categorySource");
+  });
+
+  it("builds a delete_transaction action with only the target id signed", () => {
+    const preview: DeleteTransactionPreview = {
+      transactionId: "t9",
+      accountName: "Checking",
+      amount: -20,
+      transactionDate: "2025-04-02",
+      payeeName: "Cafe",
+      categoryName: "Dining",
+      description: null,
+      currencyCode: "USD",
+      isReconciled: true,
+    };
+
+    const action = builder.buildDeleteTransaction("u1", preview);
+
+    expect(action.type).toBe("delete_transaction");
+    expect(action.descriptor).toMatchObject({
+      type: "delete_transaction",
+      userId: "u1",
+      transactionId: "t9",
+    });
+    expect(action.preview).toMatchObject({
+      accountName: "Checking",
+      amount: -20,
+      payeeName: "Cafe",
+      isReconciled: true,
+    });
+  });
+
+  it("builds an update_investment_transaction action", () => {
+    const preview: UpdateInvestmentTransactionPreview = {
+      transactionId: "it1",
+      accountId: "acc1",
+      accountName: "Brokerage",
+      accountCurrency: "USD",
+      action: InvestmentAction.SELL,
+      transactionDate: "2025-03-03",
+      securityId: "s1",
+      symbol: "VTI",
+      securityName: "Vanguard Total",
+      securityCurrency: "USD",
+      fundingAccountId: null,
+      quantity: 5,
+      price: 210,
+      commission: 1,
+      accruedInterest: 0,
+      exchangeRate: 1,
+      totalAmount: 1049,
+      cashAccountName: "Brokerage Cash",
+      cashCurrency: "USD",
+      cashAmount: 1049,
+      description: null,
+      bondInstrumentId: null,
+      bondSeriesCode: null,
+      redemptionSplit: null,
+    };
+
+    const action = builder.buildUpdateInvestmentTransaction("u1", preview);
+
+    expect(action.type).toBe("update_investment_transaction");
+    expect(action.descriptor).toMatchObject({
+      type: "update_investment_transaction",
+      userId: "u1",
+      transactionId: "it1",
+      accountId: "acc1",
+      action: InvestmentAction.SELL,
+      securityId: "s1",
+      exchangeRate: 1,
+    });
+    expect(action.preview).toMatchObject({
+      symbol: "VTI",
+      investmentAction: InvestmentAction.SELL,
+      totalAmount: 1049,
+    });
+  });
+
+  it("builds a delete_investment_transaction action", () => {
+    const preview: DeleteInvestmentTransactionPreview = {
+      transactionId: "it9",
+      accountName: "Brokerage",
+      action: InvestmentAction.BUY,
+      transactionDate: "2025-03-03",
+      symbol: "VTI",
+      securityName: "Vanguard Total",
+      securityCurrency: "USD",
+      quantity: 10,
+      price: 200,
+      commission: 1,
+      totalAmount: 2001,
+      description: null,
+    };
+
+    const action = builder.buildDeleteInvestmentTransaction("u1", preview);
+
+    expect(action.type).toBe("delete_investment_transaction");
+    expect(action.descriptor).toMatchObject({
+      type: "delete_investment_transaction",
+      userId: "u1",
+      transactionId: "it9",
+    });
+    expect(action.preview).toMatchObject({
+      symbol: "VTI",
+      investmentAction: InvestmentAction.BUY,
+      totalAmount: 2001,
+    });
+  });
+
+  it("builds a signed create_transfer action and preview", () => {
+    const preview = {
+      fromAccountId: "a1",
+      fromAccountName: "Checking",
+      fromCurrencyCode: "USD",
+      toAccountId: "a2",
+      toAccountName: "Savings",
+      toCurrencyCode: "USD",
+      amount: 100,
+      toAmount: 100,
+      exchangeRate: 1,
+      transactionDate: "2026-01-15",
+      description: null,
+      payeeId: "payee-1",
+      payeeName: "Custom transfer label",
+      payeeMatched: true,
+      payeeWillBeCreated: false,
+      categoryId: "cat-1",
+      categoryName: "Savings Goal",
+    };
+    const action = builder.buildCreateTransfer("user-1", preview);
+    expect(action.type).toBe("create_transfer");
+    expect(action.signature).toBe("sig-123");
+    expect(action.descriptor).toMatchObject({
+      type: "create_transfer",
+      userId: "user-1",
+      fromAccountId: "a1",
+      toAccountId: "a2",
+      amount: 100,
+      toAmount: 100,
+      payeeId: "payee-1",
+      payeeName: "Custom transfer label",
+      createPayee: false,
+      categoryId: "cat-1",
+    });
+    expect(action.preview).toMatchObject({
+      fromAccountName: "Checking",
+      toAccountName: "Savings",
+      toAmount: 100,
+      payeeName: "Custom transfer label",
+      payeeWillBeCreated: false,
+      categoryName: "Savings Goal",
+    });
+  });
+
+  it("carries the rule effects of a create_transfer into the display-only preview and bulk row, never the signed descriptor", () => {
+    const ruleEffects = {
+      changes: { addTagIds: ["t1"], removeTagIds: [] },
+      trace: [],
+      aiReviewRequests: [],
+      labels: {
+        accounts: {},
+        categories: {},
+        payees: {},
+        tags: { t1: "rent" },
+        rules: {},
+      },
+    };
+    const preview = {
+      fromAccountId: "a1",
+      fromAccountName: "Checking",
+      fromCurrencyCode: "USD",
+      toAccountId: "a2",
+      toAccountName: "Savings",
+      toCurrencyCode: "USD",
+      amount: 100,
+      toAmount: 100,
+      exchangeRate: 1,
+      transactionDate: "2026-01-15",
+      description: null,
+      payeeId: null,
+      payeeName: null,
+      payeeMatched: false,
+      payeeWillBeCreated: false,
+      categoryId: null,
+      categoryName: null,
+      ruleEffects,
+    };
+
+    const action = builder.buildCreateTransfer("user-1", preview);
+    expect(action.preview.ruleEffects).toBe(ruleEffects);
+    expect(JSON.stringify(action.descriptor)).not.toContain("ruleEffects");
+    expect(transferPreviewRow(preview).ruleEffects).toBe(ruleEffects);
+
+    const without = builder.buildCreateTransfer("user-1", {
+      ...preview,
+      ruleEffects: undefined,
+    });
+    expect("ruleEffects" in without.preview).toBe(false);
+    expect(
+      "ruleEffects" in
+        transferPreviewRow({ ...preview, ruleEffects: undefined }),
+    ).toBe(false);
+  });
+
+  it("carries payeeId=null and createPayee=true for an unmatched transfer label", () => {
+    const action = builder.buildCreateTransfer("user-1", {
+      fromAccountId: "a1",
+      fromAccountName: "Checking",
+      fromCurrencyCode: "USD",
+      toAccountId: "a2",
+      toAccountName: "Savings",
+      toCurrencyCode: "USD",
+      amount: 100,
+      toAmount: 100,
+      exchangeRate: 1,
+      transactionDate: "2026-01-15",
+      description: null,
+      payeeId: null,
+      payeeName: "Brand new label",
+      payeeMatched: false,
+      payeeWillBeCreated: true,
+      categoryId: null,
+      categoryName: null,
+    });
+    expect(action.descriptor).toMatchObject({
+      type: "create_transfer",
+      payeeId: null,
+      payeeName: "Brand new label",
+      createPayee: true,
+      categoryId: null,
+    });
+    expect(action.preview).toMatchObject({ payeeWillBeCreated: true });
+  });
+
+  it("builds a signed update_transfer action carrying the category", () => {
+    const action = builder.buildUpdateTransfer("user-1", {
+      transactionId: "t1",
+      fromAccountId: "a1",
+      fromAccountName: "Checking",
+      fromCurrencyCode: "USD",
+      toAccountId: "a2",
+      toAccountName: "Savings",
+      toCurrencyCode: "USD",
+      amount: 200,
+      toAmount: 200,
+      exchangeRate: 1,
+      transactionDate: "2026-01-15",
+      description: null,
+      payeeId: "payee-2",
+      payeeName: "Edited transfer label",
+      payeeMatched: true,
+      payeeWillBeCreated: false,
+      categoryId: "cat-1",
+      categoryName: "Investments: IKE",
+    });
+    expect(action.type).toBe("update_transfer");
+    expect(action.descriptor).toMatchObject({
+      type: "update_transfer",
+      transactionId: "t1",
+      amount: 200,
+      payeeId: "payee-2",
+      payeeName: "Edited transfer label",
+      createPayee: false,
+      categoryId: "cat-1",
+    });
+    expect(action.preview).toMatchObject({
+      payeeName: "Edited transfer label",
+      payeeWillBeCreated: false,
+      categoryName: "Investments: IKE",
+    });
+  });
+
+  it("builds a signed batch_actions envelope carrying rows and preview rows", () => {
+    const rows = [{ transactionId: "t1" }, { transactionId: "t2" }];
+    const previewRows = [{ status: "ok" as const }, { status: "ok" as const }];
+    const action = builder.buildBatchActions(
+      "user-1",
+      "delete",
+      rows as never,
+      previewRows,
+    );
+    expect(action.type).toBe("batch_actions");
+    expect(action.descriptor).toMatchObject({
+      type: "batch_actions",
+      operation: "delete",
+      rows,
+    });
+    expect(action.preview.rows).toHaveLength(2);
+  });
+
+  it("builds a batch_actions(update_investment) envelope via the investment sibling builder", () => {
+    const rows = [
+      {
+        transactionId: "it1",
+        accountId: "a1",
+        action: "SELL",
+        transactionDate: "2026-02-01",
+        securityId: "s1",
+        fundingAccountId: null,
+        quantity: 5,
+        price: 160,
+        commission: 0,
+        exchangeRate: 1,
+        description: null,
+      },
+    ];
+    const previewRows = [{ status: "ok" as const, symbol: "VTI" }];
+    const action = builder.buildBatchUpdateInvestmentTransactions(
+      "user-1",
+      rows as never,
+      previewRows,
+    );
+    expect(action.type).toBe("batch_actions");
+    expect(action.signature).toBe("sig-123");
+    expect(action.descriptor).toMatchObject({
+      type: "batch_actions",
+      operation: "update_investment",
+      rows,
+    });
+    expect(action.preview.rows).toHaveLength(1);
+  });
+
+  it("builds a batch_actions(delete_investment) envelope via the investment sibling builder", () => {
+    const rows = [{ transactionId: "it1" }, { transactionId: "it2" }];
+    const previewRows = [{ status: "ok" as const }, { status: "ok" as const }];
+    const action = builder.buildBatchDeleteInvestmentTransactions(
+      "user-1",
+      rows as never,
+      previewRows,
+    );
+    expect(action.descriptor).toMatchObject({
+      type: "batch_actions",
+      operation: "delete_investment",
+      rows,
+    });
+    expect(action.preview.rows).toHaveLength(2);
+  });
+
+  it("transferPreviewRow maps a transfer preview to a display row", () => {
+    const {
+      transferPreviewRow,
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+    } = require("./ai-action-builder.service");
+    const row = transferPreviewRow({
+      fromAccountId: "a1",
+      fromAccountName: "Checking",
+      fromCurrencyCode: "USD",
+      toAccountId: "a2",
+      toAccountName: "Savings",
+      toCurrencyCode: "USD",
+      amount: 100,
+      toAmount: 100,
+      exchangeRate: 1,
+      transactionDate: "2026-01-15",
+      description: null,
+      payeeId: null,
+      payeeName: "Row label",
+      payeeMatched: false,
+      payeeWillBeCreated: true,
+    });
+    expect(row).toMatchObject({
+      status: "ok",
+      accountName: "Checking",
+      toAccountName: "Savings",
+      toAmount: 100,
+      payeeName: "Row label",
+      payeeWillBeCreated: true,
+    });
+  });
+});

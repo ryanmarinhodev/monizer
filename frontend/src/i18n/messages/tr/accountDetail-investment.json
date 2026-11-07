@@ -1,0 +1,16 @@
+{
+  "openInInvestments": "Yatırımlarda Aç",
+  "income": {
+    "title": "Yatırım Geliri",
+    "dividendsInterest": "Temettü ve Faiz",
+    "realizedGains": "Gerçekleşen Kazançlar",
+    "ytd": "Yıl başından bugüne",
+    "realizedKnownPart": "Bilinen kısım: {amount}",
+    "realizedUnknownReason": "Bu kazanç hesaplanamıyor: pozisyonda maliyetsiz eklenmiş hisseler var, bu yüzden satılan hisselerin maliyeti bilinmiyor. Onları ekleyen işlemi açın ve fiyatlarını girin.",
+    "empty": "Bu yıl yatırım geliri yok"
+  },
+  "register": {
+    "deleteFailed": "İşlem silinemedi",
+    "loadFailed": "İşlem yüklenemedi"
+  }
+}

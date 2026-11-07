@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "Thông tin chi tiêu",
+    "subtitle": "Phân tích xu hướng và bất thường trong chi tiêu của bạn dựa trên AI"
+  },
+  "list": {
+    "refreshButton": "Làm mới thông tin",
+    "refreshAge": "({time})",
+    "summary": {
+      "active": "Thông tin chi tiết đang hoạt động",
+      "alerts": "Cảnh báo",
+      "warnings": "Lưu ý"
+    },
+    "allTypes": "Tất cả loại",
+    "typeFilterLabel": "Loại",
+    "severityFilterLabel": "Mức độ",
+    "severityFilter": {
+      "all": "Tất cả ({count})",
+      "alert": "Cảnh báo ({count})",
+      "warning": "Lưu ý ({count})",
+      "info": "Thông tin ({count})"
+    },
+    "showDismissed": "Hiển thị đã ẩn",
+    "emptyNoInsights": "Chưa có thông tin nào được tạo. Nhấn \"Làm mới thông tin\" để phân tích xu hướng chi tiêu của bạn.",
+    "emptyFiltered": "Không có thông tin nào khớp với bộ lọc hiện tại của bạn.",
+    "generateButton": "Tạo thông tin",
+    "errorLoadFailed": "Không thể tải thông tin. Vui lòng thử lại.",
+    "errorGenerateFailed": "Không thể tạo thông tin. Đảm bảo bạn đã cấu hình nhà cung cấp AI.",
+    "errorDismissFailed": "Không thể ẩn thông tin. Vui lòng thử lại.",
+    "errorTimeout": "Quá trình tạo thông tin mất nhiều thời gian hơn dự kiến. Vui lòng chờ hoặc làm mới trang."
+  },
+  "card": {
+    "dismiss": "Ẩn",
+    "dismissing": "Đang ẩn..."
+  },
+  "notConfigured": {
+    "heading": "AI chưa được cấu hình",
+    "message": "Chưa có nhà cung cấp AI nào được cấu hình. Để sử dụng Thông tin chi tiêu, vui lòng {link} trong cài đặt của bạn."
+  },
+  "insightTypes": {
+    "anomaly": "Bất thường",
+    "trend": "Xu hướng",
+    "subscription": "Đăng ký",
+    "budget_pace": "Tiến độ ngân sách",
+    "seasonal": "Theo mùa",
+    "new_recurring": "Định kỳ mới"
+  },
+  "insightSeverities": {
+    "info": "Thông tin",
+    "warning": "Lưu ý",
+    "alert": "Cảnh báo"
+  }
+}

@@ -1,0 +1,101 @@
+import { DemoSecurity } from "../demo-seed-data/securities";
+
+/**
+ * Ativos negociados na B3 (Bolsa de Valores do Brasil):
+ * - Blue chips: PETR4, VALE3, ITUB4, WEGE3
+ * - Fundos Imobiliários (FIIs): HGLG11 (Logística), KNIP11 (Recebíveis Imobiliários / Papel)
+ * - ETF Internacional listado na B3: IVVB11 (S&P 500 em Reais)
+ */
+export const demoSecuritiesPtBr: DemoSecurity[] = [
+  {
+    symbol: "PETR4",
+    name: "Petróleo Brasileiro S.A. - Petrobras PN",
+    type: "STOCK",
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp", // maps to 'rrsp' investment account key
+    quantity: 200,
+    averageCost: 35.5,
+    basePrice: 33.0,
+    currentPrice: 38.6,
+    dailyVolatility: 0.015,
+  },
+  {
+    symbol: "VALE3",
+    name: "Vale S.A. ON",
+    type: "STOCK",
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp",
+    quantity: 150,
+    averageCost: 62.0,
+    basePrice: 65.0,
+    currentPrice: 59.2,
+    dailyVolatility: 0.014,
+  },
+  {
+    symbol: "ITUB4",
+    name: "Itaú Unibanco Holding S.A. PN",
+    type: "STOCK",
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp",
+    quantity: 300,
+    averageCost: 31.0,
+    basePrice: 29.0,
+    currentPrice: 34.5,
+    dailyVolatility: 0.011,
+  },
+  {
+    symbol: "WEGE3",
+    name: "WEG S.A. ON",
+    type: "STOCK",
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp",
+    quantity: 180,
+    averageCost: 44.0,
+    basePrice: 39.0,
+    currentPrice: 52.8,
+    dailyVolatility: 0.013,
+  },
+  {
+    symbol: "HGLG11",
+    name: "CSHG Logística FII",
+    type: "ETF", // Marked as ETF to benefit from quarterly/monthly distributions in demo generator
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp",
+    quantity: 60,
+    averageCost: 161.0,
+    basePrice: 157.0,
+    currentPrice: 165.5,
+    dailyVolatility: 0.005,
+  },
+  {
+    symbol: "KNIP11",
+    name: "Kinea Rendimentos Imobiliários FII",
+    type: "ETF",
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp",
+    quantity: 100,
+    averageCost: 92.0,
+    basePrice: 90.5,
+    currentPrice: 94.2,
+    dailyVolatility: 0.004,
+  },
+  {
+    symbol: "IVVB11",
+    name: "iShares S&P 500 Fundo de Índice ETF B3",
+    type: "ETF",
+    exchange: "B3",
+    currency: "BRL",
+    accountKey: "rrsp",
+    quantity: 80,
+    averageCost: 285.0,
+    basePrice: 270.0,
+    currentPrice: 338.0,
+    dailyVolatility: 0.01,
+  },
+];

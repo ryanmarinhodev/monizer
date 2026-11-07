@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "[XX-Spending Insights-XX]",
+    "subtitle": "[XX-AI-powered analysis of your spending patterns and anomalies-XX]"
+  },
+  "list": {
+    "refreshButton": "[XX-Refresh Insights-XX]",
+    "refreshAge": "[XX-({time})-XX]",
+    "summary": {
+      "active": "[XX-Active Insights-XX]",
+      "alerts": "[XX-Alerts-XX]",
+      "warnings": "[XX-Warnings-XX]"
+    },
+    "allTypes": "[XX-All Types-XX]",
+    "typeFilterLabel": "[XX-Type-XX]",
+    "severityFilterLabel": "[XX-Severity-XX]",
+    "severityFilter": {
+      "all": "[XX-All ({count})-XX]",
+      "alert": "[XX-Alerts ({count})-XX]",
+      "warning": "[XX-Warnings ({count})-XX]",
+      "info": "[XX-Info ({count})-XX]"
+    },
+    "showDismissed": "[XX-Show dismissed-XX]",
+    "emptyNoInsights": "[XX-No insights generated yet. Click \"Refresh Insights\" to analyze your spending patterns.-XX]",
+    "emptyFiltered": "[XX-No insights match your current filters.-XX]",
+    "generateButton": "[XX-Generate Insights-XX]",
+    "errorLoadFailed": "[XX-Failed to load insights. Please try again.-XX]",
+    "errorGenerateFailed": "[XX-Failed to generate insights. Make sure you have an AI provider configured.-XX]",
+    "errorDismissFailed": "[XX-Failed to dismiss the insight. Please try again.-XX]",
+    "errorTimeout": "[XX-Insight generation is taking longer than expected. Please wait or refresh the page.-XX]"
+  },
+  "card": {
+    "dismiss": "[XX-Dismiss-XX]",
+    "dismissing": "[XX-Dismissing...-XX]"
+  },
+  "notConfigured": {
+    "heading": "[XX-AI Not Configured-XX]",
+    "message": "[XX-No AI provider is configured. To use Spending Insights, please {link} in your settings.-XX]"
+  },
+  "insightTypes": {
+    "anomaly": "[XX-Anomaly-XX]",
+    "trend": "[XX-Trend-XX]",
+    "subscription": "[XX-Subscription-XX]",
+    "budget_pace": "[XX-Budget Pace-XX]",
+    "seasonal": "[XX-Seasonal-XX]",
+    "new_recurring": "[XX-New Recurring-XX]"
+  },
+  "insightSeverities": {
+    "info": "[XX-Info-XX]",
+    "warning": "[XX-Warning-XX]",
+    "alert": "[XX-Alert-XX]"
+  }
+}
