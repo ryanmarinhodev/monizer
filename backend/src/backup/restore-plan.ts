@@ -138,6 +138,16 @@ export const RESTORE_PLAN: ReadonlyArray<RestoreStep> = [
     scopeToUser: true,
   },
   {
+    table: "recurring_bill_states",
+    countKey: "recurringBillStates",
+    scopeToUser: true,
+  },
+  {
+    table: "recurring_bill_month_budgets",
+    countKey: "recurringBillMonthBudgets",
+    scopeToUser: true,
+  },
+  {
     table: "scheduled_transaction_splits",
     countKey: "scheduledTransactionSplits",
     scopeToUser: false,

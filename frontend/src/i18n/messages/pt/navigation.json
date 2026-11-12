@@ -39,5 +39,6 @@
     "submit": "Pesquisar"
   },
   "backups": "Cópias de segurança",
-  "sharedExpenses": "Despesas partilhadas"
+  "sharedExpenses": "Despesas partilhadas",
+  "recurring-bills": "Contas Fixas"
 }

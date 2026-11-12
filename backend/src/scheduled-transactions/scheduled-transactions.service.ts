@@ -1,3 +1,10 @@
+import { RecurringBillState } from "./entities/recurring-bill-state.entity";
+import {
+  assertNotMonthlyTracked,
+  assertMonthlyBill,
+  monthlyConflict,
+  snapshotMonthlyBill,
+} from "./recurring-bill-policy";
 import {
   Injectable,
   ConflictException,
@@ -2678,6 +2685,7 @@ export class ScheduledTransactionsService {
           ),
         );
       }
+      assertNotMonthlyTracked(current);
       if (!sameScheduleMutationBasis(scheduled, current)) {
         throw new ConflictException(
           tr(
@@ -2871,9 +2879,15 @@ export class ScheduledTransactionsService {
   ): Promise<ScheduledTransaction> {
     const scheduled = await this.findOne(userId, id);
     const beforeData = { ...scheduled };
-    await withScopedDb(this.dataSource, (m) =>
-      m.getRepository(ScheduledTransaction).remove(scheduled),
-    );
+    await withScopedDb(this.dataSource, async (m) => {
+      const current = await m.findOne(ScheduledTransaction, {
+        where: { id, userId },
+        lock: { mode: "pessimistic_write" },
+      });
+      if (!current) throw monthlyConflict();
+      assertNotMonthlyTracked(current);
+      await m.remove(current);
+    });
     return beforeData;
   }
 
@@ -2922,6 +2936,7 @@ export class ScheduledTransactionsService {
           ),
         );
       }
+      assertNotMonthlyTracked(current);
       const nextDueDateStr = ensureYMD(current.nextDueDate);
       const override = await m
         .getRepository(ScheduledTransactionOverride)
@@ -3190,6 +3205,8 @@ export class ScheduledTransactionsService {
     postDto?: PostScheduledTransactionDto,
     options: {
       requireActiveAutoPost?: boolean;
+      /** Server-only selected slot for the validated monthly workflow. */
+      monthlyOriginalDate?: string;
       /**
        * The occurrence the caller selected. When set, the post refuses with
        * `ConflictException` unless it is still the due one, instead of posting
@@ -3243,7 +3260,10 @@ export class ScheduledTransactionsService {
   ): Promise<ScheduledTransaction | null> {
     const scheduled = await this.findOne(userId, id);
 
-    const nextDueDateStr = ensureYMD(scheduled.nextDueDate);
+    const cursorBeforePost = ensureYMD(scheduled.nextDueDate);
+    const nextDueDateStr = options.monthlyOriginalDate ?? cursorBeforePost;
+    if (options.monthlyOriginalDate && !scheduled.monthlyTrackingStart)
+      throw monthlyConflict();
 
     // The auto-post cron selects a due occurrence, then posts it. Without this,
     // a replica whose selection went stale -- another replica posted the
@@ -3696,6 +3716,7 @@ export class ScheduledTransactionsService {
     // retries it; the post-commit recalculation then deactivates the schedule
     // (a revolving line of credit stays active, since it can be drawn again).
     let skipFinancialWrite = false;
+    const afterCommit: Array<() => Promise<void>> = [];
     const removedAfterOnce = await withScopedDb(this.dataSource, async (m) => {
       // Lock the schedule and confirm this occurrence is still the due one. A
       // poster that lost the race finds next_due_date already advanced.
@@ -3712,7 +3733,7 @@ export class ScheduledTransactionsService {
           ),
         );
       }
-      if (ensureYMD(current.nextDueDate) !== nextDueDateStr) {
+      if (ensureYMD(current.nextDueDate) !== cursorBeforePost) {
         throw new ConflictException(
           tr(
             "errors.scheduled.occurrenceAlreadyPosted",
@@ -3723,7 +3744,19 @@ export class ScheduledTransactionsService {
 
       // Nothing left to post: the cron stops at a zero count or past `end_date`,
       // a manual post of the consumed slot would be an extra payment.
-      assertScheduleHasOccurrence(current);
+      assertScheduleHasOccurrence({ ...current, nextDueDate: nextDueDateStr });
+      if (current.monthlyTrackingStart) {
+        assertMonthlyBill({ ...current, account: scheduled.account });
+        if (
+          options.recordOnly ||
+          postDto?.isSplit ||
+          postDto?.splits?.length ||
+          (postDto?.amount !== undefined &&
+            postDto.amount !== null &&
+            postDto.amount >= 0)
+        )
+          throw monthlyConflict();
+      }
 
       // Cron selected this row when it was active and auto-posting; if the user
       // turned either off after selection but before the lock, the automatic
@@ -4077,6 +4110,30 @@ export class ScheduledTransactionsService {
       }
 
       await options.beforeWrite?.(m);
+      if (current.monthlyTrackingStart) {
+        const monthlyState = await m.findOne(RecurringBillState, {
+          where: {
+            userId,
+            scheduledTransactionId: id,
+            originalDate: nextDueDateStr,
+          },
+        });
+        const due =
+          monthlyState?.dueDate ??
+          lockedOverride?.overrideDate ??
+          nextDueDateStr;
+        const occurrences = await this.occurrences.expand(
+          userId,
+          [{ ...scheduled, ...current }],
+          { from: ensureYMD(due), through: ensureYMD(due) },
+          true,
+        );
+        const occurrence = occurrences.find(
+          (o) => o.originalDate === nextDueDateStr,
+        );
+        if (!occurrence) throw monthlyConflict();
+        await snapshotMonthlyBill(m, occurrence);
+      }
 
       // Claim the occurrence. The unique key on
       // (scheduled_transaction_id, original_due_date) is what makes the claim
@@ -4143,6 +4200,8 @@ export class ScheduledTransactionsService {
             // Server-set: the row pays the occurrence claimed above, so the
             // owner's settlement rules refuse it (row_from_scheduled_posting).
             fromScheduledPosting: true,
+            preserveStructure: !!current.monthlyTrackingStart,
+            afterCommit,
             ...(options.actorIsNotOwner === true
               ? { actorIsNotOwner: true }
               : {}),
@@ -4179,14 +4238,15 @@ export class ScheduledTransactionsService {
       // consumed slots are the occurrence claimed above and every claim at or
       // after it: a settlement rule may hold a later slot (INV-LOAN-008), and a
       // cursor left on it would refuse every later post (A26-S08-03).
-      await advanceScheduleCursor(
-        m,
-        current,
-        new Set([
-          nextDueDateStr,
-          ...(await claimedSlotsFrom(m, id, nextDueDateStr)),
-        ]),
-      );
+      if (nextDueDateStr === ensureYMD(current.nextDueDate))
+        await advanceScheduleCursor(
+          m,
+          current,
+          new Set([
+            nextDueDateStr,
+            ...(await claimedSlotsFrom(m, id, nextDueDateStr)),
+          ]),
+        );
       return false;
     });
 
@@ -4205,6 +4265,9 @@ export class ScheduledTransactionsService {
         ),
       );
     }
+
+    for (const complete of afterCommit)
+      await this.afterPostCommit(id, "completeTransaction", complete);
 
     if (removedAfterOnce) {
       return null;
@@ -4267,6 +4330,15 @@ export class ScheduledTransactionsService {
   ): Promise<void> {
     await m.query(
       `UPDATE scheduled_transaction_postings SET transaction_id = $1 WHERE id = $2`,
+      [transactionId, claimId],
+    );
+    await m.query(
+      `UPDATE recurring_bill_states bs
+       SET payment_transaction_ids = bs.payment_transaction_ids || jsonb_build_array($1::text)
+       FROM scheduled_transaction_postings p
+       WHERE p.id = $2 AND bs.scheduled_transaction_id = p.scheduled_transaction_id
+         AND bs.original_date = p.original_due_date
+         AND NOT (bs.payment_transaction_ids ? $1::text)`,
       [transactionId, claimId],
     );
   }

@@ -238,6 +238,13 @@ const REFS: Record<string, RefRule[]> = withSharedSupportRefs({
       onMissing: "null",
     },
   ],
+  recurring_bill_states: [
+    {
+      column: "scheduled_transaction_id",
+      refTable: "scheduled_transactions",
+      onMissing: "dropRow",
+    },
+  ],
   scheduled_transaction_overrides: [
     {
       column: "scheduled_transaction_id",

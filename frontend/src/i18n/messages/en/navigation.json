@@ -39,5 +39,6 @@
     "open": "Open search",
     "submit": "Search"
   },
-  "sharedExpenses": "Shared Expenses"
+  "sharedExpenses": "Shared Expenses",
+  "recurring-bills": "Recurring Bills"
 }

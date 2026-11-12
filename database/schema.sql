@@ -5301,6 +5301,55 @@ $$;
 
 
 -- Shared currencies in backup and liveness.
+-- Monthly bill metadata and optional planning allocations; no ledger backfill.
+ALTER TABLE scheduled_transactions ADD COLUMN IF NOT EXISTS monthly_tracking_start DATE;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_scheduled_transactions_id_owner ON scheduled_transactions (id, user_id);
+
+CREATE TABLE IF NOT EXISTS recurring_bill_states (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    scheduled_transaction_id UUID NOT NULL,
+    original_date DATE NOT NULL,
+    reserved BOOLEAN NOT NULL DEFAULT FALSE,
+    revision INTEGER NOT NULL DEFAULT 0 CHECK (revision >= 0),
+    expected_amount NUMERIC(24,8) CHECK (expected_amount >= 0),
+    due_date DATE,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_recurring_bill_states_slot UNIQUE (scheduled_transaction_id, original_date),
+    CONSTRAINT fk_recurring_bill_states_owner FOREIGN KEY (scheduled_transaction_id, user_id)
+      REFERENCES scheduled_transactions(id, user_id) ON DELETE CASCADE,
+    CONSTRAINT ck_recurring_bill_states_snapshot CHECK ((expected_amount IS NULL) = (due_date IS NULL))
+);
+CREATE INDEX IF NOT EXISTS idx_recurring_bill_states_owner ON recurring_bill_states (user_id);
+
+-- A cleared amount keeps its revision to reject stale saves after removal.
+CREATE TABLE IF NOT EXISTS recurring_bill_month_budgets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    month DATE NOT NULL CHECK (EXTRACT(DAY FROM month) = 1),
+    amount NUMERIC(24,8) CHECK (amount >= 0),
+    currency_code VARCHAR(3) NOT NULL REFERENCES currencies(code),
+    revision INTEGER NOT NULL DEFAULT 1 CHECK (revision > 0),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_recurring_bill_month_budget UNIQUE (user_id, month)
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'recurring_bill_states' AND policyname = 'recurring_bill_states_owner') THEN
+        CREATE POLICY recurring_bill_states_owner ON recurring_bill_states
+          USING (user_id = (SELECT app_current_user_id()) OR (SELECT app_bypass_rls()))
+          WITH CHECK (user_id = (SELECT app_current_user_id()) OR (SELECT app_bypass_rls()));
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'recurring_bill_month_budgets' AND policyname = 'recurring_bill_month_budgets_owner') THEN
+        CREATE POLICY recurring_bill_month_budgets_owner ON recurring_bill_month_budgets
+          USING (user_id = (SELECT app_current_user_id()) OR (SELECT app_bypass_rls()))
+          WITH CHECK (user_id = (SELECT app_current_user_id()) OR (SELECT app_bypass_rls()));
+    END IF;
+END $$;
+ALTER TABLE recurring_bill_states ENABLE ROW LEVEL SECURITY;
+ALTER TABLE recurring_bill_month_budgets ENABLE ROW LEVEL SECURITY;
+
 CREATE OR REPLACE FUNCTION currency_code_in_use_globally(p_code VARCHAR)
 RETURNS boolean
 LANGUAGE sql
@@ -5325,6 +5374,7 @@ AS $$
     UNION ALL SELECT 1 FROM bond_instruments WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM scheduled_transactions
       WHERE currency_code = p_code OR original_currency_code = p_code
+    UNION ALL SELECT 1 FROM recurring_bill_month_budgets WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM budgets WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM warranties WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM user_preferences WHERE default_currency = p_code
@@ -5370,6 +5420,7 @@ AS $$
     UNION ALL SELECT 1 FROM bond_instruments WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM scheduled_transactions
       WHERE currency_code = p_code OR original_currency_code = p_code
+    UNION ALL SELECT 1 FROM recurring_bill_month_budgets WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM budgets WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM warranties WHERE currency_code = p_code
     UNION ALL SELECT 1 FROM user_preferences WHERE default_currency = p_code
@@ -5521,6 +5572,7 @@ AS $$
     UNION SELECT currency_code FROM securities WHERE user_id = p_user_id
     UNION SELECT currency_code FROM scheduled_transactions WHERE user_id = p_user_id
     UNION SELECT original_currency_code FROM scheduled_transactions WHERE user_id = p_user_id
+    UNION SELECT currency_code FROM recurring_bill_month_budgets WHERE user_id = p_user_id
     UNION SELECT currency_code FROM budgets WHERE user_id = p_user_id
     UNION SELECT currency_code FROM warranties WHERE user_id = p_user_id
   ) referenced
@@ -5559,3 +5611,38 @@ ALTER TABLE shared_groups DROP CONSTRAINT IF EXISTS shared_groups_ownership_pair
 ALTER TABLE shared_groups ADD CONSTRAINT shared_groups_ownership_pair CHECK ((ownership_request_id IS NULL) = (ownership_candidate_id IS NULL));
 ALTER TABLE shared_groups DROP CONSTRAINT IF EXISTS shared_groups_ownership_candidate_fk;
 ALTER TABLE shared_groups ADD CONSTRAINT shared_groups_ownership_candidate_fk FOREIGN KEY (ownership_candidate_id) REFERENCES shared_participants(id) DEFERRABLE INITIALLY DEFERRED;
+
+-- Retain occurrence links across transaction delete/undo without copying money.
+ALTER TABLE recurring_bill_states ADD COLUMN IF NOT EXISTS payment_transaction_ids JSONB NOT NULL DEFAULT '[]'::jsonb;
+CREATE INDEX IF NOT EXISTS idx_recurring_bill_payment_links ON recurring_bill_states USING gin (payment_transaction_ids);
+
+CREATE OR REPLACE FUNCTION restore_recurring_bill_payment_claim()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE slot RECORD;
+BEGIN
+  FOR slot IN
+    SELECT bs.scheduled_transaction_id, bs.original_date
+    FROM recurring_bill_states bs
+    JOIN scheduled_transactions st ON st.id = bs.scheduled_transaction_id AND st.user_id = bs.user_id
+    WHERE bs.user_id = NEW.user_id AND bs.payment_transaction_ids ? NEW.id::text
+    FOR UPDATE OF st
+  LOOP
+    INSERT INTO scheduled_transaction_postings
+      (scheduled_transaction_id, original_due_date, posted_date, transaction_id, source)
+    VALUES (slot.scheduled_transaction_id, slot.original_date, NEW.transaction_date, NEW.id, 'post')
+    ON CONFLICT (scheduled_transaction_id, original_due_date) DO UPDATE
+      SET transaction_id = EXCLUDED.transaction_id
+      WHERE scheduled_transaction_postings.transaction_id = EXCLUDED.transaction_id;
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Recurring bill occurrence already has another payment' USING ERRCODE = '23505';
+    END IF;
+  END LOOP;
+  RETURN NEW;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'restore_recurring_bill_payment_claim') THEN
+    CREATE TRIGGER restore_recurring_bill_payment_claim AFTER INSERT ON transactions
+      FOR EACH ROW EXECUTE FUNCTION restore_recurring_bill_payment_claim();
+  END IF;
+END $$;

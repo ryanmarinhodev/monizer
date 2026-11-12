@@ -164,6 +164,14 @@ export class ScheduledTransaction {
   })
   endDate: string | null;
 
+  @Column({
+    type: "date",
+    name: "monthly_tracking_start",
+    nullable: true,
+    transformer: dateStringTransformer,
+  })
+  monthlyTrackingStart: string | null;
+
   @Column({ type: "int", name: "occurrences_remaining", nullable: true })
   occurrencesRemaining: number | null;
 

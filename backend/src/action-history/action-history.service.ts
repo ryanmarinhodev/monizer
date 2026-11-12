@@ -1,3 +1,4 @@
+import { assertNotMonthlyTracked } from "../scheduled-transactions/recurring-bill-policy";
 import {
   Injectable,
   NotFoundException,
@@ -802,7 +803,12 @@ export class ActionHistoryService {
       case "account":
         await this.undoAccount(action, manager);
         break;
-      case "scheduled_transaction":
+      case "scheduled_transaction": {
+        const tracked = await manager.findOne(ScheduledTransaction, {
+          where: { id: action.entityId, userId: action.userId },
+          lock: { mode: "pessimistic_write" },
+        });
+        if (tracked) assertNotMonthlyTracked(tracked);
         await this.undoSimpleEntity(
           action,
           manager,
@@ -810,6 +816,7 @@ export class ActionHistoryService {
           "scheduled_transactions",
         );
         break;
+      }
       case "security": {
         await assertUndoCurrencyKind(action, manager, "security");
         const bond = await this.guardSecurityLinkRestore(action, manager);
