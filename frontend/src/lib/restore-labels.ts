@@ -15,6 +15,8 @@ export const RESTORE_LABELS: Record<string, string | { translationKey: string }>
   tags: 'Tags',
   transactionRules: 'Transaction Rules',
   emailReceiptParsers: 'Email Receipt Parsers',
+  recurringBillStates: { translationKey: 'restoreResult.counts.recurringBillStates' },
+  recurringBillMonthBudgets: { translationKey: 'restoreResult.counts.recurringBillMonthBudgets' },
   scheduledTransactions: 'Scheduled Transactions',
   scheduledTransactionSplits: 'Scheduled Transaction Splits',
   scheduledTransactionOverrides: 'Scheduled Transaction Overrides',

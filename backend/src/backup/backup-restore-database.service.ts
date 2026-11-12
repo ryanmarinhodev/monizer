@@ -113,6 +113,7 @@ export class BackupRestoreDatabaseService {
       { rows: data.accounts, column: "currency_code" },
       { rows: data.transactions, column: "currency_code" },
       { rows: data.scheduled_transactions, column: "currency_code" },
+      { rows: data.recurring_bill_month_budgets, column: "currency_code" },
       { rows: data.securities, column: "currency_code" },
       { rows: data.budgets, column: "currency_code" },
       { rows: backupTables(data).shared_groups, column: "currency_code" },

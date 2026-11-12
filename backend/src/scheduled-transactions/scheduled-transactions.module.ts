@@ -1,3 +1,9 @@
+import { RecurringBillsReadService } from "./recurring-bills-read.service";
+import { RecurringBillsCommandService } from "./recurring-bills-command.service";
+import { RecurringBillBudgetService } from "./recurring-bill-budget.service";
+import { RecurringBillsController } from "./recurring-bills.controller";
+import { RecurringBillState } from "./entities/recurring-bill-state.entity";
+import { RecurringBillMonthBudget } from "./entities/recurring-bill-month-budget.entity";
 import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ScheduledTransaction } from "./entities/scheduled-transaction.entity";
@@ -23,6 +29,8 @@ import { SystemAlertsModule } from "../system-alerts/system-alerts.module";
   imports: [
     TypeOrmModule.forFeature([
       ScheduledTransaction,
+      RecurringBillState,
+      RecurringBillMonthBudget,
       ScheduledTransactionSplit,
       ScheduledTransactionOverride,
       Account,
@@ -41,13 +49,16 @@ import { SystemAlertsModule } from "../system-alerts/system-alerts.module";
     forwardRef(() => SystemAlertsModule),
   ],
   providers: [
+    RecurringBillsReadService,
+    RecurringBillsCommandService,
+    RecurringBillBudgetService,
     ScheduledTransactionsService,
     ScheduledEffectiveAmountService,
     ScheduledOccurrenceService,
     ScheduledTransactionOverrideService,
     ScheduledTransactionLoanService,
   ],
-  controllers: [ScheduledTransactionsController],
+  controllers: [ScheduledTransactionsController, RecurringBillsController],
   // Both read-side services are exported so a consumer that holds schedule rows
   // of its own (BudgetsService, the account balance forecast) asks them rather
   // than re-deriving the #1167 FX rules or re-implementing occurrence selection

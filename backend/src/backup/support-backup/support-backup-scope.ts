@@ -74,6 +74,10 @@ const ACCOUNT_CHILD_TABLES: Record<
     parentKey: "scheduled_transaction_id",
     parentTable: "scheduled_transactions",
   },
+  recurring_bill_states: {
+    parentKey: "scheduled_transaction_id",
+    parentTable: "scheduled_transactions",
+  },
   scheduled_transaction_overrides: {
     parentKey: "scheduled_transaction_id",
     parentTable: "scheduled_transactions",
@@ -331,6 +335,9 @@ export function scopeToAccounts(
     (t) => inScope(t.account_id),
   );
   out.scheduled_transactions = scheduled;
+  out.recurring_bill_states = (tables.recurring_bill_states ?? []).filter((o) =>
+    scheduledIds.has(str(o.scheduled_transaction_id)),
+  );
   out.scheduled_transaction_splits = scheduledSplits;
   out.scheduled_transaction_overrides = (
     tables.scheduled_transaction_overrides ?? []

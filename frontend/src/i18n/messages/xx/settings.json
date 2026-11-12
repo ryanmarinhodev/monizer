@@ -854,7 +854,9 @@
         "sharedPersonLinks": "[XX-Linked contacts-XX]",
         "sharedIntegrations": "[XX-Personal finance connections-XX]",
         "sharedPostings": "[XX-Personal shared-expense bookings-XX]",
-        "sharedLedgerLinks": "[XX-Linked personal transactions-XX]"
+        "sharedLedgerLinks": "[XX-Linked personal transactions-XX]",
+        "recurringBillStates": "[XX-Recurring Bill Occurrences-XX]",
+        "recurringBillMonthBudgets": "[XX-Monthly Bill Budgets-XX]"
       }
     },
     "storedBackups": {

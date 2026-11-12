@@ -27,6 +27,8 @@ export const SECTION_TABLES: Record<SupportBackupSection, string[]> = {
     "security_tags",
   ],
   scheduled: [
+    "recurring_bill_states",
+    "recurring_bill_month_budgets",
     "scheduled_transactions",
     "scheduled_transaction_splits",
     "scheduled_transaction_overrides",

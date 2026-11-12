@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Only mortgage accounts can have fees.",
     "mortgageScheduleOnly": "Fees can only be added to a mortgage with its scheduled payment.",
     "paymentMatchingUnsupported": "Payment matching cannot settle a mortgage payment that includes fees yet. Turn off payment matching or remove the fees."
+  },
+  "recurringBills": {
+    "unsupported": "Select a plain monthly expense paid from your own bank or cash account. Limited repetitions, transfers, cards, splits and investments are not supported here.",
+    "managed": "This bill has monthly history. Use Recurring Bills to change an individual month; deleting or changing the series would erase its history.",
+    "month": "Select a valid calendar month."
   }
 }

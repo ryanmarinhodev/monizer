@@ -1,3 +1,5 @@
+import { RecurringBillState } from "./entities/recurring-bill-state.entity";
+import { ScheduledTransactionPosting } from "./entities/scheduled-transaction-posting.entity";
 import { Injectable } from "@nestjs/common";
 import { DataSource, In } from "typeorm";
 import { ScheduledTransaction } from "./entities/scheduled-transaction.entity";
@@ -151,10 +153,51 @@ export class ScheduledOccurrenceService {
     userId: string,
     rows: ScheduledTransaction[],
     window: OccurrenceWindow,
+    includeClaimed = false,
   ): Promise<ResolvedScheduledOccurrence[]> {
     if (rows.length === 0) return [];
 
     const overridesBySchedule = await this.loadOverrides(rows.map((r) => r.id));
+    const tracked = rows.filter((r) => r.monthlyTrackingStart);
+    if (tracked.length) {
+      const states = await withScopedDb(this.dataSource, (m) =>
+        m.find(RecurringBillState, {
+          where: {
+            scheduledTransactionId: In(tracked.map((r) => r.id)),
+            userId,
+          },
+        }),
+      );
+      for (const state of states) {
+        if (state.expectedAmount === null || state.dueDate === null) continue;
+        const existing =
+          overridesBySchedule.get(state.scheduledTransactionId) ?? [];
+        // A posted snapshot outlives override pruning, including ledger deletion.
+        overridesBySchedule.set(state.scheduledTransactionId, [
+          ...existing.filter((o) => o.originalDate !== state.originalDate),
+          Object.assign(new ScheduledTransactionOverride(), {
+            id: state.id,
+            scheduledTransactionId: state.scheduledTransactionId,
+            originalDate: state.originalDate,
+            overrideDate: state.dueDate,
+            amount: -state.expectedAmount,
+            isSplit: null,
+            splits: null,
+          }),
+        ]);
+      }
+    }
+    const claims =
+      tracked.length && !includeClaimed
+        ? await withScopedDb(this.dataSource, (m) =>
+            m.find(ScheduledTransactionPosting, {
+              where: { scheduledTransactionId: In(tracked.map((r) => r.id)) },
+            }),
+          )
+        : [];
+    const claimed = new Set(
+      claims.map((c) => `${c.scheduledTransactionId}:${c.originalDueDate}`),
+    );
 
     // Hydrating `futureOverrides` is what makes the resolver price every override
     // this expansion might select. An override it did not price would read as "no
@@ -171,7 +214,21 @@ export class ScheduledOccurrenceService {
       // `resolveMany` answers for every row it was given, so this is total.
       const resolved = effective.get(row.id)!;
       const overrides = overridesBySchedule.get(row.id) ?? [];
-      for (const slot of expandOccurrenceSlots(row, overrides, window)) {
+      const basis = row.monthlyTrackingStart
+        ? { ...row, nextDueDate: row.monthlyTrackingStart }
+        : row;
+      const slots = expandOccurrenceSlots(
+        basis,
+        overrides,
+        row.monthlyTrackingStart
+          ? { ...window, maxOccurrences: undefined }
+          : window,
+      ).filter((slot) => !claimed.has(`${row.id}:${slot.originalDate}`));
+      const selected =
+        window.maxOccurrences === undefined
+          ? slots
+          : slots.slice(0, window.maxOccurrences);
+      for (const slot of selected) {
         // Branch on the ENTRY, never on its amount: an override priced as unknown
         // reads as `null`, which `??` cannot tell from "no entry at all" -- and
         // falling through to the base amount is the substitution this contract
@@ -248,7 +305,7 @@ export class ScheduledOccurrenceService {
         .where("st.userId = :userId", { userId })
         .andWhere("st.isActive = :isActive", { isActive: true })
         .andWhere(
-          `(st.nextDueDate <= :through OR EXISTS (
+          `(st.nextDueDate <= :through OR st.monthlyTrackingStart <= :through OR EXISTS (
               SELECT 1 FROM scheduled_transaction_overrides o
               WHERE o.scheduled_transaction_id = st.id
                 AND o.override_date <= :through

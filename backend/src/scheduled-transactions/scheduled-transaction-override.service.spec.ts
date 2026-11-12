@@ -70,6 +70,11 @@ describe("ScheduledTransactionOverrideService", () => {
     ]);
     const { dataSource } = mocks;
     manager = mocks.manager as unknown as Record<string, jest.Mock>;
+    manager.findOne.mockResolvedValue({
+      id: scheduledTransactionId,
+      monthlyTrackingStart: null,
+    });
+    manager.remove.mockImplementation((row) => overridesRepository.remove(row));
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
