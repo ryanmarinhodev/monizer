@@ -1,5 +1,6 @@
 import {
   Entity,
+  Index,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
@@ -38,6 +39,9 @@ const dateStringTransformer = {
 };
 
 @Entity("scheduled_transactions")
+@Index("idx_scheduled_transactions_id_owner", ["id", "userId"], {
+  unique: true,
+})
 export class ScheduledTransaction {
   @PrimaryGeneratedColumn("uuid")
   id: string;

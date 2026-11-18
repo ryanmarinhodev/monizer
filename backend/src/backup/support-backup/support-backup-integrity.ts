@@ -243,6 +243,7 @@ const REFS: Record<string, RefRule[]> = withSharedSupportRefs({
       column: "scheduled_transaction_id",
       refTable: "scheduled_transactions",
       onMissing: "dropRow",
+      scope: ["user_id"],
     },
   ],
   scheduled_transaction_overrides: [

@@ -24,6 +24,8 @@ queries on a connection that bypasses RLS and checks actual exports under RLS.
 remove ownership-transfer consent and upload replay state from a detached copy;
 these transient values must not survive restoration as live commands.
 
+Monthly bill state references carry both `scheduled_transaction_id` and `user_id`; the TypeORM relation and support scrub preserve this composite ownership boundary.
+
 Support snapshots check shared references with `withSharedSupportRefs`, including
 the owner/group components of composite foreign keys. Missing optional links are
 cleared; a missing journal participant, allocation target or refund source

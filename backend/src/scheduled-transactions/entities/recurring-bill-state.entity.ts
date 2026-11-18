@@ -1,10 +1,13 @@
 import {
   Column,
+  ManyToOne,
+  JoinColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   Unique,
 } from "typeorm";
+import { ScheduledTransaction } from "./scheduled-transaction.entity";
 import { ensureYMD } from "../../common/recurrence";
 
 /** Metadata for a slot; actual payments remain in the transaction ledger. */
@@ -15,6 +18,12 @@ export class RecurringBillState {
   @Column({ type: "uuid", name: "user_id" }) userId: string;
   @Column({ type: "uuid", name: "scheduled_transaction_id" })
   scheduledTransactionId: string;
+  @ManyToOne(() => ScheduledTransaction, { onDelete: "CASCADE" })
+  @JoinColumn([
+    { name: "scheduled_transaction_id", referencedColumnName: "id" },
+    { name: "user_id", referencedColumnName: "userId" },
+  ])
+  scheduledTransaction: ScheduledTransaction;
   @Column({
     type: "date",
     name: "original_date",
