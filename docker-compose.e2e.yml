@@ -87,7 +87,7 @@ x-backend: &backend
   # (backend/src/common/db/advisory-locks.ts), so two containers starting
   # together against one database is itself part of what the cluster shard
   # proves.
-  command: sh -c "npm run build && node dist/db-init.js && node dist/db-migrate.js && node dist/main.js"
+  command: sh -c "NODE_OPTIONS=--max-old-space-size=4096 npm run build && node dist/db-init.js && node dist/db-migrate.js && node dist/main.js"
   healthcheck:
     test:
       ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/v1/health || exit 1"]
