@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Solo las cuentas de hipoteca pueden tener gastos.",
     "mortgageScheduleOnly": "Solo se pueden añadir gastos a una hipoteca con su pago programado.",
     "paymentMatchingUnsupported": "La conciliación de pagos todavía no puede liquidar un pago de hipoteca que incluye gastos. Desactiva la conciliación de pagos o elimina los gastos."
+  },
+  "recurringBills": {
+    "unsupported": "Selecciona un gasto mensual simple pagado desde tu propia cuenta bancaria o de efectivo. No se admiten repeticiones limitadas, transferencias, tarjetas, divisiones ni inversiones.",
+    "managed": "Esta factura tiene historial mensual. Usa Facturas recurrentes para cambiar un mes; eliminar o cambiar la serie borraría su historial.",
+    "month": "Selecciona un mes válido."
   }
 }

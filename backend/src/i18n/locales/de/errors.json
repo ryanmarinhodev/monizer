@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Nur Hypothekenkonten können Gebühren haben.",
     "mortgageScheduleOnly": "Gebühren können nur einer Hypothek mit ihrer geplanten Zahlung hinzugefügt werden.",
     "paymentMatchingUnsupported": "Der Zahlungsabgleich kann eine Hypothekenzahlung mit Gebühren noch nicht verrechnen. Schalten Sie den Zahlungsabgleich aus oder entfernen Sie die Gebühren."
+  },
+  "recurringBills": {
+    "unsupported": "Wähle eine einfache monatliche Ausgabe von deinem eigenen Bank- oder Bargeldkonto. Begrenzte Wiederholungen, Überweisungen, Karten, Aufteilungen und Anlagen werden hier nicht unterstützt.",
+    "managed": "Diese Rechnung hat einen Monatsverlauf. Ändere einzelne Monate unter Wiederkehrende Rechnungen; das Löschen oder Ändern der Serie würde den Verlauf entfernen.",
+    "month": "Wähle einen gültigen Kalendermonat."
   }
 }

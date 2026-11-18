@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Yalnızca ipotek hesaplarının ücretleri olabilir.",
     "mortgageScheduleOnly": "Ücretler yalnızca planlı ödemesi olan bir ipoteğe eklenebilir.",
     "paymentMatchingUnsupported": "Ödeme eşleştirme, ücret içeren bir ipotek ödemesini henüz kapatamaz. Ödeme eşleştirmeyi kapatın veya ücretleri kaldırın."
+  },
+  "recurringBills": {
+    "unsupported": "Kendi banka veya nakit hesabınızdan ödenen basit bir aylık gider seçin. Sınırlı tekrarlar, transferler, kartlar, bölünmüş işlemler ve yatırımlar desteklenmez.",
+    "managed": "Bu faturanın aylık geçmişi var. Bir ayı değiştirmek için Düzenli Faturalar bölümünü kullanın; seriyi silmek veya değiştirmek geçmişi siler.",
+    "month": "Geçerli bir takvim ayı seçin."
   }
 }

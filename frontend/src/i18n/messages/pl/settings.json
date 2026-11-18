@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Powiązane kontakty",
         "sharedIntegrations": "Powiązania z finansami osobistymi",
         "sharedPostings": "Prywatne księgowania wspólnych wydatków",
-        "sharedLedgerLinks": "Powiązane transakcje osobiste"
+        "sharedLedgerLinks": "Powiązane transakcje osobiste",
+        "recurringBillStates": "Terminy rachunków cyklicznych",
+        "recurringBillMonthBudgets": "Miesięczne budżety rachunków"
       }
     },
     "storedBackups": {

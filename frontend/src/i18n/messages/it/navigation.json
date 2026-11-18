@@ -39,5 +39,6 @@
     "submit": "Cerca"
   },
   "backups": "Backup",
-  "sharedExpenses": "Spese condivise"
+  "sharedExpenses": "Spese condivise",
+  "recurring-bills": "Bollette ricorrenti"
 }

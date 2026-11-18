@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Contacts liés",
         "sharedIntegrations": "Connexions aux finances personnelles",
         "sharedPostings": "Écritures personnelles des dépenses partagées",
-        "sharedLedgerLinks": "Transactions personnelles liées"
+        "sharedLedgerLinks": "Transactions personnelles liées",
+        "recurringBillStates": "Échéances de factures récurrentes",
+        "recurringBillMonthBudgets": "Budgets mensuels des factures"
       }
     },
     "storedBackups": {

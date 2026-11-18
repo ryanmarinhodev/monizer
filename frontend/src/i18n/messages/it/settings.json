@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Contatti collegati",
         "sharedIntegrations": "Collegamenti alle finanze personali",
         "sharedPostings": "Registrazioni personali delle spese condivise",
-        "sharedLedgerLinks": "Transazioni personali collegate"
+        "sharedLedgerLinks": "Transazioni personali collegate",
+        "recurringBillStates": "Scadenze delle bollette ricorrenti",
+        "recurringBillMonthBudgets": "Budget mensili delle bollette"
       }
     },
     "storedBackups": {

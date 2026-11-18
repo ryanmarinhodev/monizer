@@ -39,5 +39,6 @@
     "submit": "Пошук"
   },
   "backups": "Резервні копії",
-  "sharedExpenses": "Спільні витрати"
+  "sharedExpenses": "Спільні витрати",
+  "recurring-bills": "Регулярні рахунки"
 }

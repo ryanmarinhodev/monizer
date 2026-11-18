@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Seuls les comptes hypothécaires peuvent avoir des frais.",
     "mortgageScheduleOnly": "Des frais ne peuvent être ajoutés qu'à un prêt hypothécaire doté de son paiement planifié.",
     "paymentMatchingUnsupported": "Le rapprochement des paiements ne peut pas encore solder un paiement hypothécaire qui comprend des frais. Désactivez le rapprochement des paiements ou supprimez les frais."
+  },
+  "recurringBills": {
+    "unsupported": "Sélectionnez une dépense mensuelle simple payée depuis votre propre compte bancaire ou espèces. Les répétitions limitées, virements, cartes, ventilations et investissements ne sont pas pris en charge.",
+    "managed": "Cette facture possède un historique mensuel. Modifiez un mois dans Factures récurrentes ; supprimer ou modifier la série effacerait son historique.",
+    "month": "Sélectionnez un mois valide."
   }
 }

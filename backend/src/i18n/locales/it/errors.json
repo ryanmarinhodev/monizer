@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Solo i conti mutuo possono avere spese.",
     "mortgageScheduleOnly": "Le spese possono essere aggiunte solo a un mutuo con il relativo pagamento pianificato.",
     "paymentMatchingUnsupported": "L'abbinamento dei pagamenti non può ancora saldare un pagamento del mutuo che include spese. Disattiva l'abbinamento dei pagamenti o rimuovi le spese."
+  },
+  "recurringBills": {
+    "unsupported": "Seleziona una spesa mensile semplice pagata dal tuo conto bancario o di cassa. Ripetizioni limitate, trasferimenti, carte, suddivisioni e investimenti non sono supportati.",
+    "managed": "Questa bolletta ha uno storico mensile. Usa Bollette ricorrenti per modificare un mese; eliminare o modificare la serie cancellerebbe lo storico.",
+    "month": "Seleziona un mese valido."
   }
 }

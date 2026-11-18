@@ -854,7 +854,9 @@
         "sharedPersonLinks": "已連結的聯絡人",
         "sharedIntegrations": "個人財務連結",
         "sharedPostings": "共同支出的個人記帳",
-        "sharedLedgerLinks": "已連結的個人交易"
+        "sharedLedgerLinks": "已連結的個人交易",
+        "recurringBillStates": "定期帳單期次",
+        "recurringBillMonthBudgets": "月度帳單預算"
       }
     },
     "storedBackups": {

@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Liên hệ được liên kết",
         "sharedIntegrations": "Kết nối với tài chính cá nhân",
         "sharedPostings": "Bút toán cá nhân cho chi tiêu chung",
-        "sharedLedgerLinks": "Giao dịch cá nhân được liên kết"
+        "sharedLedgerLinks": "Giao dịch cá nhân được liên kết",
+        "recurringBillStates": "Các kỳ hóa đơn định kỳ",
+        "recurringBillMonthBudgets": "Ngân sách hóa đơn hàng tháng"
       }
     },
     "storedBackups": {

@@ -39,5 +39,6 @@
     "submit": "Suchen"
   },
   "backups": "Sicherungen",
-  "sharedExpenses": "Gemeinsame Ausgaben"
+  "sharedExpenses": "Gemeinsame Ausgaben",
+  "recurring-bills": "Wiederkehrende Rechnungen"
 }

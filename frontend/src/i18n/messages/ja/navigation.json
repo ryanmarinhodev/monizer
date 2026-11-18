@@ -39,5 +39,6 @@
     "submit": "検索"
   },
   "backups": "バックアップ",
-  "sharedExpenses": "共同支出"
+  "sharedExpenses": "共同支出",
+  "recurring-bills": "定期請求"
 }
