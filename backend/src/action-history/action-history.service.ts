@@ -804,11 +804,13 @@ export class ActionHistoryService {
         await this.undoAccount(action, manager);
         break;
       case "scheduled_transaction": {
-        const tracked = await manager.findOne(ScheduledTransaction, {
-          where: { id: action.entityId, userId: action.userId },
-          lock: { mode: "pessimistic_write" },
-        });
-        if (tracked) assertNotMonthlyTracked(tracked);
+        if (action.entityId) {
+          const tracked = await manager.findOne(ScheduledTransaction, {
+            where: { id: action.entityId, userId: action.userId },
+            lock: { mode: "pessimistic_write" },
+          });
+          if (tracked) assertNotMonthlyTracked(tracked);
+        }
         await this.undoSimpleEntity(
           action,
           manager,

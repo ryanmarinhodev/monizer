@@ -2798,6 +2798,19 @@ describe("ActionHistoryService", () => {
       },
     );
 
+    it("does not look up an arbitrary schedule when history has no entity id", async () => {
+      mockRepository.findOne.mockResolvedValue({
+        ...mockAction,
+        entityType: "scheduled_transaction",
+        entityId: null,
+      });
+
+      await service.undo(userId);
+
+      expect(mockQueryRunner.manager.findOne).not.toHaveBeenCalled();
+      expect(mockQueryRunner.manager.delete).not.toHaveBeenCalled();
+    });
+
     it("should undo scheduled_transaction delete", async () => {
       const action = {
         ...mockAction,
