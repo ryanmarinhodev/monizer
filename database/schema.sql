@@ -5315,6 +5315,7 @@ CREATE TABLE IF NOT EXISTS recurring_bill_states (
     expected_amount NUMERIC(24,8) CHECK (expected_amount >= 0),
     due_date DATE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    payment_transaction_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
     CONSTRAINT uq_recurring_bill_states_slot UNIQUE (scheduled_transaction_id, original_date),
     CONSTRAINT fk_recurring_bill_states_owner FOREIGN KEY (scheduled_transaction_id, user_id)
       REFERENCES scheduled_transactions(id, user_id) ON DELETE CASCADE,
@@ -5398,6 +5399,7 @@ REVOKE ALL ON FUNCTION currency_code_in_use_globally(VARCHAR) FROM PUBLIC;
 -- true from birth; this one counts every other reference column and ignores
 -- activations. Same SECURITY DEFINER shape; held by currency-references.spec.ts.
 -- -------------------------------------------------------------------------
+-- Includes monthly bill budgets; kept in sync by 20261118180111_recurring_bill_currency_reference.sql.
 CREATE OR REPLACE FUNCTION currency_code_referenced_by_data(p_code VARCHAR)
 RETURNS boolean
 LANGUAGE sql

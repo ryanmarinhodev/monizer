@@ -1,3 +1,4 @@
+import { compareMigrationFilenames } from "../../src/common/db/migration-filename";
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { TestingModule } from "@nestjs/testing";
@@ -53,7 +54,7 @@ describe("Monthly bills: persisted occurrence identity and financial effects", (
       .filter((n) =>
         /_recurring_bill(s_monthly|_payment_restore)\.sql$/.test(n),
       )
-      .sort()) {
+      .sort(compareMigrationFilenames)) {
       await ds.query(readFileSync(join(dir, name), "utf8"));
     }
     await ds.query(
