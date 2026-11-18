@@ -429,7 +429,7 @@ const str = (value: unknown): string | null =>
  */
 export function scrubToFixedPoint(
   tables: TableMap,
-  refs: Record<string, RefRule[]>,
+  refs: Readonly<Record<string, readonly RefRule[]>>,
   maxPasses: number,
 ): TableMap {
   const out: TableMap = { ...tables };
