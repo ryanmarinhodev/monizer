@@ -1,29 +1,12 @@
 import { BadRequestException, ConflictException } from "@nestjs/common";
 import { createHash } from "crypto";
 import { EntityManager } from "typeorm";
-import { AccountType } from "../accounts/entities/account.entity";
+import { isMonthlyBill } from "./recurring-bill-eligibility";
+export { isMonthlyBill } from "./recurring-bill-eligibility";
 import { tr } from "../i18n/translate";
 import { ScheduledTransaction } from "./entities/scheduled-transaction.entity";
 import { RecurringBillState } from "./entities/recurring-bill-state.entity";
 import type { ResolvedScheduledOccurrence } from "./scheduled-occurrence.service";
-
-export function isMonthlyBill(row: ScheduledTransaction): boolean {
-  return (
-    row.frequency === "MONTHLY" &&
-    !row.isSplit &&
-    !row.isTransfer &&
-    !row.isInvestment &&
-    !row.originalCurrencyCode &&
-    row.occurrencesRemaining === null &&
-    Number(row.amount) < 0 &&
-    !!row.account &&
-    row.account.userId === row.userId &&
-    [AccountType.CHEQUING, AccountType.SAVINGS, AccountType.CASH].includes(
-      row.account.accountType,
-    ) &&
-    row.account.currencyCode === row.currencyCode
-  );
-}
 
 export function assertMonthlyBill(row: ScheduledTransaction): void {
   if (!isMonthlyBill(row))

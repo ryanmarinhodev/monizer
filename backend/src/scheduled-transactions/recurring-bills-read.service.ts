@@ -1,3 +1,4 @@
+import { isMonthlyBillPayment } from "./recurring-bill-eligibility";
 import { Injectable, Inject, forwardRef } from "@nestjs/common";
 import { DataSource, In, Not, IsNull } from "typeorm";
 import { withScopedDb } from "../common/db/scoped-db";
@@ -120,15 +121,13 @@ export class RecurringBillsReadService {
       const claim = claims.get(key);
       const transaction = claim?.transaction;
       const valid =
-        transaction &&
-        transaction.userId === userId &&
-        transaction.status !== "VOID" &&
-        transaction.accountId === occurrence.settlementAccountId &&
-        transaction.currencyCode === occurrence.currencyCode &&
-        Number(transaction.amount) < 0 &&
-        !transaction.isSplit &&
-        !transaction.isTransfer &&
-        !transaction.originalCurrencyCode;
+        !!transaction &&
+        isMonthlyBillPayment(
+          transaction,
+          userId,
+          occurrence.settlementAccountId,
+          occurrence.currencyCode,
+        );
       const invalid = !!claim && !valid && transaction?.status !== "VOID";
       const expectedAmount =
         occurrence.amount === null ? null : -occurrence.amount;
