@@ -238,6 +238,14 @@ const REFS: Record<string, RefRule[]> = withSharedSupportRefs({
       onMissing: "null",
     },
   ],
+  recurring_bill_states: [
+    {
+      column: "scheduled_transaction_id",
+      refTable: "scheduled_transactions",
+      onMissing: "dropRow",
+      scope: ["user_id"],
+    },
+  ],
   scheduled_transaction_overrides: [
     {
       column: "scheduled_transaction_id",
@@ -421,7 +429,7 @@ const str = (value: unknown): string | null =>
  */
 export function scrubToFixedPoint(
   tables: TableMap,
-  refs: Record<string, RefRule[]>,
+  refs: Readonly<Record<string, readonly RefRule[]>>,
   maxPasses: number,
 ): TableMap {
   const out: TableMap = { ...tables };

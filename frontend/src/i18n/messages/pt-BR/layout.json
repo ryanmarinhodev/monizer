@@ -153,7 +153,7 @@
   },
   "pushBanner": {
     "enableTitle": "Ativar as notificações?",
-    "enableBody": "O Monize pode lembrar você de contas e limites de orçamento neste dispositivo, mesmo com o aplicativo fechado. Seu navegador vai pedir permissão.",
+    "enableBody": "Receba lembretes de contas a pagar e alertas de orçamento, mesmo com o Monize fechado. No iPhone, abra o Monize pelo Safari, toque em Compartilhar → Adicionar à Tela de Início e abra o aplicativo pelo ícone criado. Depois, toque em Ativar e permita o envio de notificações.",
     "enableButton": "Ativar",
     "enabling": "Ativando…",
     "installIosTitle": "Adicione o Monize à tela de início primeiro.",

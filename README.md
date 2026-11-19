@@ -526,6 +526,37 @@ docker compose -f docker-compose.dev.yml up -d
    - Frontend: http://localhost:3001
    - Backend API: http://localhost:3000
 
+### Daily development and memory usage
+
+Opening the editor does not require starting Compose again. Check the stack with
+`docker compose -f docker-compose.dev.yml ps`. If it is running, use it directly;
+the development watchers reload source changes. `up -d` reconciles the stack and
+may recreate containers when their configuration changes; it does not create a
+second stack each time.
+
+Stop the stack when finished to release its running processes' memory, then
+start the existing containers next time:
+
+```bash
+docker compose -f docker-compose.dev.yml stop
+docker compose -f docker-compose.dev.yml start
+```
+
+Use `up -d` for the first start or after Compose configuration changes, and
+`up -d --build` when an image needs rebuilding (for example, dependency changes).
+Do not use `down -v` for routine shutdown: it deletes database volumes.
+
+The backend's `build:dev` and `start:dev` scripts use `backend/tsconfig.dev.json`
+to emit JavaScript without full type checking or declaration files, excluding
+unit specs from the development build. TypeScript still emits Nest's decorator
+metadata and the Nest CLI copies locale assets. Run `npm run typecheck` from
+`backend/` to check types explicitly; `npm run build` keeps the full production
+type check. This separates the memory-heavy check from the long-running watcher.
+
+RAM and disk usage are separate: inspect them with `docker stats --no-stream`
+and `docker system df`. Unused volumes may contain older databases; inspect their
+contents before deleting them.
+
 ### Try It with Demo Data
 
 `docker-compose.demo.yml` turns on demo mode on top of the production stack.

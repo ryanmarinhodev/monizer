@@ -58,6 +58,21 @@ describe("SimpleFIN operation-scoped batch reader", () => {
       client as unknown as SimplefinClient,
     );
   beforeEach(() => {
+    // The union window ends today; keep it aligned with this scenario's cutoffs.
+    jest.useFakeTimers({
+      now: new Date("2026-10-19T12:00:00Z"),
+      doNotFake: [
+        "nextTick",
+        "setImmediate",
+        "setTimeout",
+        "clearTimeout",
+        "setInterval",
+        "clearInterval",
+        "queueMicrotask",
+        "performance",
+        "hrtime",
+      ],
+    });
     jest.clearAllMocks();
     client.accounts.mockReset();
     budget.reserve.mockReset();
@@ -69,6 +84,8 @@ describe("SimpleFIN operation-scoped batch reader", () => {
     });
     client.accounts.mockResolvedValue(payload());
   });
+  afterEach(() => jest.useRealTimers());
+
   it("reads transactions and signed balance together with one quota reservation", async () => {
     const result = await service().readAccount("owner", creds, id("a"), range);
     expect(result.balance?.amount).toBe("-50.2500");

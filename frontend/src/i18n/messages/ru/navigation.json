@@ -39,5 +39,6 @@
     "submit": "Найти"
   },
   "backups": "Резервные копии",
-  "sharedExpenses": "Общие расходы"
+  "sharedExpenses": "Общие расходы",
+  "recurring-bills": "Регулярные счета"
 }

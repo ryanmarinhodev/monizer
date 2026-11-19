@@ -504,6 +504,14 @@ export function buildExportTableQueries(
             WHERE t.user_id = $1`,
     },
     {
+      key: "recurring_bill_states",
+      sql: "SELECT * FROM recurring_bill_states WHERE user_id = $1",
+    },
+    {
+      key: "recurring_bill_month_budgets",
+      sql: "SELECT * FROM recurring_bill_month_budgets WHERE user_id = $1",
+    },
+    {
       key: "scheduled_transactions",
       sql: "SELECT * FROM scheduled_transactions WHERE user_id = $1",
     },

@@ -1,5 +1,6 @@
 import {
   Entity,
+  Index,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
@@ -38,6 +39,9 @@ const dateStringTransformer = {
 };
 
 @Entity("scheduled_transactions")
+@Index("idx_scheduled_transactions_id_owner", ["id", "userId"], {
+  unique: true,
+})
 export class ScheduledTransaction {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -163,6 +167,14 @@ export class ScheduledTransaction {
     transformer: dateStringTransformer,
   })
   endDate: string | null;
+
+  @Column({
+    type: "date",
+    name: "monthly_tracking_start",
+    nullable: true,
+    transformer: dateStringTransformer,
+  })
+  monthlyTrackingStart: string | null;
 
   @Column({ type: "int", name: "occurrences_remaining", nullable: true })
   occurrencesRemaining: number | null;

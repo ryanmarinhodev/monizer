@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Пов’язані контакти",
         "sharedIntegrations": "Зв’язки з особистими фінансами",
         "sharedPostings": "Особисті проведення спільних витрат",
-        "sharedLedgerLinks": "Пов’язані особисті операції"
+        "sharedLedgerLinks": "Пов’язані особисті операції",
+        "recurringBillStates": "Періоди регулярних рахунків",
+        "recurringBillMonthBudgets": "Місячні бюджети рахунків"
       }
     },
     "storedBackups": {

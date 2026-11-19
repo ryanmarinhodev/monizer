@@ -1,3 +1,4 @@
+import type { MonthlyBills } from "@/types/recurring-bill";
 import apiClient from './api';
 import {
   ScheduledTransaction,
@@ -24,6 +25,37 @@ type OccurrencePinData = Pick<
 export const LOAN_OCCURRENCES_MAX_COUNT = 60;
 
 export const scheduledTransactionsApi = {
+  getMonthlyBills: async (month: string): Promise<MonthlyBills> => {
+    const response = await apiClient.get<MonthlyBills>(`/recurring-bills/months/${month}`);
+    return response.data;
+  },
+  createMonthlyBill: async (data: { accountId: string; name: string; amount: number; firstDueDate: string }) => {
+    const response = await apiClient.post('/recurring-bills', data);
+    invalidateCache('scheduled:');
+    return response.data;
+  },
+  adoptMonthlyBill: async (id: string) => {
+    await apiClient.post(`/recurring-bills/${id}/adopt`);
+    invalidateCache('scheduled:');
+  },
+  setMonthlyBillAmount: async (id: string, date: string, amount: number, revision: string) => {
+    await apiClient.patch(`/recurring-bills/${id}/occurrences/${date}/amount`, { amount, revision });
+    invalidateCache('scheduled:');
+  },
+  reserveMonthlyBill: async (id: string, date: string, reserved: boolean, revision: string) => {
+    await apiClient.patch(`/recurring-bills/${id}/occurrences/${date}/reservation`, { reserved, revision });
+  },
+  payMonthlyBill: async (id: string, date: string, amount: number, paymentDate: string, revision: string) => {
+    await apiClient.post(`/recurring-bills/${id}/occurrences/${date}/payment`, { amount, paymentDate, revision });
+    invalidateBalanceCaches();
+  },
+  saveMonthlyBillBudget: async (month: string, amount: number, revision: number) => {
+    await apiClient.put(`/recurring-bills/months/${month}/budget`, { amount, revision });
+  },
+  removeMonthlyBillBudget: async (month: string, revision: number) => {
+    await apiClient.post(`/recurring-bills/months/${month}/budget/remove`, { revision });
+  },
+
   // Create a new scheduled transaction
   create: async (data: CreateScheduledTransactionData): Promise<ScheduledTransaction> => {
     const response = await apiClient.post<ScheduledTransaction>('/scheduled-transactions', data);

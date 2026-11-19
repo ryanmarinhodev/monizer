@@ -91,3 +91,4 @@ credentials/
 # Standalone Chromium push integration artifacts
 e2e/playwright-push-report/
 e2e/test-results-push/
+config.md

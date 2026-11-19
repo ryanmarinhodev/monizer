@@ -97,6 +97,7 @@ export const RESTORE_REFERENCE_COLUMNS: Readonly<
     linked_loan_account_id: "accounts",
     payment_matching_rule_id: "transaction_rules",
   },
+  recurring_bill_states: { scheduled_transaction_id: "scheduled_transactions" },
   scheduled_transactions: {
     account_id: "accounts",
     payee_id: "payees",

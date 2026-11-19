@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Só as contas de crédito habitação podem ter encargos.",
     "mortgageScheduleOnly": "Só é possível adicionar encargos a um crédito habitação com o respetivo pagamento agendado.",
     "paymentMatchingUnsupported": "A correspondência de pagamentos ainda não consegue liquidar um pagamento do crédito habitação que inclui encargos. Desative a correspondência de pagamentos ou remova os encargos."
+  },
+  "recurringBills": {
+    "unsupported": "Selecione uma despesa mensal simples de sua conta bancária ou de dinheiro. Repetições limitadas, transferências, cartões, rateios e investimentos não são suportados aqui.",
+    "managed": "Esta conta possui histórico mensal. Use Contas Fixas para alterar um mês; excluir ou modificar a série apagaria seu histórico.",
+    "month": "Selecione um mês válido."
   }
 }

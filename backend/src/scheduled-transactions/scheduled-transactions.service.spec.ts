@@ -2594,7 +2594,7 @@ describe("ScheduledTransactionsService", () => {
 
       await service.remove(userId, stId);
 
-      expect(scheduledRepo.remove).toHaveBeenCalledWith(scheduled);
+      expect(mockQueryRunner.manager.remove).toHaveBeenCalledWith(scheduled);
     });
 
     it("should throw NotFoundException if not found", async () => {
@@ -3126,7 +3126,11 @@ describe("ScheduledTransactionsService", () => {
           amount: -1200,
           currencyCode: "USD",
         }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -3142,7 +3146,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ amount: -0.000025, currencyCode: "BTC" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -3236,7 +3244,12 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ accountId: "acc-1" }),
-        { fromScheduledPosting: true, actorIsNotOwner: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+          actorIsNotOwner: true,
+        },
       );
     });
 
@@ -3695,7 +3708,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ amount: -500, description: "inline desc" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -3723,7 +3740,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ amount: -999, description: "override desc" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -3791,7 +3812,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ accountId: "acc-1", amount: -1200 }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -3903,6 +3928,8 @@ describe("ScheduledTransactionsService", () => {
         // refuse to settle it against the same occurrence.
         expect(transactionsService.create.mock.calls[0][2]).toEqual({
           fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
         });
       });
 
@@ -4236,7 +4263,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ transactionDate: "2025-03-01" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -4320,7 +4351,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ referenceNumber: "CHQ-1234" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -4358,7 +4393,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ referenceNumber: "ACCT-42" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -4375,7 +4414,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ referenceNumber: undefined }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -4880,7 +4923,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ transactionDate: "2025-03-15" }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -6068,7 +6115,11 @@ describe("ScheduledTransactionsService", () => {
           originalCurrencyCode: "USD",
           exchangeRate: 1.4,
         }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -6095,7 +6146,11 @@ describe("ScheduledTransactionsService", () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ amount: -57.4 }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -6160,7 +6215,11 @@ describe("ScheduledTransactionsService", () => {
           originalAmount: -40,
           exchangeRate: 1.5,
         }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
 
@@ -6498,7 +6557,7 @@ describe("ScheduledTransactionsService", () => {
 
       await service.removeOverride(userId, stId, "ovr-1");
 
-      expect(overridesRepo.remove).toHaveBeenCalledWith(override);
+      expect(mockQueryRunner.manager.remove).toHaveBeenCalledWith(override);
     });
   });
 
@@ -7115,7 +7174,11 @@ describe("ScheduledTransactionsService", () => {
         expect.objectContaining({
           transactionDate: "2025-03-12",
         }),
-        { fromScheduledPosting: true },
+        {
+          fromScheduledPosting: true,
+          preserveStructure: false,
+          afterCommit: expect.any(Array),
+        },
       );
     });
   });

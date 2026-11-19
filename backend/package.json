@@ -7,9 +7,10 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "build": "nest build",
+    "build:dev": "nest build --path tsconfig.dev.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "nest start --watch --path tsconfig.dev.json",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "db:init": "node dist/db-init",

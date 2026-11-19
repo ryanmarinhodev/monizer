@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Opłaty mogą mieć tylko konta kredytów hipotecznych.",
     "mortgageScheduleOnly": "Opłaty można dodać tylko do kredytu hipotecznego z zaplanowaną płatnością.",
     "paymentMatchingUnsupported": "Dopasowywanie płatności nie może jeszcze rozliczyć płatności kredytu hipotecznego zawierającej opłaty. Wyłącz dopasowywanie płatności lub usuń opłaty."
+  },
+  "recurringBills": {
+    "unsupported": "Wybierz prosty miesięczny wydatek z własnego konta bankowego lub gotówkowego. Ograniczona liczba powtórzeń, przelewy, karty, podziały i inwestycje nie są obsługiwane.",
+    "managed": "Ten rachunek ma historię miesięczną. Zmień konkretny miesiąc w Rachunkach cyklicznych; usunięcie lub zmiana serii wymazałaby historię.",
+    "month": "Wybierz prawidłowy miesiąc kalendarzowy."
   }
 }

@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Hanya akun hipotek yang dapat memiliki biaya.",
     "mortgageScheduleOnly": "Biaya hanya dapat ditambahkan ke hipotek yang memiliki pembayaran terjadwal.",
     "paymentMatchingUnsupported": "Pencocokan pembayaran belum dapat melunasi pembayaran hipotek yang mencakup biaya. Matikan pencocokan pembayaran atau hapus biayanya."
+  },
+  "recurringBills": {
+    "unsupported": "Pilih pengeluaran bulanan sederhana dari rekening bank atau kas Anda sendiri. Pengulangan terbatas, transfer, kartu, pembagian, dan investasi tidak didukung.",
+    "managed": "Tagihan ini memiliki riwayat bulanan. Gunakan Tagihan Berulang untuk mengubah satu bulan; menghapus atau mengubah seri akan menghapus riwayatnya.",
+    "month": "Pilih bulan kalender yang valid."
   }
 }

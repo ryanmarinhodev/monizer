@@ -854,7 +854,9 @@
         "sharedPersonLinks": "연결된 연락처",
         "sharedIntegrations": "개인 재정 연결",
         "sharedPostings": "공동 지출의 개인 기록",
-        "sharedLedgerLinks": "연결된 개인 거래"
+        "sharedLedgerLinks": "연결된 개인 거래",
+        "recurringBillStates": "반복 청구 회차",
+        "recurringBillMonthBudgets": "월별 청구 예산"
       }
     },
     "storedBackups": {

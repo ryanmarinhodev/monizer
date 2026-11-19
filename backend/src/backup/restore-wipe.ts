@@ -258,6 +258,13 @@ export async function deleteAllUserData(
     "DELETE FROM payroll_deduction_rules WHERE user_id = $1",
     [userId],
   );
+  await manager.query("DELETE FROM recurring_bill_states WHERE user_id = $1", [
+    userId,
+  ]);
+  await manager.query(
+    "DELETE FROM recurring_bill_month_budgets WHERE user_id = $1",
+    [userId],
+  );
   await manager.query("DELETE FROM scheduled_transactions WHERE user_id = $1", [
     userId,
   ]);

@@ -380,6 +380,8 @@ export interface BackupData {
   transaction_tags: Record<string, unknown>[];
   transaction_split_tags: Record<string, unknown>[];
   scheduled_transactions: Record<string, unknown>[];
+  recurring_bill_states?: Record<string, unknown>[];
+  recurring_bill_month_budgets?: Record<string, unknown>[];
   scheduled_transaction_splits: Record<string, unknown>[];
   scheduled_transaction_overrides: Record<string, unknown>[];
   securities: Record<string, unknown>[];

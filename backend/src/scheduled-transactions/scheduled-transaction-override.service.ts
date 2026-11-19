@@ -1,3 +1,5 @@
+import { ScheduledTransaction } from "./entities/scheduled-transaction.entity";
+import { assertNotMonthlyTracked } from "./recurring-bill-policy";
 import {
   Injectable,
   NotFoundException,
@@ -150,8 +152,10 @@ export class ScheduledTransactionOverrideService {
     createDto: CreateScheduledTransactionOverrideDto,
     investmentProvenance?: OverrideInvestmentProvenance,
     amountCurrencyCode?: string,
+    monthlyCommand = false,
   ): Promise<ScheduledTransactionOverride> {
     return withScopedDb(this.dataSource, async (m) => {
+      await this.lockMutableSchedule(m, scheduledTransactionId, monthlyCommand);
       const decimals = await this.assertOverrideAmountsPrecision(
         m,
         amountCurrencyCode,
@@ -327,6 +331,7 @@ export class ScheduledTransactionOverrideService {
     updateDto: UpdateScheduledTransactionOverrideDto,
     investmentProvenance?: OverrideInvestmentProvenance,
     amountCurrencyCode?: string,
+    monthlyCommand = false,
   ): Promise<ScheduledTransactionOverride> {
     const override = await this.findOverride(
       scheduledTransactionId,
@@ -370,6 +375,7 @@ export class ScheduledTransactionOverrideService {
       override.investmentTotalAmount = updateDto.investmentTotalAmount;
 
     return withScopedDb(this.dataSource, async (m) => {
+      await this.lockMutableSchedule(m, scheduledTransactionId, monthlyCommand);
       const decimals = await this.assertOverrideAmountsPrecision(
         m,
         amountCurrencyCode,
@@ -422,22 +428,42 @@ export class ScheduledTransactionOverrideService {
     scheduledTransactionId: string,
     overrideId: string,
   ): Promise<void> {
-    const override = await this.findOverride(
-      scheduledTransactionId,
-      overrideId,
-    );
-    await withScopedDb(this.dataSource, (m) =>
-      m.getRepository(ScheduledTransactionOverride).remove(override),
-    );
+    await withScopedDb(this.dataSource, async (m) => {
+      await this.lockMutableSchedule(m, scheduledTransactionId, false);
+      const override = await this.findOverride(
+        scheduledTransactionId,
+        overrideId,
+      );
+      await m.remove(override);
+    });
   }
 
   async removeAllOverrides(scheduledTransactionId: string): Promise<number> {
-    const result = await withScopedDb(this.dataSource, (m) =>
-      m.getRepository(ScheduledTransactionOverride).delete({
-        scheduledTransactionId,
-      }),
-    );
-    return result.affected || 0;
+    return withScopedDb(this.dataSource, async (m) => {
+      await this.lockMutableSchedule(m, scheduledTransactionId, false);
+      const result = await m
+        .getRepository(ScheduledTransactionOverride)
+        .delete({ scheduledTransactionId });
+      return result.affected ?? 0;
+    });
+  }
+
+  private async lockMutableSchedule(
+    m: EntityManager,
+    id: string,
+    monthlyCommand: boolean,
+  ): Promise<void> {
+    const row = await m.findOne(ScheduledTransaction, {
+      where: { id },
+      lock: { mode: "pessimistic_write" },
+    });
+    if (!row)
+      throw new NotFoundException(
+        tr("errors.scheduled.notFound", "Scheduled transaction not found", {
+          id,
+        }),
+      );
+    if (!monthlyCommand) assertNotMonthlyTracked(row);
   }
 
   async hasOverrides(

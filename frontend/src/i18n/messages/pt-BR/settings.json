@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Contatos vinculados",
         "sharedIntegrations": "Conexões com finanças pessoais",
         "sharedPostings": "Lançamentos pessoais de despesas compartilhadas",
-        "sharedLedgerLinks": "Transações pessoais vinculadas"
+        "sharedLedgerLinks": "Transações pessoais vinculadas",
+        "recurringBillStates": "Ocorrências de contas fixas",
+        "recurringBillMonthBudgets": "Orçamentos mensais de contas fixas"
       }
     },
     "storedBackups": {

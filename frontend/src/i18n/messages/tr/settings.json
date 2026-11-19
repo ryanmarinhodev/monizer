@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Bağlı kişiler",
         "sharedIntegrations": "Kişisel finans bağlantıları",
         "sharedPostings": "Ortak giderlerin kişisel kayıtları",
-        "sharedLedgerLinks": "Bağlı kişisel işlemler"
+        "sharedLedgerLinks": "Bağlı kişisel işlemler",
+        "recurringBillStates": "Düzenli fatura dönemleri",
+        "recurringBillMonthBudgets": "Aylık fatura bütçeleri"
       }
     },
     "storedBackups": {

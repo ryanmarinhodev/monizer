@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Chỉ tài khoản thế chấp mới có thể có phí.",
     "mortgageScheduleOnly": "Chỉ có thể thêm phí vào khoản vay thế chấp có khoản thanh toán định kỳ.",
     "paymentMatchingUnsupported": "Đối chiếu thanh toán chưa thể tất toán khoản thanh toán thế chấp có bao gồm phí. Hãy tắt đối chiếu thanh toán hoặc xóa các khoản phí."
+  },
+  "recurringBills": {
+    "unsupported": "Chọn khoản chi hàng tháng đơn giản từ tài khoản ngân hàng hoặc tiền mặt của bạn. Không hỗ trợ số lần lặp giới hạn, chuyển khoản, thẻ, chia nhỏ hay đầu tư.",
+    "managed": "Hóa đơn này có lịch sử hàng tháng. Dùng Hóa đơn định kỳ để sửa một tháng; xóa hoặc sửa chuỗi sẽ xóa lịch sử.",
+    "month": "Chọn tháng hợp lệ."
   }
 }

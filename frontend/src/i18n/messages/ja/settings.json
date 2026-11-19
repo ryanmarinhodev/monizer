@@ -854,7 +854,9 @@
         "sharedPersonLinks": "リンクされた連絡先",
         "sharedIntegrations": "個人の家計との連携",
         "sharedPostings": "共有支出の個人記帳",
-        "sharedLedgerLinks": "リンクされた個人取引"
+        "sharedLedgerLinks": "リンクされた個人取引",
+        "recurringBillStates": "定期請求の各回",
+        "recurringBillMonthBudgets": "請求の月次予算"
       }
     },
     "storedBackups": {

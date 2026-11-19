@@ -854,7 +854,9 @@
         "sharedPersonLinks": "Связанные контакты",
         "sharedIntegrations": "Связи с личными финансами",
         "sharedPostings": "Личные проводки совместных расходов",
-        "sharedLedgerLinks": "Связанные личные операции"
+        "sharedLedgerLinks": "Связанные личные операции",
+        "recurringBillStates": "Периоды регулярных счетов",
+        "recurringBillMonthBudgets": "Месячные бюджеты счетов"
       }
     },
     "storedBackups": {

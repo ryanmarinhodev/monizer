@@ -39,5 +39,6 @@
     "submit": "Buscar"
   },
   "backups": "Copias de seguridad",
-  "sharedExpenses": "Gastos compartidos"
+  "sharedExpenses": "Gastos compartidos",
+  "recurring-bills": "Facturas recurrentes"
 }

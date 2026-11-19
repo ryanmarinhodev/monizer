@@ -129,10 +129,10 @@ describe('useSwipeNavigation', () => {
       expect(result.current.isSwipePage).toBe(true);
     });
 
-    it('returns currentIndex for transactions (index 1)', () => {
+    it('returns currentIndex for transactions after recurring bills (index 2)', () => {
       mockPathname = '/transactions';
       const { result } = renderHook(() => useSwipeNavigation());
-      expect(result.current.currentIndex).toBe(1);
+      expect(result.current.currentIndex).toBe(2);
       expect(result.current.isSwipePage).toBe(true);
     });
 
@@ -216,7 +216,7 @@ describe('useSwipeNavigation', () => {
     });
 
     it('enters swiping phase on horizontal move beyond threshold', () => {
-      mockPathname = '/transactions'; // index 1, can go both left and right
+      mockPathname = '/transactions'; // index 2, can go both left and right
       renderSwipeHook();
 
       act(() => {
@@ -323,12 +323,12 @@ describe('useSwipeNavigation', () => {
         vi.advanceTimersByTime(300);
       });
 
-      expect(mockPush).toHaveBeenCalledWith('/transactions');
+      expect(mockPush).toHaveBeenCalledWith('/recurring-bills');
       vi.useRealTimers();
     });
 
     it('navigates to previous page on swipe right that exceeds commit threshold', () => {
-      mockPathname = '/transactions'; // index 1
+      mockPathname = '/transactions'; // index 2
       vi.useFakeTimers();
       renderSwipeHook();
 
@@ -343,7 +343,7 @@ describe('useSwipeNavigation', () => {
         vi.advanceTimersByTime(300);
       });
 
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith('/recurring-bills');
       vi.useRealTimers();
     });
 
@@ -391,7 +391,7 @@ describe('useSwipeNavigation', () => {
 
   describe('velocity threshold (fast swipe commits)', () => {
     it('commits navigation for a fast short swipe', () => {
-      mockPathname = '/transactions'; // index 1
+      mockPathname = '/transactions'; // index 2
       vi.useFakeTimers();
       renderSwipeHook();
 
@@ -426,7 +426,7 @@ describe('useSwipeNavigation', () => {
 
   describe('below-threshold swipe snaps back', () => {
     it('snaps back when swipe does not exceed commit threshold or velocity', () => {
-      mockPathname = '/transactions'; // index 1
+      mockPathname = '/transactions'; // index 2
       vi.useFakeTimers();
       renderSwipeHook();
 

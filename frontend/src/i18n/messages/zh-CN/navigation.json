@@ -39,5 +39,6 @@
     "submit": "搜索"
   },
   "backups": "备份",
-  "sharedExpenses": "共同支出"
+  "sharedExpenses": "共同支出",
+  "recurring-bills": "定期账单"
 }

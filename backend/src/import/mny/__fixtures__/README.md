@@ -10,6 +10,9 @@ shape is the behavior under test.
 The five `money20*.mny` files are copied verbatim from the
 [jackcess-encrypt](https://github.com/jahlborn/jackcessencrypt) project,
 `src/test/data/`, which distributes them under the **Apache License 2.0**.
+Restored from jackcess-encrypt commit `77a1d54db8fc71606f391d94adacae7e34b108ca`.
+These five binary fixtures must remain committed; a clean clone runs the same parser tests without downloading data.
+
 They are small, purpose-built sample files created by that project for its own
 codec tests; they contain no real personal financial data.
 

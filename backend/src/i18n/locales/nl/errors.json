@@ -1007,5 +1007,10 @@
     "mortgageOnly": "Alleen hypotheekrekeningen kunnen kosten hebben.",
     "mortgageScheduleOnly": "Kosten kunnen alleen worden toegevoegd aan een hypotheek met een geplande betaling.",
     "paymentMatchingUnsupported": "Betalingskoppeling kan een hypotheekbetaling met kosten nog niet verrekenen. Zet betalingskoppeling uit of verwijder de kosten."
+  },
+  "recurringBills": {
+    "unsupported": "Selecteer een eenvoudige maandelijkse uitgave vanaf je eigen bank- of kasrekening. Beperkte herhalingen, overboekingen, kaarten, splitsingen en beleggingen worden niet ondersteund.",
+    "managed": "Deze rekening heeft maandhistorie. Wijzig een afzonderlijke maand via Terugkerende rekeningen; verwijderen of wijzigen van de reeks zou de historie wissen.",
+    "month": "Selecteer een geldige kalendermaand."
   }
 }

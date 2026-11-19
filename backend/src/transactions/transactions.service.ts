@@ -140,6 +140,8 @@ import {
 } from "../common/fx-entry.util";
 
 export interface CreateTransactionOptions {
+  /** A containing transaction runs these callbacks only after its commit. */
+  afterCommit?: Array<() => Promise<void>>;
   createPayeeIfMissing?: boolean;
   /**
    * Set when the authenticated actor is not the row's owner (a joint
@@ -155,6 +157,8 @@ export interface CreateTransactionOptions {
    * `settle_loan_installment` rule refuses it (`row_from_scheduled_posting`).
    */
   fromScheduledPosting?: boolean;
+  /** A monthly bill keeps its plain expense shape; cosmetic rules still apply. */
+  preserveStructure?: boolean;
   /**
    * Runs inside the write's own transaction before anything is written. A
    * throw refuses the create with nothing written. The joint register
@@ -701,7 +705,9 @@ export class TransactionsService {
           "create",
           {
             payeeTextById: new Map([[savedTransaction.id, payeeText]]),
-            structuralNotAllowed: options?.actorIsNotOwner === true,
+            structuralNotAllowed:
+              options?.actorIsNotOwner === true ||
+              options?.preserveStructure === true,
             fromScheduledPosting: options?.fromScheduledPosting === true,
           },
         );
@@ -755,26 +761,30 @@ export class TransactionsService {
       return { transaction: winner, created: false };
     }
 
-    this.netWorthService.triggerDebouncedRecalc(
-      createTransactionDto.accountId,
-      userId,
-    );
-    for (const affected of splitAffectedAccountIds) {
-      if (affected !== createTransactionDto.accountId) {
-        this.netWorthService.triggerDebouncedRecalc(affected, userId);
-      }
-    }
-    // The next installment of a schedule a rule settled an occurrence of is
-    // priced on the ledger this create left, in its own transaction after the
-    // commit (INV-CACHE-001; docs/specs/loan-installment-settlement.md 12.8).
-    await repriceSettledLoanTemplates(this.dataSource, settledScheduleIds);
-    await this.splitService.recomputeBondPricesAfterWrite(
-      userId,
-      touchedSecurityIds,
-    );
-
     const result = await this.findOne(userId, savedTransactionId);
-    this.recordTransactionAction(userId, result, "create");
+    const complete = async (): Promise<void> => {
+      this.netWorthService.triggerDebouncedRecalc(
+        createTransactionDto.accountId,
+        userId,
+      );
+      for (const affected of splitAffectedAccountIds) {
+        if (affected !== createTransactionDto.accountId) {
+          this.netWorthService.triggerDebouncedRecalc(affected, userId);
+        }
+      }
+      // The next installment of a schedule a rule settled an occurrence of is
+      // priced on the ledger this create left, in its own transaction after the
+      // commit (INV-CACHE-001; docs/specs/loan-installment-settlement.md 12.8).
+      await repriceSettledLoanTemplates(this.dataSource, settledScheduleIds);
+      await this.splitService.recomputeBondPricesAfterWrite(
+        userId,
+        touchedSecurityIds,
+      );
+
+      this.recordTransactionAction(userId, result, "create");
+    };
+    if (options?.afterCommit) options.afterCommit.push(complete);
+    else await complete();
     return { transaction: result, created: true };
   }
 

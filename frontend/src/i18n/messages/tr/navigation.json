@@ -39,5 +39,6 @@
     "submit": "Ara"
   },
   "backups": "Yedekler",
-  "sharedExpenses": "Paylaşılan Giderler"
+  "sharedExpenses": "Paylaşılan Giderler",
+  "recurring-bills": "Düzenli Faturalar"
 }

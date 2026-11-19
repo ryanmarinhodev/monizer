@@ -105,6 +105,26 @@ describe("dedupeMaskedText", () => {
  * exhaustion branch can be reached on purpose.
  */
 describe("scrubToFixedPoint", () => {
+  it("keeps monthly bill state only when both schedule and owner match", () => {
+    const input = {
+      scheduled_transactions: [{ id: "schedule", user_id: "owner" }],
+      recurring_bill_states: [
+        { id: "valid", scheduled_transaction_id: "schedule", user_id: "owner" },
+        {
+          id: "wrong-owner",
+          scheduled_transaction_id: "schedule",
+          user_id: "other",
+        },
+        { id: "missing", scheduled_transaction_id: "absent", user_id: "owner" },
+      ],
+    };
+    const refs = Object.fromEntries(REFS_FOR_TEST);
+    const result = scrubToFixedPoint(input, refs, MAX_SCRUB_PASSES);
+    expect(result.recurring_bill_states).toEqual([
+      input.recurring_bill_states[0],
+    ]);
+  });
+
   /**
    * A chain t1 -> t2 -> ... -> tN, plus a tN whose own reference is already
    * dangling. Listing the tables parent-first means each pass resolves exactly
