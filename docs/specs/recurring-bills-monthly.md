@@ -255,3 +255,21 @@ November's budget does not appear in December unless explicitly entered there.
 - Missing FX/history and API failures do not become zero or an available remainder.
 - Budget-only start clearly explains accountId is still needed for bill/payment.
 - Budget mutations leave ledger row counts and bank balances unchanged.
+
+
+## Monthly planning and removal follow-up
+
+The first tracked calendar month is covered even when its first due date is not
+the first day. Older, untracked months still withhold complete totals. Overrides
+remain keyed by the original occurrence date and are never overwritten when
+browsing months or cancelling.
+
+`DELETE /recurring-bills/:id/occurrences/:date` accepts the current `revision`
+and a `scope` of `occurrence` or `future`. Under the same parent lock used by
+posting (INV-OCCURRENCE-001), it refuses foreign owners, stale revisions and
+claimed payments before writing. Occurrence cancellation records
+`recurring_bill_states.cancelled`; series termination sets `end_date` to the day
+before the selected original date, without deleting snapshots or overrides.
+Shared occurrence reads exclude cancellations and ended unpaid slots; monthly
+reads retain claimed payments beyond an end date. All posting paths reject a
+cancelled slot under the parent lock. Balances and ledger rows remain untouched.

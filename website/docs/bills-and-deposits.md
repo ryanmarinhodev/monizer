@@ -235,3 +235,26 @@ A credit card's detail page can also schedule a monthly payment with **Make a Pa
 ## Email Reminders
 
 Monize reminds you of scheduled transactions as they come due, in the notification bell and, when you turn them on under [Notifications](settings-and-security.md#notifications), by email or push. A schedule's **Remind Days Before** sets how early. Reminder emails are colour-coded to help you quickly distinguish between expenses and income at a glance.
+
+
+## Monthly recurring bills
+
+Use **Recurring Bills** to plan a selected month before it starts. Set that month's
+initial budget and use **Edit this month** to change a bill's expected amount.
+The change belongs to that occurrence: it does not replace the values in other
+months. A bill beginning during the selected month is included in its totals.
+Months before an adopted bill's tracking began remain incomplete history.
+
+Unpaid bills offer two confirmed removal options:
+
+- **Delete this month** excludes only the selected occurrence from totals and
+  payment actions. Other months and their amounts remain unchanged.
+- **End from this month** stops unpaid occurrences from the selected occurrence
+  onward. Earlier months and payments already recorded, including advance
+  payments, remain visible and unchanged.
+
+Neither option deletes financial transactions or changes account balances.
+A paid bill cannot be deleted through these controls; manage an actual payment
+through the transaction register. Deleted occurrences cannot be paid through
+another scheduling screen. Monthly amounts are retained internally, but this
+screen does not currently offer an undo action for these removals.

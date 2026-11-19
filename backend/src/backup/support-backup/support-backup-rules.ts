@@ -319,6 +319,7 @@ export const RULES: Record<string, TableRules> = {
   transaction_tags: { transaction_id: keep, tag_id: keep },
   transaction_split_tags: { transaction_split_id: keep, tag_id: keep },
   recurring_bill_states: {
+    cancelled: keep,
     id: keep,
     user_id: keep,
     scheduled_transaction_id: keep,

@@ -1,5 +1,6 @@
 import {
   Body,
+  Delete,
   Controller,
   Get,
   Param,
@@ -19,6 +20,7 @@ import { RecurringBillBudgetService } from "./recurring-bill-budget.service";
 import {
   CreateMonthlyBillDto,
   MonthlyBillAmountDto,
+  MonthlyBillDeleteDto,
   MonthlyBillPaymentDto,
   MonthlyBillReserveDto,
   MonthlyBudgetDto,
@@ -48,6 +50,16 @@ export class RecurringBillsController {
   @Post(":id/adopt")
   adopt(@Request() req, @Param("id", ParseUUIDPipe) id: string) {
     return this.commands.adopt(req.user.id, id);
+  }
+
+  @Delete(":id/occurrences/:date")
+  remove(
+    @Request() req,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Param("date", ParseCalendarDatePipe) date: string,
+    @Body() dto: MonthlyBillDeleteDto,
+  ) {
+    return this.commands.remove(req.user.id, id, date, dto);
   }
 
   @Patch(":id/occurrences/:date/amount")

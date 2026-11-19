@@ -5311,6 +5311,7 @@ CREATE TABLE IF NOT EXISTS recurring_bill_states (
     scheduled_transaction_id UUID NOT NULL,
     original_date DATE NOT NULL,
     reserved BOOLEAN NOT NULL DEFAULT FALSE,
+    cancelled BOOLEAN NOT NULL DEFAULT FALSE,
     revision INTEGER NOT NULL DEFAULT 0 CHECK (revision >= 0),
     expected_amount NUMERIC(24,8) CHECK (expected_amount >= 0),
     due_date DATE,

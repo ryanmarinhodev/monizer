@@ -40,13 +40,14 @@ export function RecurringBillsContent() {
   const [dialog, setDialog] = useState<'create' | 'budget' | 'account' | null>(null);
   const [action, setAction] = useState<{ row: MonthlyBillRow; mode: 'amount' | 'pay' } | null>(null);
   const [adopting, setAdopting] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState<{ row: MonthlyBillRow; scope: 'occurrence' | 'future' } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestKey = `${userId}:${month}:${defaultCurrency}:${locale}`;
   const report = useReportData(() => scheduledTransactionsApi.getMonthlyBills(`${month}-01`),
     [requestKey], { requestKey });
   const data = report.dataKey === requestKey && !report.error && !report.isLoading ? report.data : null;
-  const modalOpen = dialog !== null || action !== null || adopting !== null;
+  const modalOpen = dialog !== null || action !== null || adopting !== null || deleting !== null;
   const saved = () => { setDialog(null); setAction(null); setError(null); report.reload(); };
   const money = (amount: number | null, code: string) => amount === null ? t('unknown') : formatCurrency(amount, code);
   async function reserve(row: MonthlyBillRow) {
@@ -56,6 +57,15 @@ export function RecurringBillsContent() {
       await scheduledTransactionsApi.reserveMonthlyBill(row.scheduleId, row.originalDate, !row.reserved, row.revision);
       report.reload();
     } catch (cause) { setError(getErrorMessage(cause, t('saveFailed'))); }
+    finally { setBusy(false); }
+  }
+  async function remove() {
+    if (!deleting || busy) return;
+    setBusy(true); setError(null);
+    try {
+      await scheduledTransactionsApi.deleteMonthlyBill(deleting.row.scheduleId, deleting.row.originalDate, deleting.scope, deleting.row.revision);
+      setDeleting(null); report.reload();
+    } catch (cause) { setDeleting(null); setError(getErrorMessage(cause, t('saveFailed'))); }
     finally { setBusy(false); }
   }
   async function adopt() {
@@ -116,6 +126,8 @@ export function RecurringBillsContent() {
                 <Button size="sm" variant="outline" disabled={busy} onClick={() => setAction({ row, mode: 'amount' })}>{t('editAmount')}</Button>
                 <Button size="sm" variant="outline" disabled={busy} onClick={() => void reserve(row)}>{row.reserved ? t('unreserve') : t('reserve')}</Button>
                 <Button size="sm" disabled={busy} onClick={() => setAction({ row, mode: 'pay' })}>{t('pay')}</Button>
+                <Button size="sm" variant="outline" disabled={busy || modalOpen} onClick={() => setDeleting({ row, scope: 'occurrence' })}>{t('deleteMonth')}</Button>
+                <Button size="sm" variant="outline" disabled={busy || modalOpen} onClick={() => setDeleting({ row, scope: 'future' })}>{t('endSeries')}</Button>
               </div>}
             </Card>
           </li>)}
@@ -133,6 +145,9 @@ export function RecurringBillsContent() {
     {dialog === 'account' && <QuickAccountForm onClose={() => setDialog(null)} onSaved={saved} />}
     {dialog === 'budget' && data && <MonthlyBudgetForm data={data} onClose={() => setDialog(null)} onSaved={saved} />}
     {action && <MonthlyBillAction {...action} today={data?.today ?? today} onClose={() => setAction(null)} onSaved={saved} />}
+    <ConfirmDialog isOpen={!!deleting} title={t(deleting?.scope === 'future' ? 'endSeries' : 'deleteMonth')}
+      message={deleting ? t(deleting.scope === 'future' ? 'endSeriesHelp' : 'deleteMonthHelp', { name: deleting.row.name, date: formatDate(deleting.row.dueDate) }) : ''}
+      onConfirm={() => void remove()} onCancel={() => { if (!busy) setDeleting(null); }} />
     <ConfirmDialog isOpen={!!adopting} title={t('adopt')} message={t('adoptHelp')} onConfirm={adopt} onCancel={() => setAdopting(null)} variant="info" />
   </PageLayout>;
 }

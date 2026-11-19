@@ -137,6 +137,10 @@
     "unknownBills": "Sprawdź rachunki i powiązane transakcje: {names}. Pełne sumy są niedostępne.",
     "existingBills": "Istniejące harmonogramy miesięczne",
     "adopt": "Rozpocznij śledzenie",
-    "adoptHelp": "Śledź bieżący niezapłacony termin i kolejne miesiące, korzystając z istniejącego harmonogramu. Wcześniejsze płatności nie są odtwarzane; sprawdź, czy termin nie został już opłacony oddzielnie."
+    "adoptHelp": "Śledź bieżący niezapłacony termin i kolejne miesiące, korzystając z istniejącego harmonogramu. Wcześniejsze płatności nie są odtwarzane; sprawdź, czy termin nie został już opłacony oddzielnie.",
+    "deleteMonth": "Usuń ten miesiąc",
+    "endSeries": "Zakończ od tego miesiąca",
+    "deleteMonthHelp": "Usunąć tylko {name} z terminem {date}? Pozostałe miesiące i zapisane płatności zostaną zachowane.",
+    "endSeriesHelp": "Zakończyć {name} od terminu {date}? Wcześniejsze miesiące i zapisane płatności zostaną zachowane."
   }
 }

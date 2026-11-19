@@ -137,6 +137,10 @@
     "unknownBills": "Controlla queste bollette e le transazioni collegate: {names}. I totali completi non sono disponibili.",
     "existingBills": "Pianificazioni mensili esistenti",
     "adopt": "Avvia monitoraggio",
-    "adoptHelp": "Monitora la scadenza attuale e i mesi successivi riutilizzando la pianificazione. I pagamenti precedenti non vengono ricostruiti; verifica che non sia già stata pagata separatamente."
+    "adoptHelp": "Monitora la scadenza attuale e i mesi successivi riutilizzando la pianificazione. I pagamenti precedenti non vengono ricostruiti; verifica che non sia già stata pagata separatamente.",
+    "deleteMonth": "Elimina questo mese",
+    "endSeries": "Termina da questo mese",
+    "deleteMonthHelp": "Eliminare solo {name} in scadenza il {date}? Gli altri mesi e i pagamenti registrati saranno conservati.",
+    "endSeriesHelp": "Terminare {name} dalla scadenza del {date}? I mesi precedenti e i pagamenti registrati saranno conservati."
   }
 }

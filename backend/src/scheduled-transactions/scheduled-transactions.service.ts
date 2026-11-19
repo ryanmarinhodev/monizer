@@ -3746,6 +3746,14 @@ export class ScheduledTransactionsService {
       // a manual post of the consumed slot would be an extra payment.
       assertScheduleHasOccurrence({ ...current, nextDueDate: nextDueDateStr });
       if (current.monthlyTrackingStart) {
+        const state = await m.findOne(RecurringBillState, {
+          where: {
+            userId,
+            scheduledTransactionId: id,
+            originalDate: nextDueDateStr,
+          },
+        });
+        if (state?.cancelled) throw monthlyConflict();
         assertMonthlyBill({ ...current, account: scheduled.account });
         if (
           options.recordOnly ||

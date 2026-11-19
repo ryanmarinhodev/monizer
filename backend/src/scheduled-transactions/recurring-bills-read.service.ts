@@ -185,7 +185,8 @@ export class RecurringBillsReadService {
     const historyGaps = data.schedules.filter(
       (s) =>
         s.startDate <= through &&
-        s.monthlyTrackingStart! > month &&
+        (!s.endDate || s.endDate >= month) &&
+        s.monthlyTrackingStart!.slice(0, 7) > month.slice(0, 7) &&
         s.startDate < s.monthlyTrackingStart!,
     );
     if (historyGaps.length) {

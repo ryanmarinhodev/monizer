@@ -137,6 +137,10 @@
     "unknownBills": "Vérifiez ces factures et leurs transactions : {names}. Les totaux complets sont indisponibles.",
     "existingBills": "Échéanciers mensuels existants",
     "adopt": "Commencer le suivi",
-    "adoptHelp": "Suivez l’échéance en attente et les mois suivants en réutilisant l’échéancier. Les paiements antérieurs ne sont pas reconstitués ; vérifiez que cette échéance n’a pas déjà été payée séparément."
+    "adoptHelp": "Suivez l’échéance en attente et les mois suivants en réutilisant l’échéancier. Les paiements antérieurs ne sont pas reconstitués ; vérifiez que cette échéance n’a pas déjà été payée séparément.",
+    "deleteMonth": "Supprimer ce mois",
+    "endSeries": "Arrêter à partir de ce mois",
+    "deleteMonthHelp": "Supprimer uniquement {name} à échéance du {date} ? Les autres mois et paiements enregistrés seront conservés.",
+    "endSeriesHelp": "Arrêter {name} à partir de l’échéance du {date} ? Les mois précédents et paiements enregistrés seront conservés."
   }
 }

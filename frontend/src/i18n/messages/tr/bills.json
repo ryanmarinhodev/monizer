@@ -137,6 +137,10 @@
     "unknownBills": "Faturaları ve bağlı işlemleri inceleyin: {names}. Tam toplamlar kullanılamıyor.",
     "existingBills": "Mevcut aylık takvimler",
     "adopt": "Takibi başlat",
-    "adoptHelp": "Mevcut takvimi kullanarak bekleyen dönemi ve sonraki ayları takip edin. Önceki ödemeler yeniden oluşturulmaz; bu dönemin ayrıca ödenmediğini doğrulayın."
+    "adoptHelp": "Mevcut takvimi kullanarak bekleyen dönemi ve sonraki ayları takip edin. Önceki ödemeler yeniden oluşturulmaz; bu dönemin ayrıca ödenmediğini doğrulayın.",
+    "deleteMonth": "Bu ayı sil",
+    "endSeries": "Bu aydan itibaren bitir",
+    "deleteMonthHelp": "Yalnızca {date} vadeli {name} silinsin mi? Diğer aylar ve kayıtlı ödemeler korunur.",
+    "endSeriesHelp": "{name}, {date} vadesinden itibaren bitirilsin mi? Önceki aylar ve kayıtlı ödemeler korunur."
   }
 }

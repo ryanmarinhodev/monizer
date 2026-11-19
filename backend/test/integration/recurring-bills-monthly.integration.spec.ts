@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { TestingModule } from "@nestjs/testing";
 import { DataSource } from "typeorm";
+import { FrequencyType } from "@/scheduled-transactions/dto/create-scheduled-transaction.dto";
 import { ScheduledTransactionsModule } from "@/scheduled-transactions/scheduled-transactions.module";
 import { ScheduledTransactionsService } from "@/scheduled-transactions/scheduled-transactions.service";
 import { RecurringBillsCommandService } from "@/scheduled-transactions/recurring-bills-command.service";
@@ -148,6 +149,219 @@ describe("Monthly bills: persisted occurrence identity and financial effects", (
       "2024-01-31",
       "2024-03-31",
     ]);
+  });
+
+  it("plans the first tracked month without losing monthly edits or inventing earlier history", async () => {
+    const old = await asUser(() =>
+      schedules.create(userId, {
+        accountId,
+        name: "Adopted monthly bill",
+        amount: -180,
+        currencyCode: "USD",
+        frequency: FrequencyType.MONTHLY,
+        startDate: "2024-01-22",
+        nextDueDate: "2026-12-22",
+        autoPost: false,
+      }),
+    );
+    await asUser(() => commands.adopt(userId, old.id));
+    expect(await month("2026-11-01")).toMatchObject({
+      total: null,
+      paid: null,
+      reserved: null,
+    });
+    const december = await month("2026-12-01");
+    expect(december).toMatchObject({
+      total: 180,
+      paid: 0,
+      outstanding: 180,
+      reserved: 0,
+    });
+    await asUser(() =>
+      commands.amount(userId, old.id, december.rows[0].originalDate, {
+        amount: 240,
+        revision: december.rows[0].revision,
+      }),
+    );
+    await asUser(() => budgets.save(userId, "2026-12-01", 1000, 0));
+    expect(await month("2026-12-01")).toMatchObject({
+      total: 240,
+      remainder: 760,
+    });
+    expect((await month("2027-01-01")).rows[0].expectedAmount).toBe(180);
+    expect((await month("2026-12-01")).rows[0].expectedAmount).toBe(240);
+    expect(await balance()).toBe(1000);
+  });
+
+  it("excludes only the selected month, retaining its edited value and refusing every payment path", async () => {
+    const bill = await create();
+    let january = (await month("2024-01-01")).rows[0];
+    await asUser(() =>
+      commands.amount(userId, bill.id, january.originalDate, {
+        amount: 230,
+        revision: january.revision,
+      }),
+    );
+    january = (await month("2024-01-01")).rows[0];
+    await asUser(() =>
+      commands.remove(userId, bill.id, january.originalDate, {
+        scope: "occurrence",
+        revision: january.revision,
+      }),
+    );
+    expect(await month("2024-01-01")).toMatchObject({
+      rows: [],
+      total: 0,
+      reserved: 0,
+    });
+    expect((await month("2024-02-01")).rows[0].expectedAmount).toBe(180);
+    const overrides = await ds.query(
+      "SELECT amount FROM scheduled_transaction_overrides WHERE scheduled_transaction_id = $1",
+      [bill.id],
+    );
+    expect(Number(overrides[0].amount)).toBe(-230);
+    await expect(
+      asUser(() =>
+        commands.pay(userId, bill.id, january.originalDate, {
+          amount: 230,
+          paymentDate: january.originalDate,
+          revision: january.revision,
+        }),
+      ),
+    ).rejects.toThrow();
+    await expect(
+      asUser(() =>
+        schedules.post(userId, bill.id, {
+          amount: -230,
+          transactionDate: january.originalDate,
+        }),
+      ),
+    ).rejects.toThrow();
+    expect(await balance()).toBe(1000);
+  });
+
+  it("ends future recurrence but preserves earlier monthly values and even payments recorded in later months", async () => {
+    const bill = await create();
+    const january = (await month("2024-01-01")).rows[0];
+    await asUser(() =>
+      commands.amount(userId, bill.id, january.originalDate, {
+        amount: 210,
+        revision: january.revision,
+      }),
+    );
+    const march = (await month("2024-03-01")).rows[0];
+    await asUser(() =>
+      commands.pay(userId, bill.id, march.originalDate, {
+        amount: 170,
+        paymentDate: "2024-01-15",
+        revision: march.revision,
+      }),
+    );
+    const february = (await month("2024-02-01")).rows[0];
+    await asUser(() =>
+      commands.remove(userId, bill.id, february.originalDate, {
+        scope: "future",
+        revision: february.revision,
+      }),
+    );
+    expect((await month("2024-01-01")).rows[0].expectedAmount).toBe(210);
+    expect((await month("2024-02-01")).rows).toEqual([]);
+    expect((await month("2024-03-01")).rows[0]).toMatchObject({
+      status: "paid",
+      expectedAmount: 180,
+      paidAmount: 170,
+    });
+    expect((await month("2024-04-01")).rows).toEqual([]);
+    expect(await balance()).toBe(830);
+    await expect(
+      asUser(() =>
+        commands.pay(userId, bill.id, february.originalDate, {
+          amount: 180,
+          paymentDate: february.originalDate,
+          revision: february.revision,
+        }),
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("refuses foreign, paid and stale deletion requests without changing history", async () => {
+    const bill = await create();
+    const row = (await month("2024-01-01")).rows[0];
+    const other = await createTestUserDirect(ds);
+    await expect(
+      withUserContext(other.id, () =>
+        commands.remove(other.id, bill.id, row.originalDate, {
+          scope: "future",
+          revision: row.revision,
+        }),
+      ),
+    ).rejects.toThrow();
+    await asUser(() =>
+      commands.reserve(userId, bill.id, row.originalDate, {
+        reserved: true,
+        revision: row.revision,
+      }),
+    );
+    await expect(
+      asUser(() =>
+        commands.remove(userId, bill.id, row.originalDate, {
+          scope: "occurrence",
+          revision: row.revision,
+        }),
+      ),
+    ).rejects.toThrow();
+    const fresh = (await month("2024-01-01")).rows[0];
+    await asUser(() =>
+      commands.pay(userId, bill.id, row.originalDate, {
+        amount: 180,
+        paymentDate: row.originalDate,
+        revision: fresh.revision,
+      }),
+    );
+    const paid = (await month("2024-01-01")).rows[0];
+    await expect(
+      asUser(() =>
+        commands.remove(userId, bill.id, row.originalDate, {
+          scope: "occurrence",
+          revision: paid.revision,
+        }),
+      ),
+    ).rejects.toThrow();
+    expect((await month("2024-01-01")).paid).toBe(180);
+    expect((await month("2024-02-01")).total).toBe(180);
+    expect(await balance()).toBe(820);
+  });
+
+  it("serializes cancellation against payment without losing a committed payment", async () => {
+    const bill = await create();
+    const row = (await month("2024-01-01")).rows[0];
+    const barrier = createBarrier();
+    const results = await Promise.allSettled([
+      asUser(async () => {
+        await barrier.arrive();
+        return commands.remove(userId, bill.id, row.originalDate, {
+          scope: "occurrence",
+          revision: row.revision,
+        });
+      }),
+      asUser(async () => {
+        await barrier.arrive();
+        return commands.pay(userId, bill.id, row.originalDate, {
+          amount: 180,
+          paymentDate: row.originalDate,
+          revision: row.revision,
+        });
+      }),
+    ]);
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    const report = await month("2024-01-01");
+    if (results[0].status === "fulfilled") {
+      expect(report.rows).toEqual([]);
+      expect(await balance()).toBe(1000);
+    } else {
+      expect(report.rows[0]).toMatchObject({ status: "paid", paidAmount: 180 });
+      expect(await balance()).toBe(820);
+    }
   });
 
   it("serializes duplicate payments and rejects a stale edit without another financial effect", async () => {

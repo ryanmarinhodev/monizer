@@ -137,6 +137,10 @@
     "unknownBills": "Prüfe diese Rechnungen und ihre Transaktionen: {names}. Vollständige Summen sind nicht verfügbar.",
     "existingBills": "Bestehende monatliche Zeitpläne",
     "adopt": "Verfolgung starten",
-    "adoptHelp": "Verfolge den aktuellen offenen Termin und die Folgemonate im bestehenden Zeitplan. Frühere Zahlungen werden nicht rekonstruiert; prüfe, ob der Termin bereits separat bezahlt wurde."
+    "adoptHelp": "Verfolge den aktuellen offenen Termin und die Folgemonate im bestehenden Zeitplan. Frühere Zahlungen werden nicht rekonstruiert; prüfe, ob der Termin bereits separat bezahlt wurde.",
+    "deleteMonth": "Diesen Monat löschen",
+    "endSeries": "Ab diesem Monat beenden",
+    "deleteMonthHelp": "Nur {name} mit Fälligkeit am {date} entfernen? Andere Monate und erfasste Zahlungen bleiben erhalten.",
+    "endSeriesHelp": "{name} ab der Fälligkeit am {date} beenden? Frühere Monate und erfasste Zahlungen bleiben erhalten."
   }
 }
