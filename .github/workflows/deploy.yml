@@ -7,15 +7,13 @@ on:
       - .github/workflows/fork-images.yml
       - scripts/deploy*
       - docker-compose.fork.yml
-  workflow_run:
-    workflows: [CI Pipeline, Fork Images]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
-# Serialize both completion events and retries. Never cancel a live SSH deploy.
+# Serialize pushes and retries. Never cancel a live SSH deploy.
 concurrency:
-  group: production-deploy
+  group: production-deploy-${{ github.event.pull_request.number || 'main' }}
   cancel-in-progress: false
 
 permissions:
@@ -34,40 +32,50 @@ jobs:
           persist-credentials: false
       - run: bash -n scripts/deploy.sh scripts/deploy-gate.sh
       - run: python3 scripts/deploy.test.py
-  deploy:
+  gate:
     needs: validate
     if: >-
       github.repository == 'ryanmarinhodev/monizer' &&
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' ||
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_repository.full_name == github.repository &&
-       github.event.workflow_run.conclusion == 'success')
+      github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+      commit: ${{ steps.gate.outputs.commit }}
+      order: ${{ steps.gate.outputs.order }}
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Wait for both successful push workflows for current main
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: bash scripts/deploy-gate.sh --wait
+  deploy:
+    needs: gate
+    if: needs.gate.outputs.ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
     steps:
       - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
-      - name: Require both successful push workflows for current main
-        id: gate
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-        run: bash scripts/deploy-gate.sh
       - name: Log in to GHCR
-        if: steps.gate.outputs.ready == 'true'
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
       - name: Resolve and verify immutable images
-        if: steps.gate.outputs.ready == 'true'
         id: images
         env:
-          COMMIT: ${{ steps.gate.outputs.commit }}
+          COMMIT: ${{ needs.gate.outputs.commit }}
         run: |
           for service in backend frontend; do
             image="ghcr.io/ryanmarinhodev/monize-${service}"
@@ -78,12 +86,11 @@ jobs:
             echo "$service=$image@$digest" >> "$GITHUB_OUTPUT"
           done
       - name: Transfer release and deploy
-        if: steps.gate.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          COMMIT: ${{ steps.gate.outputs.commit }}
-          ORDER: ${{ steps.gate.outputs.order }}
+          COMMIT: ${{ needs.gate.outputs.commit }}
+          ORDER: ${{ needs.gate.outputs.order }}
           BACKEND: ${{ steps.images.outputs.backend }}
           FRONTEND: ${{ steps.images.outputs.frontend }}
           SSH_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}

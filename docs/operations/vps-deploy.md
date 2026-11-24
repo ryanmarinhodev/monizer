@@ -3,10 +3,11 @@
 After one-time provisioning, merging or pushing to main needs no SSH session,
 git pull or manual build. The existing CI Pipeline tests the commit; Fork Images
 builds backend/frontend once and adds sha-<full-commit> tags. Deploy to Production
-runs on completion of either workflow. Its gate requires the latest push run of
-**both** workflows for that exact main commit to succeed. The first completion
-can skip; the second rechecks both. A failed or cancelled workflow never qualifies.
+starts on a push to main and waits up to 90 minutes for the latest push run of
+**both** workflows for that exact main commit to succeed. Its gate polls every
+30 seconds without VPS secrets. A failed or cancelled workflow never qualifies.
 No CI or build gate is bypassed. A manual run on main retries this same gate.
+The waiting job consumes GitHub Actions runner time; it performs no build.
 
 The image manifest revision must equal the tested commit. Tags resolve to digests
 before transfer, and Compose uses those digests. The workflow group serializes
@@ -132,7 +133,7 @@ node scripts/check-docs-manifests.mjs
 
 The Python suite uses temporary files, fake Docker/GitHub commands and a real
 kernel file lock. It tests ordering, backup failure, mount changes, missing health,
-Compose failures, first-deploy rollback, migration refusal and duplicate events.
+Compose failures, first-deploy rollback, migration refusal and duplicate retries.
 It contacts neither the VPS nor a Docker daemon. Real Ubuntu/Compose/registry
 integration and a restore drill remain staging verification responsibilities.
 

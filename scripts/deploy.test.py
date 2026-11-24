@@ -100,7 +100,7 @@ class DeployTests(unittest.TestCase):
         self.assertNotEqual(self.run_deploy().returncode, 0)
         self.assertNotIn('stop ', self.calls())
 
-    def test_duplicate_completion_is_noop(self):
+    def test_duplicate_retry_is_noop(self):
         (self.p / '.deploy-success').write_text(SHA)
         self.assertEqual(self.run_deploy().returncode, 0)
         self.assertNotIn('pull ', self.calls())
@@ -172,8 +172,29 @@ else: print(os.environ['BUILD_RESULT'] + '\\t101')
                 out.write_text('')
                 env = {**self.env, 'TEST_SHA': SHA, 'MAIN_SHA': main, 'CI_RESULT': ci, 'BUILD_RESULT': build, 'REPOSITORY': 'ryanmarinhodev/monizer', 'GITHUB_OUTPUT': str(out)}
                 result = subprocess.run(['bash', str(ROOT / 'scripts/deploy-gate.sh')], env=env, capture_output=True)
-                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.returncode, 1 if ci == 'failure' else 0, result.stderr)
                 self.assertEqual('ready=true' in out.read_text(), ready)
+
+    def test_wait_mode_observes_completion_without_rebuilding(self):
+        self.executable('git', '#!/bin/sh\nprintf "%s\\n" "$TEST_SHA"\n')
+        self.executable('gh', '''#!/usr/bin/env python3
+import os,sys
+from pathlib import Path
+s = ' '.join(sys.argv)
+p = Path(os.environ['FIXTURE']) / 'polled'
+if 'commits/main' in s: print(os.environ['TEST_SHA'])
+elif 'ci.yml' in s:
+    print(('success' if p.exists() else 'pending') + '\\t100')
+    p.touch()
+else: print('success\\t101')
+''')
+        out = self.p / 'output'
+        env = {**self.env, 'TEST_SHA': SHA, 'REPOSITORY': 'ryanmarinhodev/monizer', 'GITHUB_OUTPUT': str(out)}
+        result = subprocess.run(['bash', str(ROOT / 'scripts/deploy-gate.sh'), '--wait'], env=env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('Waiting for CI and images', result.stdout)
+        self.assertIn('ready=true', out.read_text())
+        self.assertEqual(self.calls(), '')
 
 
 if __name__ == '__main__':
