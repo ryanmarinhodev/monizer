@@ -1,0 +1,121 @@
+name: Deploy to Production
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/deploy.yml
+      - .github/workflows/fork-images.yml
+      - scripts/deploy*
+      - docker-compose.fork.yml
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Serialize pushes and retries. Never cancel a live SSH deploy.
+concurrency:
+  group: production-deploy-${{ github.event.pull_request.number || 'main' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+  packages: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        with:
+          persist-credentials: false
+      - run: bash -n scripts/deploy.sh scripts/deploy-gate.sh
+      - run: python3 scripts/deploy.test.py
+  gate:
+    needs: validate
+    if: >-
+      github.repository == 'ryanmarinhodev/monizer' &&
+      github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+      commit: ${{ steps.gate.outputs.commit }}
+      order: ${{ steps.gate.outputs.order }}
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Wait for both successful push workflows for current main
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: bash scripts/deploy-gate.sh --wait
+  deploy:
+    needs: gate
+    if: needs.gate.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Log in to GHCR
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Resolve and verify immutable images
+        id: images
+        env:
+          COMMIT: ${{ needs.gate.outputs.commit }}
+        run: |
+          for service in backend frontend; do
+            image="ghcr.io/ryanmarinhodev/monize-${service}"
+            digest=$(docker buildx imagetools inspect "$image:sha-$COMMIT" --format '{{.Manifest.Digest}}')
+            [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
+            revision=$(docker buildx imagetools inspect "$image@$digest" --raw | jq -r '.annotations["org.opencontainers.image.revision"]')
+            test "$revision" = "$COMMIT"
+            echo "$service=$image@$digest" >> "$GITHUB_OUTPUT"
+          done
+      - name: Transfer release and deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT: ${{ needs.gate.outputs.commit }}
+          ORDER: ${{ needs.gate.outputs.order }}
+          BACKEND: ${{ steps.images.outputs.backend }}
+          FRONTEND: ${{ steps.images.outputs.frontend }}
+          SSH_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+          HOST: ${{ secrets.VPS_HOST }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+          SSH_PORT: ${{ secrets.VPS_SSH_PORT || '22' }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          [[ "$HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          [[ "$SSH_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$SSH_PORT" =~ ^[0-9]{1,5}$ ]]
+          [[ "$COMMIT" =~ ^[a-f0-9]{40}$ && "$ORDER" =~ ^[0-9]+$ ]]
+          test "$(gh api "repos/$REPOSITORY/commits/main" --jq .sha)" = "$COMMIT"
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh_args=(-i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
+          release="/opt/apps/monizer/releases/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ssh "${ssh_args[@]}" -p "$SSH_PORT" "$SSH_USER@$HOST" "umask 077; mkdir -p '$release'"
+          scp "${ssh_args[@]}" -P "$SSH_PORT" scripts/deploy.sh docker-compose.prod.yml docker-compose.fork.yml "$SSH_USER@$HOST:$release/"
+          ssh "${ssh_args[@]}" -p "$SSH_PORT" "$SSH_USER@$HOST" \
+            "bash '$release/deploy.sh' '$COMMIT' '$ORDER' '$BACKEND' '$FRONTEND'"
+      - name: Remove SSH credentials
+        if: always()
+        run: rm -f ~/.ssh/id_deploy ~/.ssh/known_hosts

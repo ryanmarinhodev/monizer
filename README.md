@@ -680,6 +680,9 @@ reach them.
 
 ### Docker Compose (Production)
 
+For automatic fork deployment to a VPS, use the digest-only override
+`docker-compose.fork.yml` and follow [the VPS deployment guide](docs/operations/vps-deploy.md).
+
 1. Create `.env` from the example and set production values:
 ```bash
 cp .env.example .env
