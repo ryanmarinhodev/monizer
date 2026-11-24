@@ -118,7 +118,7 @@ jobs:
           # immutable :<branch-slug>-<short-sha> so each commit's image is both
           # identifiable by branch at a glance and pinnable. Move :latest only on
           # the default branch, so feature/fork pushes never clobber :latest.
-          tags="$(printf '%s:%s\n%s:%s-%s\n' "$image" "$slug" "$image" "$slug" "$sha_short")"
+          tags="$(printf '%s:%s\n%s:%s-%s\n%s:sha-%s\n' "$image" "$slug" "$image" "$slug" "$sha_short" "$image" "$sha_full")"
           if [ "$REF_NAME" = "$DEFAULT_BRANCH" ]; then
             # $tags has no trailing newline ($() stripped it), so add one before
             # appending :latest -- otherwise it concatenates onto the last tag

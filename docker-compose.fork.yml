@@ -1,0 +1,6 @@
+# Production deploy supplies verified GHCR digests; no moving-tag fallback.
+services:
+  backend:
+    image: ${DEPLOY_BACKEND_IMAGE:?Set the verified backend digest}
+  frontend:
+    image: ${DEPLOY_FRONTEND_IMAGE:?Set the verified frontend digest}
