@@ -29,6 +29,7 @@ import {
   MonthlyBillReserveDto,
 } from "./dto/recurring-bills.dto";
 import { addDaysYMD } from "../common/date-utils";
+import { advanceScheduleCursor, claimedSlotsFrom } from "./schedule-cursor";
 import { FrequencyType } from "./dto/create-scheduled-transaction.dto";
 
 @Injectable()
@@ -174,6 +175,14 @@ export class RecurringBillsCommandService {
           cancelled: true,
           reserved: false,
         });
+        if (date === schedule.nextDueDate) {
+          await advanceScheduleCursor(
+            m,
+            schedule,
+            new Set([date, ...(await claimedSlotsFrom(m, id, date))]),
+            { stampLastPosted: false },
+          );
+        }
       } else {
         const endDate = addDaysYMD(date, -1);
         await m.update(

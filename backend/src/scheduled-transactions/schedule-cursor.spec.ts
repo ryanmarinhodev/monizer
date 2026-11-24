@@ -81,6 +81,31 @@ describe("advanceScheduleCursor", () => {
     expect(written).not.toHaveProperty("isActive");
   });
 
+  it("skips monthly cancellations and preserves their overrides without changing the consumed set", async () => {
+    manager.find.mockResolvedValue([
+      { originalDate: "2025-01-15" },
+      { originalDate: "2025-03-15" },
+      { originalDate: "2025-04-15" },
+    ]);
+    const consumed = new Set(["2025-02-15"]);
+    const result = await advanceScheduleCursor(
+      m(),
+      schedule({ monthlyTrackingStart: "2025-01-15" }),
+      consumed,
+      { stampLastPosted: false },
+    );
+    expect(result.nextDueDate).toBe("2025-05-15");
+    expect(result.slotsConsumed).toBe(3);
+    expect(consumed).toEqual(new Set(["2025-02-15"]));
+    expect(deleteChain.andWhere).toHaveBeenCalledWith(
+      "originalDate NOT IN (:...cancelledDates)",
+      { cancelledDates: ["2025-01-15", "2025-03-15", "2025-04-15"] },
+    );
+    expect(manager.update.mock.calls[0][2]).not.toHaveProperty(
+      "lastPostedDate",
+    );
+  });
+
   it("leaves last_posted_date alone when asked not to stamp it (a skip posts nothing)", async () => {
     const result = await advanceScheduleCursor(
       m(),

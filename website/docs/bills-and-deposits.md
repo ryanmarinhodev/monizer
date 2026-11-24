@@ -248,7 +248,8 @@ Months before an adopted bill's tracking began remain incomplete history.
 Unpaid bills offer two confirmed removal options:
 
 - **Delete this month** excludes only the selected occurrence from totals and
-  payment actions. Other months and their amounts remain unchanged.
+  payment actions. Other months and their amounts remain unchanged. Automatic
+  posting continues with the next uncancelled occurrence.
 - **End from this month** stops unpaid occurrences from the selected occurrence
   onward. Earlier months and payments already recorded, including advance
   payments, remain visible and unchanged.

@@ -10,6 +10,7 @@ import { RecurringBillsCommandService } from "@/scheduled-transactions/recurring
 import { RecurringBillsReadService } from "@/scheduled-transactions/recurring-bills-read.service";
 import { RecurringBillBudgetService } from "@/scheduled-transactions/recurring-bill-budget.service";
 import { ScheduledOccurrenceService } from "@/scheduled-transactions/scheduled-occurrence.service";
+import { ScheduledTransaction } from "@/scheduled-transactions/entities/scheduled-transaction.entity";
 import { Account } from "@/accounts/entities/account.entity";
 import { TransactionsService } from "@/transactions/transactions.service";
 import {
@@ -231,10 +232,15 @@ describe("Monthly bills: persisted occurrence identity and financial effects", (
     ).rejects.toThrow();
     await expect(
       asUser(() =>
-        schedules.post(userId, bill.id, {
-          amount: -230,
-          transactionDate: january.originalDate,
-        }),
+        schedules.post(
+          userId,
+          bill.id,
+          {
+            amount: -230,
+            transactionDate: january.originalDate,
+          },
+          { expectedDueDate: january.originalDate },
+        ),
       ),
     ).rejects.toThrow();
     expect(await balance()).toBe(1000);
@@ -362,6 +368,103 @@ describe("Monthly bills: persisted occurrence identity and financial effects", (
       expect(report.rows[0]).toMatchObject({ status: "paid", paidAmount: 180 });
       expect(await balance()).toBe(820);
     }
+  });
+
+  const adoptAutomatic = async () => {
+    const bill = await asUser(() =>
+      schedules.create(userId, {
+        accountId,
+        name: "Automatic monthly bill",
+        amount: -180,
+        currencyCode: "USD",
+        frequency: FrequencyType.MONTHLY,
+        startDate: "2024-01-31",
+        nextDueDate: "2024-01-31",
+        autoPost: true,
+      }),
+    );
+    await asUser(() => commands.adopt(userId, bill.id));
+    return bill;
+  };
+
+  it("advances a cancelled automatic cursor without losing the monthly override or recording a payment", async () => {
+    const bill = await adoptAutomatic();
+    let row = (await month("2024-01-01")).rows[0];
+    await asUser(() =>
+      commands.amount(userId, bill.id, row.originalDate, {
+        amount: 230,
+        revision: row.revision,
+      }),
+    );
+    row = (await month("2024-01-01")).rows[0];
+    await asUser(() =>
+      commands.remove(userId, bill.id, row.originalDate, {
+        scope: "occurrence",
+        revision: row.revision,
+      }),
+    );
+    expect(
+      await ds
+        .getRepository(ScheduledTransaction)
+        .findOneByOrFail({ id: bill.id }),
+    ).toMatchObject({
+      nextDueDate: "2024-02-29",
+      lastPostedDate: null,
+      autoPost: true,
+    });
+    expect(await balance()).toBe(1000);
+    const overrides = await ds.query(
+      "SELECT amount FROM scheduled_transaction_overrides WHERE scheduled_transaction_id = $1",
+      [bill.id],
+    );
+    expect(Number(overrides[0].amount)).toBe(-230);
+    await schedules.processAutoPostTransactions();
+    expect((await month("2024-02-01")).paid).toBe(180);
+    expect(await balance()).toBe(820);
+    const claims = await ds.query(
+      "SELECT TO_CHAR(original_due_date, 'YYYY-MM-DD') AS date FROM scheduled_transaction_postings WHERE scheduled_transaction_id = $1",
+      [bill.id],
+    );
+    expect(claims).toEqual([{ date: "2024-02-29" }]);
+    const retained = await ds.query(
+      "SELECT amount FROM scheduled_transaction_overrides WHERE scheduled_transaction_id = $1 AND original_date = $2",
+      [bill.id, row.originalDate],
+    );
+    expect(Number(retained[0].amount)).toBe(-230);
+  });
+
+  it("skips consecutive future cancellations when an earlier automatic payment advances the cursor", async () => {
+    const bill = await adoptAutomatic();
+    for (const date of ["2024-02-01", "2024-03-01"]) {
+      const row = (await month(date)).rows[0];
+      await asUser(() =>
+        commands.remove(userId, bill.id, row.originalDate, {
+          scope: "occurrence",
+          revision: row.revision,
+        }),
+      );
+    }
+    expect(
+      await ds
+        .getRepository(ScheduledTransaction)
+        .findOneByOrFail({ id: bill.id }),
+    ).toMatchObject({ nextDueDate: "2024-01-31", lastPostedDate: null });
+    await schedules.processAutoPostTransactions();
+    expect(
+      await ds
+        .getRepository(ScheduledTransaction)
+        .findOneByOrFail({ id: bill.id }),
+    ).toMatchObject({ nextDueDate: "2024-04-30", autoPost: true });
+    expect(await balance()).toBe(820);
+    await schedules.processAutoPostTransactions();
+    expect(await balance()).toBe(640);
+    const claims = await ds.query(
+      "SELECT TO_CHAR(original_due_date, 'YYYY-MM-DD') AS date FROM scheduled_transaction_postings WHERE scheduled_transaction_id = $1 ORDER BY original_due_date",
+      [bill.id],
+    );
+    expect(claims).toEqual([{ date: "2024-01-31" }, { date: "2024-04-30" }]);
+    expect((await month("2024-02-01")).rows).toEqual([]);
+    expect((await month("2024-03-01")).rows).toEqual([]);
   });
 
   it("serializes duplicate payments and rejects a stale edit without another financial effect", async () => {
