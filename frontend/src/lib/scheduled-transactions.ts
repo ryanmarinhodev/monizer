@@ -42,6 +42,10 @@ export const scheduledTransactionsApi = {
     await apiClient.patch(`/recurring-bills/${id}/occurrences/${date}/amount`, { amount, revision });
     invalidateCache('scheduled:');
   },
+  deleteMonthlyBill: async (id: string, date: string, scope: 'occurrence' | 'future', revision: string) => {
+    await apiClient.delete(`/recurring-bills/${id}/occurrences/${date}`, { data: { scope, revision } });
+    invalidateCache('scheduled:');
+  },
   reserveMonthlyBill: async (id: string, date: string, reserved: boolean, revision: string) => {
     await apiClient.patch(`/recurring-bills/${id}/occurrences/${date}/reservation`, { reserved, revision });
   },

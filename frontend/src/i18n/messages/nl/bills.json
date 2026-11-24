@@ -137,6 +137,10 @@
     "unknownBills": "Controleer deze rekeningen en transacties: {names}. Volledige totalen zijn niet beschikbaar.",
     "existingBills": "Bestaande maandelijkse schema’s",
     "adopt": "Volgen starten",
-    "adoptHelp": "Volg de huidige openstaande termijn en volgende maanden met het bestaande schema. Eerdere betalingen worden niet hersteld; controleer of deze termijn al afzonderlijk is betaald."
+    "adoptHelp": "Volg de huidige openstaande termijn en volgende maanden met het bestaande schema. Eerdere betalingen worden niet hersteld; controleer of deze termijn al afzonderlijk is betaald.",
+    "deleteMonth": "Deze maand verwijderen",
+    "endSeries": "Vanaf deze maand stoppen",
+    "deleteMonthHelp": "Alleen {name} met vervaldatum {date} verwijderen? Andere maanden en geregistreerde betalingen blijven behouden.",
+    "endSeriesHelp": "{name} vanaf vervaldatum {date} stoppen? Eerdere maanden en geregistreerde betalingen blijven behouden."
   }
 }

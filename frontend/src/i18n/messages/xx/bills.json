@@ -137,6 +137,10 @@
     "unknownBills": "[XX-Review these bills and their linked transactions: {names}. Their complete totals are unavailable.-XX]",
     "existingBills": "[XX-Existing monthly schedules-XX]",
     "adopt": "[XX-Start tracking-XX]",
-    "adoptHelp": "[XX-Start tracking the current outstanding occurrence and the months after it. Existing schedules are reused. Earlier payments are not reconstructed; verify that the current occurrence has not already been paid separately.-XX]"
+    "adoptHelp": "[XX-Start tracking the current outstanding occurrence and the months after it. Existing schedules are reused. Earlier payments are not reconstructed; verify that the current occurrence has not already been paid separately.-XX]",
+    "deleteMonth": "[XX-Delete this month-XX]",
+    "endSeries": "[XX-End from this month-XX]",
+    "deleteMonthHelp": "[XX-Remove {name} due on {date} only? Other months and recorded payments are preserved.-XX]",
+    "endSeriesHelp": "[XX-End {name} from the occurrence due on {date}? Earlier months and recorded payments are preserved.-XX]"
   }
 }

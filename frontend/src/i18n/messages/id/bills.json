@@ -137,6 +137,10 @@
     "unknownBills": "Periksa tagihan dan transaksi terkait: {names}. Total lengkap tidak tersedia.",
     "existingBills": "Jadwal bulanan yang ada",
     "adopt": "Mulai melacak",
-    "adoptHelp": "Lacak kejadian tertunda saat ini dan bulan berikutnya memakai jadwal yang ada. Pembayaran lama tidak dibangun ulang; pastikan kejadian ini belum dibayar terpisah."
+    "adoptHelp": "Lacak kejadian tertunda saat ini dan bulan berikutnya memakai jadwal yang ada. Pembayaran lama tidak dibangun ulang; pastikan kejadian ini belum dibayar terpisah.",
+    "deleteMonth": "Hapus bulan ini",
+    "endSeries": "Akhiri mulai bulan ini",
+    "deleteMonthHelp": "Hapus hanya {name} yang jatuh tempo {date}? Bulan lain dan pembayaran tercatat tetap disimpan.",
+    "endSeriesHelp": "Akhiri {name} mulai jatuh tempo {date}? Bulan sebelumnya dan pembayaran tercatat tetap disimpan."
   }
 }

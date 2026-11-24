@@ -24,9 +24,12 @@ import {
 import {
   CreateMonthlyBillDto,
   MonthlyBillAmountDto,
+  MonthlyBillDeleteDto,
   MonthlyBillPaymentDto,
   MonthlyBillReserveDto,
 } from "./dto/recurring-bills.dto";
+import { addDaysYMD } from "../common/date-utils";
+import { advanceScheduleCursor, claimedSlotsFrom } from "./schedule-cursor";
 import { FrequencyType } from "./dto/create-scheduled-transaction.dto";
 
 @Injectable()
@@ -149,6 +152,51 @@ export class RecurringBillsCommandService {
           ? { expectedAmount: dto.amount }
           : {}),
       });
+    });
+  }
+
+  async remove(
+    userId: string,
+    id: string,
+    date: string,
+    dto: MonthlyBillDeleteDto,
+  ) {
+    return withScopedDb(this.dataSource, async (m) => {
+      const { schedule, state } = await this.validate(
+        m,
+        userId,
+        id,
+        date,
+        dto.revision,
+      );
+      if (dto.scope === "occurrence") {
+        // Keep the user's monthly override; cancellation is metadata, not a payment.
+        await this.saveState(m, userId, id, date, state, {
+          cancelled: true,
+          reserved: false,
+        });
+        if (date === schedule.nextDueDate) {
+          await advanceScheduleCursor(
+            m,
+            schedule,
+            new Set([date, ...(await claimedSlotsFrom(m, id, date))]),
+            { stampLastPosted: false },
+          );
+        }
+      } else {
+        const endDate = addDaysYMD(date, -1);
+        await m.update(
+          ScheduledTransaction,
+          { id, userId },
+          {
+            endDate:
+              schedule.endDate && schedule.endDate < endDate
+                ? schedule.endDate
+                : endDate,
+            autoPost: false,
+          },
+        );
+      }
     });
   }
 

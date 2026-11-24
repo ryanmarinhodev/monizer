@@ -137,6 +137,10 @@
     "unknownBills": "Revisa estas facturas y sus transacciones: {names}. Los totales completos no están disponibles.",
     "existingBills": "Programaciones mensuales existentes",
     "adopt": "Iniciar seguimiento",
-    "adoptHelp": "Sigue la ocurrencia pendiente actual y los meses posteriores reutilizando la programación. No se reconstruyen pagos anteriores; comprueba que no se pagó por separado."
+    "adoptHelp": "Sigue la ocurrencia pendiente actual y los meses posteriores reutilizando la programación. No se reconstruyen pagos anteriores; comprueba que no se pagó por separado.",
+    "deleteMonth": "Eliminar este mes",
+    "endSeries": "Finalizar desde este mes",
+    "deleteMonthHelp": "¿Eliminar solo {name} con vencimiento el {date}? Se conservarán los otros meses y pagos registrados.",
+    "endSeriesHelp": "¿Finalizar {name} desde el vencimiento del {date}? Se conservarán los meses anteriores y pagos registrados."
   }
 }

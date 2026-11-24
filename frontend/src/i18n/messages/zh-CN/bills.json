@@ -137,6 +137,10 @@
     "unknownBills": "请检查这些账单及关联交易：{names}。完整总额不可用。",
     "existingBills": "已有月度计划",
     "adopt": "开始跟踪",
-    "adoptHelp": "复用已有计划，跟踪当前未付款期及后续月份。不会重建以前的付款；请确认本期尚未单独付款。"
+    "adoptHelp": "复用已有计划，跟踪当前未付款期及后续月份。不会重建以前的付款；请确认本期尚未单独付款。",
+    "deleteMonth": "删除本月",
+    "endSeries": "从本月起终止",
+    "deleteMonthHelp": "仅删除到期日为{date}的{name}？其他月份和已记录的付款将保留。",
+    "endSeriesHelp": "从到期日{date}起终止{name}？之前的月份和已记录的付款将保留。"
   }
 }

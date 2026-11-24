@@ -1,5 +1,6 @@
 import { EntityManager } from "typeorm";
 import { ScheduledTransaction } from "./entities/scheduled-transaction.entity";
+import { RecurringBillState } from "./entities/recurring-bill-state.entity";
 import { ScheduledTransactionOverride } from "./entities/scheduled-transaction-override.entity";
 import {
   anchorDayOf,
@@ -43,7 +44,8 @@ export interface ScheduleCursorAdvance {
  * is one step.
  *
  * `options.stampLastPosted` (default true) sets `last_posted_date`; a skip
- * passes false because nothing was posted.
+ * or a monthly cancellation passes false because nothing was posted.
+ * Monthly cancellations also count as unavailable slots; their overrides are retained.
  *
  * A ONCE schedule has no next slot; `post()` deletes it instead and never
  * calls this.
@@ -54,10 +56,19 @@ export async function advanceScheduleCursor(
     ScheduledTransaction,
     "id" | "nextDueDate" | "frequency" | "occurrencesRemaining" | "endDate"
   > &
-    Partial<Pick<ScheduledTransaction, "startDate">>,
+    Partial<Pick<ScheduledTransaction, "startDate" | "monthlyTrackingStart">>,
   consumedSlots: ReadonlySet<string>,
   options: { stampLastPosted?: boolean } = {},
 ): Promise<ScheduleCursorAdvance> {
+  // Cancellation and posting both hold the parent lock. Include future
+  // cancellations here so posting an earlier slot cannot strand the cursor.
+  const cancelled = schedule.monthlyTrackingStart
+    ? await m.find(RecurringBillState, {
+        where: { scheduledTransactionId: schedule.id, cancelled: true },
+      })
+    : [];
+  const cancelledDates = cancelled.map((state) => state.originalDate);
+  const unavailableSlots = new Set([...consumedSlots, ...cancelledDates]);
   let newNextDueDateStr = ensureYMD(schedule.nextDueDate);
   let slotsConsumed = 0;
   do {
@@ -80,17 +91,22 @@ export async function advanceScheduleCursor(
       );
     }
     slotsConsumed += 1;
-  } while (consumedSlots.has(newNextDueDateStr));
+  } while (unavailableSlots.has(newNextDueDateStr));
 
-  await m
+  const prune = m
     .createQueryBuilder()
     .delete()
     .from(ScheduledTransactionOverride)
     .where("scheduledTransactionId = :id", { id: schedule.id })
     .andWhere("originalDate < :newNextDueDate", {
       newNextDueDate: newNextDueDateStr,
-    })
-    .execute();
+    });
+  // Retain edited amounts of cancelled months on later advances too.
+  if (cancelledDates.length)
+    prune.andWhere("originalDate NOT IN (:...cancelledDates)", {
+      cancelledDates,
+    });
+  await prune.execute();
 
   const updateFields: Partial<ScheduledTransaction> = {
     nextDueDate: newNextDueDateStr,

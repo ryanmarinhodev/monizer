@@ -34,6 +34,7 @@ export class RecurringBillState {
   })
   originalDate: string;
   @Column({ default: false }) reserved: boolean;
+  @Column({ default: false }) cancelled: boolean;
   @Column({ type: "integer", default: 0 }) revision: number;
   @Column({
     type: "numeric",

@@ -137,6 +137,10 @@
     "unknownBills": "Xem hóa đơn và giao dịch liên kết: {names}. Không có tổng đầy đủ.",
     "existingBills": "Lịch hàng tháng có sẵn",
     "adopt": "Bắt đầu theo dõi",
-    "adoptHelp": "Dùng lịch có sẵn để theo dõi kỳ chưa trả hiện tại và các tháng sau. Không khôi phục thanh toán cũ; kiểm tra kỳ hiện tại chưa được trả riêng."
+    "adoptHelp": "Dùng lịch có sẵn để theo dõi kỳ chưa trả hiện tại và các tháng sau. Không khôi phục thanh toán cũ; kiểm tra kỳ hiện tại chưa được trả riêng.",
+    "deleteMonth": "Xóa tháng này",
+    "endSeries": "Kết thúc từ tháng này",
+    "deleteMonthHelp": "Chỉ xóa {name} đến hạn {date}? Các tháng khác và khoản thanh toán đã ghi nhận được giữ lại.",
+    "endSeriesHelp": "Kết thúc {name} từ kỳ đến hạn {date}? Các tháng trước và khoản thanh toán đã ghi nhận được giữ lại."
   }
 }

@@ -213,3 +213,16 @@ Two things the projection does not fix, stated rather than smuggled in:
 - **A scope with no ledger rows projects to "no holding"** and its row is deleted, which is what `POST /holdings/rebuild` has always done. An imported opening position is an `ADD_SHARES` row; a holding with nothing behind it is residue.
 
 INV-HOLDING-001.
+
+## Monthly cancellations must advance the posting cursor
+
+Cancelling the current tracked monthly occurrence calls `advanceScheduleCursor`
+under the same parent lock as posting, with `stampLastPosted: false`: it creates
+no payment claim and moves no money. The shared cursor helper includes persisted
+cancellations when advancing after a payment too, so a month cancelled in advance
+does not strand the cron later. Keep cancelled months' overrides out of pruning
+on every later advance; cancellation must preserve their edited amounts.
+`recurring-bills-monthly.integration.spec.ts` covers current/future cancellation,
+consecutive skipped months, month-end anchoring, retained amounts and the actual
+cron's ledger/balance effects. A stale poster still refuses its original occurrence
+pin; advancing the cursor does not authorize posting the following month instead.

@@ -159,6 +159,7 @@ export class ScheduledOccurrenceService {
 
     const overridesBySchedule = await this.loadOverrides(rows.map((r) => r.id));
     const tracked = rows.filter((r) => r.monthlyTrackingStart);
+    const cancelled = new Set<string>();
     if (tracked.length) {
       const states = await withScopedDb(this.dataSource, (m) =>
         m.find(RecurringBillState, {
@@ -169,6 +170,10 @@ export class ScheduledOccurrenceService {
         }),
       );
       for (const state of states) {
+        if (state.cancelled)
+          cancelled.add(
+            `${state.scheduledTransactionId}:${state.originalDate}`,
+          );
         if (state.expectedAmount === null || state.dueDate === null) continue;
         const existing =
           overridesBySchedule.get(state.scheduledTransactionId) ?? [];
@@ -187,14 +192,13 @@ export class ScheduledOccurrenceService {
         ]);
       }
     }
-    const claims =
-      tracked.length && !includeClaimed
-        ? await withScopedDb(this.dataSource, (m) =>
-            m.find(ScheduledTransactionPosting, {
-              where: { scheduledTransactionId: In(tracked.map((r) => r.id)) },
-            }),
-          )
-        : [];
+    const claims = tracked.length
+      ? await withScopedDb(this.dataSource, (m) =>
+          m.find(ScheduledTransactionPosting, {
+            where: { scheduledTransactionId: In(tracked.map((r) => r.id)) },
+          }),
+        )
+      : [];
     const claimed = new Set(
       claims.map((c) => `${c.scheduledTransactionId}:${c.originalDueDate}`),
     );
@@ -215,7 +219,11 @@ export class ScheduledOccurrenceService {
       const resolved = effective.get(row.id)!;
       const overrides = overridesBySchedule.get(row.id) ?? [];
       const basis = row.monthlyTrackingStart
-        ? { ...row, nextDueDate: row.monthlyTrackingStart }
+        ? {
+            ...row,
+            nextDueDate: row.monthlyTrackingStart,
+            endDate: includeClaimed ? null : row.endDate,
+          }
         : row;
       const slots = expandOccurrenceSlots(
         basis,
@@ -223,7 +231,12 @@ export class ScheduledOccurrenceService {
         row.monthlyTrackingStart
           ? { ...window, maxOccurrences: undefined }
           : window,
-      ).filter((slot) => !claimed.has(`${row.id}:${slot.originalDate}`));
+      ).filter((slot) => {
+        const key = `${row.id}:${slot.originalDate}`;
+        if (cancelled.has(key)) return false;
+        if (claimed.has(key)) return includeClaimed;
+        return !row.endDate || slot.originalDate <= ensureYMD(row.endDate);
+      });
       const selected =
         window.maxOccurrences === undefined
           ? slots

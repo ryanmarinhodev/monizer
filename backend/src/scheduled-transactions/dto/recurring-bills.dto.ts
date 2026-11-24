@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsIn,
   IsInt,
   IsString,
   IsUUID,
@@ -21,6 +22,9 @@ export class CreateMonthlyBillDto {
 }
 export class MonthlyBillRevisionDto {
   @IsString() @Length(64, 64) revision: string;
+}
+export class MonthlyBillDeleteDto extends MonthlyBillRevisionDto {
+  @IsIn(["occurrence", "future"]) scope: "occurrence" | "future";
 }
 export class MonthlyBillAmountDto extends MonthlyBillRevisionDto {
   @IsMoneyAmount(4) @Min(0.0001) @Max(999999999999) amount: number;

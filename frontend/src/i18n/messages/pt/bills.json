@@ -137,6 +137,10 @@
     "unknownBills": "Confira estas contas e as transações vinculadas: {names}. Os totais completos estão indisponíveis.",
     "existingBills": "Agendamentos mensais existentes",
     "adopt": "Acompanhar",
-    "adoptHelp": "Acompanhar a ocorrência atualmente pendente e os meses seguintes, reutilizando o agendamento existente. Pagamentos anteriores não serão reconstruídos. Confira se a ocorrência atual já foi paga separadamente."
+    "adoptHelp": "Acompanhar a ocorrência atualmente pendente e os meses seguintes, reutilizando o agendamento existente. Pagamentos anteriores não serão reconstruídos. Confira se a ocorrência atual já foi paga separadamente.",
+    "deleteMonth": "Eliminar este mês",
+    "endSeries": "Terminar a partir deste mês",
+    "deleteMonthHelp": "Eliminar apenas {name} com vencimento em {date}? Os outros meses e pagamentos registados serão preservados.",
+    "endSeriesHelp": "Terminar {name} a partir do vencimento em {date}? Os meses anteriores e pagamentos registados serão preservados."
   }
 }
